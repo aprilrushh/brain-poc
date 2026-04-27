@@ -1,0 +1,125 @@
+{
+  "script": "phase_c_smoke_01_baseline",
+  "repo": "neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8",
+  "start_iso": "2026-04-24T15:53:02.851139+00:00",
+  "torch_version": "2.7.0",
+  "gpu_name": "NVIDIA H100 PCIe",
+  "gpu_total_GB": 79.19,
+  "ctx_list": [
+    512,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768
+  ],
+  "batch": 1,
+  "use_cache": false,
+  "snapshots": [
+    {
+      "tag": "before_load",
+      "alloc_GB": 0.0,
+      "reserv_GB": 0.0,
+      "peak_alloc_GB": 0.0,
+      "peak_reserv_GB": 0.0
+    },
+    {
+      "tag": "after_load",
+      "alloc_GB": 67.667,
+      "reserv_GB": 67.672,
+      "peak_alloc_GB": 67.667,
+      "peak_reserv_GB": 67.672
+    }
+  ],
+  "forwards": [
+    {
+      "ctx": 512,
+      "batch": 1,
+      "pre": {
+        "tag": "pre_fwd_ctx512",
+        "alloc_GB": 67.667,
+        "reserv_GB": 67.672,
+        "peak_alloc_GB": 67.667,
+        "peak_reserv_GB": 67.672
+      },
+      "ok": false,
+      "OOM": true,
+      "error": "CUDA out of memory. Tried to allocate 448.00 MiB. GPU 0 has a total capacity of 79.19 GiB of which 249.00 MiB is free. Including non-PyTorch memory, this process has 78.94 GiB memory in use. Of the allocated memory 77.23 GiB is allocated by PyTorch, and 1.19 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segmen"
+    },
+    {
+      "ctx": 2048,
+      "batch": 1,
+      "pre": {
+        "tag": "pre_fwd_ctx2048",
+        "alloc_GB": 76.792,
+        "reserv_GB": 78.422,
+        "peak_alloc_GB": 76.792,
+        "peak_reserv_GB": 78.422
+      },
+      "ok": false,
+      "OOM": true,
+      "error": "CUDA out of memory. Tried to allocate 448.00 MiB. GPU 0 has a total capacity of 79.19 GiB of which 249.00 MiB is free. Including non-PyTorch memory, this process has 78.94 GiB memory in use. Of the allocated memory 77.45 GiB is allocated by PyTorch, and 996.92 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segm"
+    },
+    {
+      "ctx": 4096,
+      "batch": 1,
+      "pre": {
+        "tag": "pre_fwd_ctx4096",
+        "alloc_GB": 77.011,
+        "reserv_GB": 77.984,
+        "peak_alloc_GB": 77.011,
+        "peak_reserv_GB": 77.984
+      },
+      "ok": false,
+      "OOM": true,
+      "error": "CUDA out of memory. Tried to allocate 448.00 MiB. GPU 0 has a total capacity of 79.19 GiB of which 249.00 MiB is free. Including non-PyTorch memory, this process has 78.94 GiB memory in use. Of the allocated memory 77.81 GiB is allocated by PyTorch, and 628.90 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segm"
+    },
+    {
+      "ctx": 8192,
+      "batch": 1,
+      "pre": {
+        "tag": "pre_fwd_ctx8192",
+        "alloc_GB": 77.37,
+        "reserv_GB": 78.422,
+        "peak_alloc_GB": 77.37,
+        "peak_reserv_GB": 78.422
+      },
+      "ok": false,
+      "OOM": true,
+      "error": "CUDA out of memory. Tried to allocate 448.00 MiB. GPU 0 has a total capacity of 79.19 GiB of which 249.00 MiB is free. Including non-PyTorch memory, this process has 78.94 GiB memory in use. Of the allocated memory 78.03 GiB is allocated by PyTorch, and 404.87 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segm"
+    },
+    {
+      "ctx": 16384,
+      "batch": 1,
+      "pre": {
+        "tag": "pre_fwd_ctx16384",
+        "alloc_GB": 77.589,
+        "reserv_GB": 77.984,
+        "peak_alloc_GB": 77.589,
+        "peak_reserv_GB": 77.984
+      },
+      "ok": false,
+      "OOM": true,
+      "error": "CUDA out of memory. Tried to allocate 448.00 MiB. GPU 0 has a total capacity of 79.19 GiB of which 249.00 MiB is free. Including non-PyTorch memory, this process has 78.94 GiB memory in use. Of the allocated memory 78.03 GiB is allocated by PyTorch, and 404.81 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segm"
+    },
+    {
+      "ctx": 32768,
+      "batch": 1,
+      "pre": {
+        "tag": "pre_fwd_ctx32768",
+        "alloc_GB": 77.589,
+        "reserv_GB": 78.422,
+        "peak_alloc_GB": 77.589,
+        "peak_reserv_GB": 78.422
+      },
+      "ok": false,
+      "OOM": true,
+      "error": "CUDA out of memory. Tried to allocate 448.00 MiB. GPU 0 has a total capacity of 79.19 GiB of which 249.00 MiB is free. Including non-PyTorch memory, this process has 78.94 GiB memory in use. Of the allocated memory 78.03 GiB is allocated by PyTorch, and 404.69 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segm"
+    }
+  ],
+  "vocab_size": 128000,
+  "load_sec": 25.96,
+  "sdpa_flash": true,
+  "sdpa_mem": true,
+  "end_iso": "2026-04-24T15:53:33.606855+00:00"
+}

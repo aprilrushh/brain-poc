@@ -1,0 +1,9 @@
+{
+  "name": "S4_16x32k_15min",
+  "n_convs": 16,
+  "prefill_ctx": 32768,
+  "sim_duration_sec": 900.0,
+  "decode_n": 64,
+  "started_at": "2026-04-25T16:28:13.455198+00:00",
+  "status": "SKIPPED_INSUFFICIENT_TOKENS"
+}

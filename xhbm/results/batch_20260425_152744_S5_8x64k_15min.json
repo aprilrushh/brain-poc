@@ -1,0 +1,9 @@
+{
+  "name": "S5_8x64k_15min",
+  "n_convs": 8,
+  "prefill_ctx": 65536,
+  "sim_duration_sec": 900.0,
+  "decode_n": 64,
+  "started_at": "2026-04-25T16:28:13.456405+00:00",
+  "status": "SKIPPED_INSUFFICIENT_TOKENS"
+}

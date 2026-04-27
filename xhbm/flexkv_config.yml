@@ -1,0 +1,4 @@
+cpu_cache_gb: 32
+ssd_cache_gb: 200
+ssd_cache_dir: /home/ubuntu/xhbm/flexkv_data/ssd0/
+enable_gds: false

@@ -1,0 +1,30 @@
+{
+  "run_id": "20260425_142646",
+  "single_thread_baseline_sec": 200.1,
+  "trials": [
+    {
+      "n_threads": 4,
+      "elapsed_sec": 56.72841823499766,
+      "total_GiB": 131.4165982156992,
+      "throughput_GiBps": 2.316591971087674,
+      "ceiling_pct": 31.17889597695389,
+      "buff_cache_after_GB": 131.84254837036133
+    },
+    {
+      "n_threads": 8,
+      "elapsed_sec": 28.25660904999677,
+      "total_GiB": 131.4165982156992,
+      "throughput_GiBps": 4.650826926301485,
+      "ceiling_pct": 62.59524799867408,
+      "buff_cache_after_GB": 131.84293365478516
+    },
+    {
+      "n_threads": 16,
+      "elapsed_sec": 18.631561423004314,
+      "total_GiB": 131.4165982156992,
+      "throughput_GiBps": 7.053439871842392,
+      "ceiling_pct": 94.9318959871116,
+      "buff_cache_after_GB": 131.84212112426758
+    }
+  ]
+}

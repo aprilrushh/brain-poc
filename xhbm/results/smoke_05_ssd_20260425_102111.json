@@ -1,0 +1,270 @@
+{
+  "script": "phase_d_smoke_05_ssd_baseline.py",
+  "repo": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+  "use_cache": true,
+  "cache_backend": "SSDOffloadCache",
+  "num_workers": 4,
+  "ssd_dir_base": "/home/ubuntu/xhbm/fio_bench/smoke_05_ssd",
+  "quantization": {
+    "backend": "bitsandbytes",
+    "load_in_4bit": true,
+    "quant_type": "nf4",
+    "compute_dtype": "bfloat16",
+    "double_quant": true
+  },
+  "run_id": "20260425_102111",
+  "ctx_list": [
+    4096,
+    16384,
+    32768,
+    65536,
+    98304,
+    131072
+  ],
+  "batch": 1,
+  "torch": "2.7.1+cu126",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "reserved_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": true,
+    "seconds": 100.8706946559978,
+    "tag": "post_load",
+    "alloc_MiB": 37745.548828125,
+    "reserved_MiB": 38422.0,
+    "peak_MiB": 38146.7236328125,
+    "num_params": 36328185856,
+    "hidden_size": 8192,
+    "num_layers": 80,
+    "vocab_size": 128256,
+    "num_kv_heads": 8
+  },
+  "runs": [
+    {
+      "ctx": 4096,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx4096_pre",
+        "alloc_MiB": 37745.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37745.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 2.6241232290012704,
+        "logit_last_hash_fp32": "2419ecc00a9f1ce4",
+        "argmax_last": 128008,
+        "ssd_disk_used_MiB": 1280.0,
+        "pool_stats": {
+          "bytes_written_MiB": 16.0,
+          "bytes_read_MiB": 16.0,
+          "write_count": 2,
+          "read_count": 2,
+          "write_throughput_MBps": 245.8179227167788,
+          "read_throughput_MBps": 572.454614530573,
+          "gpu_to_cpu_time_sec": 1.1443816790124401,
+          "gpu_to_cpu_throughput_GBps": 1.0922929149640919,
+          "gpu_to_cpu_count": 80,
+          "submit_overhead_time_sec": 0.020837781998125138,
+          "prefetch_wait_time_sec": 2.8323000151431188e-05,
+          "prefetch_wait_count": 1
+        }
+      },
+      "post_forward": {
+        "tag": "ctx4096_post",
+        "alloc_MiB": 38795.580078125,
+        "reserved_MiB": 40502.0,
+        "peak_MiB": 38947.611328125
+      }
+    },
+    {
+      "ctx": 16384,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx16384_pre",
+        "alloc_MiB": 37777.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37777.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 14.057022682001843,
+        "logit_last_hash_fp32": "2e9c62e75bce6902",
+        "argmax_last": 128008,
+        "ssd_disk_used_MiB": 5120.0,
+        "pool_stats": {
+          "bytes_written_MiB": 64.0,
+          "bytes_read_MiB": 64.0,
+          "write_count": 2,
+          "read_count": 2,
+          "write_throughput_MBps": 334.08116880652625,
+          "read_throughput_MBps": 679.793233232459,
+          "gpu_to_cpu_time_sec": 4.924012195991963,
+          "gpu_to_cpu_throughput_GBps": 1.0154320909419943,
+          "gpu_to_cpu_count": 80,
+          "submit_overhead_time_sec": 0.06507610199696501,
+          "prefetch_wait_time_sec": 4.136400093557313e-05,
+          "prefetch_wait_count": 1
+        }
+      },
+      "post_forward": {
+        "tag": "ctx16384_post",
+        "alloc_MiB": 41849.673828125,
+        "reserved_MiB": 47166.0,
+        "peak_MiB": 42105.673828125
+      }
+    },
+    {
+      "ctx": 32768,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx32768_pre",
+        "alloc_MiB": 37777.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37777.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 26.744448855999508,
+        "logit_last_hash_fp32": "6a362ee371f91159",
+        "argmax_last": 128009,
+        "ssd_disk_used_MiB": 10240.0,
+        "pool_stats": {
+          "bytes_written_MiB": 128.0,
+          "bytes_read_MiB": 128.0,
+          "write_count": 2,
+          "read_count": 2,
+          "write_throughput_MBps": 303.05286482980193,
+          "read_throughput_MBps": 640.0651234175015,
+          "gpu_to_cpu_time_sec": 10.623937975989975,
+          "gpu_to_cpu_throughput_GBps": 0.9412705554757501,
+          "gpu_to_cpu_count": 80,
+          "submit_overhead_time_sec": 0.00769430499713053,
+          "prefetch_wait_time_sec": 4.356499994173646e-05,
+          "prefetch_wait_count": 1
+        }
+      },
+      "post_forward": {
+        "tag": "ctx32768_post",
+        "alloc_MiB": 45921.798828125,
+        "reserved_MiB": 55078.0,
+        "peak_MiB": 46433.798828125
+      }
+    },
+    {
+      "ctx": 65536,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx65536_pre",
+        "alloc_MiB": 37777.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37777.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 51.673879658999795,
+        "logit_last_hash_fp32": "58f4e5ce2b80339d",
+        "argmax_last": 128008,
+        "ssd_disk_used_MiB": 20480.0,
+        "pool_stats": {
+          "bytes_written_MiB": 256.0,
+          "bytes_read_MiB": 256.0,
+          "write_count": 2,
+          "read_count": 2,
+          "write_throughput_MBps": 264.7494435819143,
+          "read_throughput_MBps": 1025.14132264688,
+          "gpu_to_cpu_time_sec": 25.663341113013303,
+          "gpu_to_cpu_throughput_GBps": 0.779321753622269,
+          "gpu_to_cpu_count": 80,
+          "submit_overhead_time_sec": 0.008304033995955251,
+          "prefetch_wait_time_sec": 3.9023998397169635e-05,
+          "prefetch_wait_count": 1
+        }
+      },
+      "post_forward": {
+        "tag": "ctx65536_post",
+        "alloc_MiB": 54066.048828125,
+        "reserved_MiB": 72214.0,
+        "peak_MiB": 55090.048828125
+      }
+    },
+    {
+      "ctx": 98304,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx98304_pre",
+        "alloc_MiB": 37777.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37777.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 98.30433645800076,
+        "logit_last_hash_fp32": "7124cf0843088d77",
+        "argmax_last": 78191,
+        "ssd_disk_used_MiB": 30720.0,
+        "pool_stats": {
+          "bytes_written_MiB": 384.0,
+          "bytes_read_MiB": 384.0,
+          "write_count": 2,
+          "read_count": 2,
+          "write_throughput_MBps": 403.0770321200333,
+          "read_throughput_MBps": 1190.0594187954957,
+          "gpu_to_cpu_time_sec": 62.10821206697801,
+          "gpu_to_cpu_throughput_GBps": 0.48302791211648066,
+          "gpu_to_cpu_count": 80,
+          "submit_overhead_time_sec": 0.008237756021117093,
+          "prefetch_wait_time_sec": 3.96939976781141e-05,
+          "prefetch_wait_count": 1
+        }
+      },
+      "post_forward": {
+        "tag": "ctx98304_post",
+        "alloc_MiB": 62210.298828125,
+        "reserved_MiB": 63942.0,
+        "peak_MiB": 63746.298828125
+      }
+    },
+    {
+      "ctx": 131072,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx131072_pre",
+        "alloc_MiB": 37777.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37777.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 159.49542879699948,
+        "logit_last_hash_fp32": "6e50c2a6fa3c427f",
+        "argmax_last": 78191,
+        "ssd_disk_used_MiB": 40960.0,
+        "pool_stats": {
+          "bytes_written_MiB": 512.0,
+          "bytes_read_MiB": 512.0,
+          "write_count": 2,
+          "read_count": 2,
+          "write_throughput_MBps": 448.80061345024905,
+          "read_throughput_MBps": 1155.6102720951988,
+          "gpu_to_cpu_time_sec": 116.92810303098668,
+          "gpu_to_cpu_throughput_GBps": 0.34209055789949616,
+          "gpu_to_cpu_count": 80,
+          "submit_overhead_time_sec": 0.008217834987590322,
+          "prefetch_wait_time_sec": 4.153900226810947e-05,
+          "prefetch_wait_count": 1
+        }
+      },
+      "post_forward": {
+        "tag": "ctx131072_post",
+        "alloc_MiB": 70354.548828125,
+        "reserved_MiB": 72598.0,
+        "peak_MiB": 72402.548828125
+      }
+    }
+  ]
+}

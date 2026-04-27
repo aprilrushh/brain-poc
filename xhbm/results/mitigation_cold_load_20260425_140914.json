@@ -1,0 +1,29 @@
+{
+  "run_id": "20260425_140914",
+  "scenarios": [
+    {
+      "label": "T1_cold_baseline",
+      "load_seconds": 503.4441910339956,
+      "gpu_alloc_GB": 36.86088752746582,
+      "buff_cache_before_GB": 0.3814201354980469,
+      "buff_cache_after_GB": 132.5312957763672
+    },
+    {
+      "label": "T2_warm_process",
+      "load_seconds": 23.822330716997385,
+      "gpu_alloc_GB": 73.72177410125732,
+      "buff_cache_before_GB": 132.5312957763672,
+      "buff_cache_after_GB": 132.53131866455078
+    },
+    {
+      "label": "T3_explicit_warmup",
+      "load_seconds": 24.73672275699937,
+      "gpu_alloc_GB": 73.72079753875732,
+      "buff_cache_before_GB": 132.14125442504883,
+      "buff_cache_after_GB": 132.1417465209961,
+      "warmup_seconds": 200.06983963600214,
+      "warmup_GB": 131.4165982156992,
+      "warmup_throughput_GBps": 0.6568536189902111
+    }
+  ]
+}

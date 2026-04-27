@@ -1,0 +1,29 @@
+{
+  "script": "phase_c_smoke_02_awq_baseline.py",
+  "repo": "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+  "run_id": "20260424_221907",
+  "ctx_list": [
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072
+  ],
+  "batch": 1,
+  "torch": "2.7.0",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "reserved_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": false,
+    "error_type": "ImportError",
+    "error_msg": "Loading an AWQ quantized model requires gptqmodel. Please install it with `pip install gptqmodel`",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_c_smoke_02_awq_baseline.py\", line 65, in main\n    model = AutoModelForCausalLM.from_pretrained(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py\", line 394, in from_pretrained\n    return model_class.from_pretrained(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/modeling_utils.py\", line 4095, in from_pretrained\n    hf_quantizer, config, device_map = get_hf_quantizer(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/quantizers/auto.py\", line 342, in get_hf_quantizer\n    hf_quantizer.validate_environment(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/quantizers/quantizer_awq.py\", line 50, in validate_environment\n    raise ImportError(\nImportError: Loading an AWQ quantized model requires gptqmodel. Please install it with `pip install gptqmodel`\n"
+  },
+  "runs": []
+}

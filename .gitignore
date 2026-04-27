@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.bin
+*.safetensors
+*.gguf
+models/
+*.log
+data/sherlock/sherlock_merged.txt

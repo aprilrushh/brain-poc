@@ -1,0 +1,90 @@
+{
+  "name": "S1_n1_8x32k_15min",
+  "n_convs": 8,
+  "prefill_ctx": 32768,
+  "sim_duration_sec": 900.0,
+  "decode_n": 64,
+  "started_at": "2026-04-25T15:28:59.122333+00:00",
+  "status": "FAILED",
+  "prefill": [
+    {
+      "conv_id": "conv_0",
+      "prefill_sec": 19.299819798994577,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 13.91816993500106,
+      "argmax_id": 1071,
+      "argmax_text": " said",
+      "logit_hash": "db0706584f6c9288"
+    },
+    {
+      "conv_id": "conv_1",
+      "prefill_sec": 18.84269396700256,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 13.747823661004077,
+      "argmax_id": 33201,
+      "argmax_text": " dre",
+      "logit_hash": "87b8c4b68a728742"
+    },
+    {
+      "conv_id": "conv_2",
+      "prefill_sec": 18.95962539100583,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 14.378413794001972,
+      "argmax_id": 14254,
+      "argmax_text": " sight",
+      "logit_hash": "600675163fa422da"
+    },
+    {
+      "conv_id": "conv_3",
+      "prefill_sec": 19.009901112003718,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 12.550222229998326,
+      "argmax_id": 902,
+      "argmax_text": " which",
+      "logit_hash": "4c60438c3c18b82a"
+    },
+    {
+      "conv_id": "conv_4",
+      "prefill_sec": 19.0619599069978,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 12.91712750899751,
+      "argmax_id": 11,
+      "argmax_text": ",",
+      "logit_hash": "74da00fd33e6dc60"
+    },
+    {
+      "conv_id": "conv_5",
+      "prefill_sec": 19.15699489700637,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 13.01151423000556,
+      "argmax_id": 304,
+      "argmax_text": " in",
+      "logit_hash": "39cdbf5bead3d399"
+    },
+    {
+      "conv_id": "conv_6",
+      "prefill_sec": 19.176206629999797,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 13.097072395998111,
+      "argmax_id": 11,
+      "argmax_text": ",",
+      "logit_hash": "3d62aa6a1242822e"
+    },
+    {
+      "conv_id": "conv_7",
+      "prefill_sec": 19.167261677997885,
+      "peak_MiB": 46433.798828125,
+      "demote_sec": 12.92264024400356,
+      "argmax_id": 11,
+      "argmax_text": ",",
+      "logit_hash": "b26d73178a5c5eb0"
+    }
+  ],
+  "post_prefill_gpu": {
+    "alloc_MiB": 37777.5,
+    "peak_MiB": 46433.8
+  },
+  "error": "'Event' object is not callable",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_d_batch_driver.py\", line 143, in run_scenario\n    sim.run()\n  File \"/home/ubuntu/xhbm/scripts/multi_conv_simulator_v2.py\", line 216, in run\n    self.sampler.join(timeout=2.0)\n  File \"/usr/lib/python3.10/threading.py\", line 1100, in join\n    self._wait_for_tstate_lock(timeout=max(timeout, 0))\n  File \"/usr/lib/python3.10/threading.py\", line 1118, in _wait_for_tstate_lock\n    self._stop()\nTypeError: 'Event' object is not callable\n",
+  "finished_at": "2026-04-25T15:48:35.412150+00:00"
+}

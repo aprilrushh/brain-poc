@@ -1,0 +1,1351 @@
+{
+  "script": "phase_d_smoke_06_tiered.py",
+  "stage": "D-7.6.2 RAM tier sanity",
+  "n_convs": 2,
+  "prefill_ctx": 32768,
+  "sim_duration_sec": 180.0,
+  "run_id": "20260426_010846",
+  "torch": "2.7.1+cu126",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": true,
+    "seconds": 25.57447499599948,
+    "tag": "post_load",
+    "alloc_MiB": 37745.548828125,
+    "peak_MiB": 38146.7236328125
+  },
+  "prefill": [
+    {
+      "conv_id": "conv_0",
+      "prefill_seconds": 18.90662466500362,
+      "peak_MiB": 46433.798828125,
+      "demote_seconds": 0.2452824289939599,
+      "argmax_last": 1071,
+      "argmax_text": " said",
+      "logit_hash": "db0706584f6c9288",
+      "tier_state_after_demote": "ram_resident",
+      "tier_stats_after_demote": {
+        "conv_id": "conv_0",
+        "tier_state": "ram_resident",
+        "ssd_demote_count": 0,
+        "ssd_promote_count": 0,
+        "ssd_demote_time_sec": 0.0,
+        "ssd_promote_time_sec": 0.0,
+        "ssd_demote_MiB": 0.0,
+        "ssd_promote_MiB": 0.0,
+        "ram_demote_count": 1,
+        "ram_promote_count": 0,
+        "ram_demote_time_sec": 0.245,
+        "ram_promote_time_sec": 0.0,
+        "ram_demote_MiB": 10240.0,
+        "ram_promote_MiB": 0.0,
+        "idle_seconds": 19.2
+      }
+    },
+    {
+      "conv_id": "conv_1",
+      "prefill_seconds": 18.84264959099528,
+      "peak_MiB": 46433.798828125,
+      "demote_seconds": 0.24200812799972482,
+      "argmax_last": 33201,
+      "argmax_text": " dre",
+      "logit_hash": "87b8c4b68a728742",
+      "tier_state_after_demote": "ram_resident",
+      "tier_stats_after_demote": {
+        "conv_id": "conv_1",
+        "tier_state": "ram_resident",
+        "ssd_demote_count": 0,
+        "ssd_promote_count": 0,
+        "ssd_demote_time_sec": 0.0,
+        "ssd_promote_time_sec": 0.0,
+        "ssd_demote_MiB": 0.0,
+        "ssd_promote_MiB": 0.0,
+        "ram_demote_count": 1,
+        "ram_promote_count": 0,
+        "ram_demote_time_sec": 0.242,
+        "ram_promote_time_sec": 0.0,
+        "ram_demote_MiB": 10240.0,
+        "ram_promote_MiB": 0.0,
+        "idle_seconds": 19.1
+      }
+    }
+  ],
+  "post_prefill": {
+    "tag": "post_prefill_all_in_ssd",
+    "alloc_MiB": 37777.548828125,
+    "peak_MiB": 46433.798828125
+  },
+  "simulation": {
+    "duration_sec": 180.0,
+    "total_events": 9,
+    "forward_count": 4,
+    "demote_count": 2,
+    "promote_count": 3,
+    "promote_ssd_count": 0,
+    "promote_ram_count": 3,
+    "demote_ram_count": 2,
+    "demote_ssd_count": 0,
+    "promote_ssd_p50_sec": 0.0,
+    "promote_ssd_p95_sec": 0.0,
+    "promote_ram_p50_sec": 0.1962,
+    "promote_ram_p95_sec": 0.1963,
+    "promote_latency_p50_sec": 0.196,
+    "promote_latency_p95_sec": 0.196,
+    "promote_latency_p99_sec": 0.196,
+    "ttft_p50_sec": 5.1,
+    "ttft_p95_sec": 6.734,
+    "ttft_p99_sec": 6.734,
+    "decode_p50_step_sec": 0.3604,
+    "decode_p95_step_sec": 0.3615,
+    "forward_p50_sec": 28.437,
+    "forward_p95_sec": 30.122,
+    "aggregate_msg_per_sec": 0.0222,
+    "total_pcie_sec": 0.0,
+    "total_promote_GiB": 0.0,
+    "total_demote_GiB": 0.0,
+    "time_series_samples": 180,
+    "time_series": [
+      {
+        "t_sec": 0.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 1.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 9280.1,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 2.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 7808.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 3.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 6208.1,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 4.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 4736.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 5.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 3200.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 6.0,
+        "active_count": 1,
+        "gpu_kv_MiB": 1664.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 7.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 256.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 8.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 192.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 9.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 192.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 10.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 11.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 12.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 13.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 14.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 15.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 16.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 17.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 18.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 19.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 20.01,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 21.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 22.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 23.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 24.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 25.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 26.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 27.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 28.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 29.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 30.02,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 31.02,
+        "active_count": 2,
+        "gpu_kv_MiB": 7488.6,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 32.02,
+        "active_count": 2,
+        "gpu_kv_MiB": 5952.6,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 33.02,
+        "active_count": 2,
+        "gpu_kv_MiB": 4416.6,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 34.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 2880.6,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 35.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 1344.6,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 36.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 320.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 37.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 38.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 39.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 40.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 41.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 42.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 43.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 44.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 45.03,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 46.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 47.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 48.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 49.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 50.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 51.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 52.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 53.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 256.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 54.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 55.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 56.04,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 57.05,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 58.05,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 59.05,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 60.05,
+        "active_count": 2,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 61.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 257.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 62.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 63.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 64.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 65.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 66.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 67.05,
+        "active_count": 1,
+        "gpu_kv_MiB": 257.5,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 68.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.7,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 69.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 70.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 71.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 72.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 73.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 74.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 75.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 76.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 77.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 78.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.8,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 79.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 80.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 81.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 82.06,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 83.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 84.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 85.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 86.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 87.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 128.9,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 88.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 89.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 90.07,
+        "active_count": 0,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 91.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 92.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 93.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 94.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 95.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 96.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 97.07,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 98.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 99.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 100.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 101.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 102.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 103.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 104.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 105.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 106.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 107.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 108.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 109.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 110.08,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 111.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 112.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 113.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 114.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 115.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 116.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 117.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 118.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 119.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 120.09,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 121.09,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 122.09,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 123.09,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 124.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 125.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 126.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 127.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 128.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 129.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 130.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 131.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 132.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 133.1,
+        "active_count": 0,
+        "gpu_kv_MiB": 0.0,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 134.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 1676.7,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 135.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 136.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 137.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 138.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 139.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 140.1,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 141.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.2,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 142.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 143.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 144.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 145.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 146.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 147.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 148.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 149.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 150.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.3,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 151.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 152.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 153.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 154.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 155.11,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 156.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 157.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 158.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 159.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 160.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 161.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 162.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 163.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 164.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 165.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 166.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 167.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 168.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 169.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 170.12,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 171.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 172.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 173.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 174.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 175.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 176.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 177.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 178.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      },
+      {
+        "t_sec": 179.13,
+        "active_count": 1,
+        "gpu_kv_MiB": 129.4,
+        "ssd_kv_MiB_approx": 0.0
+      }
+    ],
+    "per_conv": [
+      {
+        "conv_id": "conv_0",
+        "is_frequent": true,
+        "prefill_tokens": 32768,
+        "total_messages": 3,
+        "tier_stats": {
+          "conv_id": "conv_0",
+          "tier_state": "gpu",
+          "ssd_demote_count": 0,
+          "ssd_promote_count": 0,
+          "ssd_demote_time_sec": 0.0,
+          "ssd_promote_time_sec": 0.0,
+          "ssd_demote_MiB": 0.0,
+          "ssd_promote_MiB": 0.0,
+          "ram_demote_count": 2,
+          "ram_promote_count": 2,
+          "ram_demote_time_sec": 0.502,
+          "ram_promote_time_sec": 0.391,
+          "ram_demote_MiB": 20558.4,
+          "ram_promote_MiB": 20558.4,
+          "idle_seconds": 22.5
+        }
+      },
+      {
+        "conv_id": "conv_1",
+        "is_frequent": false,
+        "prefill_tokens": 32768,
+        "total_messages": 1,
+        "tier_stats": {
+          "conv_id": "conv_1",
+          "tier_state": "ram_resident",
+          "ssd_demote_count": 0,
+          "ssd_promote_count": 0,
+          "ssd_demote_time_sec": 0.0,
+          "ssd_promote_time_sec": 0.0,
+          "ssd_demote_MiB": 0.0,
+          "ssd_promote_MiB": 0.0,
+          "ram_demote_count": 2,
+          "ram_promote_count": 1,
+          "ram_demote_time_sec": 0.544,
+          "ram_promote_time_sec": 0.196,
+          "ram_demote_MiB": 20520.9,
+          "ram_promote_MiB": 10240.0,
+          "idle_seconds": 149.5
+        }
+      }
+    ]
+  },
+  "post_sim": {
+    "tag": "post_sim",
+    "alloc_MiB": 37906.970703125,
+    "peak_MiB": 49185.1513671875
+  },
+  "events": [
+    {
+      "t": 0.322,
+      "type": "promote_ram",
+      "conv": "conv_1",
+      "dur": 0.196,
+      "promote_MiB": 10240.0
+    },
+    {
+      "t": 30.456,
+      "type": "forward",
+      "conv": "conv_1",
+      "dur": 30.122,
+      "new_tokens": 67,
+      "tokens_source": "real",
+      "decode_steps": 64,
+      "ttft_sec": 6.7343,
+      "decode_total_sec": 23.388,
+      "decode_p50_step_sec": 0.3591,
+      "first_decode_token": 1527,
+      "last_decode_token": 578,
+      "kv_len_before": 32768,
+      "kv_len_after": 32899,
+      "total_messages_after": 1
+    },
+    {
+      "t": 30.65,
+      "type": "promote_ram",
+      "conv": "conv_0",
+      "dur": 0.194,
+      "promote_MiB": 10240.0
+    },
+    {
+      "t": 59.098,
+      "type": "forward",
+      "conv": "conv_0",
+      "dur": 28.437,
+      "new_tokens": 63,
+      "tokens_source": "real",
+      "decode_steps": 64,
+      "ttft_sec": 5.1003,
+      "decode_total_sec": 23.3362,
+      "decode_p50_step_sec": 0.3593,
+      "first_decode_token": 3892,
+      "last_decode_token": 578,
+      "kv_len_before": 32768,
+      "kv_len_after": 32895,
+      "total_messages_after": 1
+    },
+    {
+      "t": 61.402,
+      "type": "demote_ram",
+      "conv": "conv_1",
+      "dur": 0.302
+    },
+    {
+      "t": 90.126,
+      "type": "forward",
+      "conv": "conv_0",
+      "dur": 23.895,
+      "new_tokens": 60,
+      "tokens_source": "real",
+      "decode_steps": 64,
+      "ttft_sec": 0.7866,
+      "decode_total_sec": 23.1082,
+      "decode_p50_step_sec": 0.3604,
+      "first_decode_token": 320,
+      "last_decode_token": 578,
+      "kv_len_before": 32895,
+      "kv_len_after": 33019,
+      "total_messages_after": 2
+    },
+    {
+      "t": 120.419,
+      "type": "demote_ram",
+      "conv": "conv_0",
+      "dur": 0.257
+    },
+    {
+      "t": 133.616,
+      "type": "promote_ram",
+      "conv": "conv_0",
+      "dur": 0.196,
+      "promote_MiB": 20558.4
+    },
+    {
+      "t": 157.521,
+      "type": "forward",
+      "conv": "conv_0",
+      "dur": 23.892,
+      "new_tokens": 49,
+      "tokens_source": "real",
+      "decode_steps": 64,
+      "ttft_sec": 0.7249,
+      "decode_total_sec": 23.1675,
+      "decode_p50_step_sec": 0.3615,
+      "first_decode_token": 320,
+      "last_decode_token": 578,
+      "kv_len_before": 33019,
+      "kv_len_after": 33132,
+      "total_messages_after": 3
+    }
+  ]
+}

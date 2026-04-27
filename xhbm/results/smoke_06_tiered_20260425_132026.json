@@ -1,0 +1,229 @@
+{
+  "script": "phase_d_smoke_06_tiered.py",
+  "stage": "D-7.2.1 decode sanity",
+  "n_convs": 2,
+  "prefill_ctx": 32768,
+  "sim_duration_sec": 60.0,
+  "run_id": "20260425_132026",
+  "torch": "2.7.1+cu126",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": true,
+    "seconds": 388.2246783099981,
+    "tag": "post_load",
+    "alloc_MiB": 37745.548828125,
+    "peak_MiB": 38146.7236328125
+  },
+  "prefill": [
+    {
+      "conv_id": "conv_0",
+      "prefill_seconds": 19.050700281004538,
+      "peak_MiB": 46433.798828125,
+      "demote_seconds": 14.505915998997807,
+      "argmax_last": 1071,
+      "argmax_text": " said",
+      "logit_hash": "db0706584f6c9288",
+      "tier_state_after_demote": "ssd",
+      "tier_stats_after_demote": {
+        "conv_id": "conv_0",
+        "ssd_state": "ssd",
+        "demote_count": 1,
+        "promote_count": 0,
+        "demote_time_sec": 14.505,
+        "promote_time_sec": 0.0,
+        "demote_MiB": 10240.0,
+        "promote_MiB": 0.0,
+        "idle_seconds": 33.6,
+        "ssd_pool": {
+          "bytes_written_MiB": 10240.0,
+          "bytes_read_MiB": 0.0,
+          "write_count": 160,
+          "read_count": 0,
+          "write_throughput_MBps": 181.45412339329079,
+          "read_throughput_MBps": 0,
+          "gpu_to_cpu_time_sec": 0.0,
+          "gpu_to_cpu_throughput_GBps": 0,
+          "gpu_to_cpu_count": 0,
+          "submit_overhead_time_sec": 0.0,
+          "prefetch_wait_time_sec": 0.0,
+          "prefetch_wait_count": 0
+        }
+      }
+    },
+    {
+      "conv_id": "conv_1",
+      "prefill_seconds": 18.834452810995572,
+      "peak_MiB": 46433.798828125,
+      "demote_seconds": 13.939712428997154,
+      "argmax_last": 33201,
+      "argmax_text": " dre",
+      "logit_hash": "87b8c4b68a728742",
+      "tier_state_after_demote": "ssd",
+      "tier_stats_after_demote": {
+        "conv_id": "conv_1",
+        "ssd_state": "ssd",
+        "demote_count": 1,
+        "promote_count": 0,
+        "demote_time_sec": 13.939,
+        "promote_time_sec": 0.0,
+        "demote_MiB": 10240.0,
+        "promote_MiB": 0.0,
+        "idle_seconds": 32.8,
+        "ssd_pool": {
+          "bytes_written_MiB": 10240.0,
+          "bytes_read_MiB": 0.0,
+          "write_count": 160,
+          "read_count": 0,
+          "write_throughput_MBps": 186.73307831088704,
+          "read_throughput_MBps": 0,
+          "gpu_to_cpu_time_sec": 0.0,
+          "gpu_to_cpu_throughput_GBps": 0,
+          "gpu_to_cpu_count": 0,
+          "submit_overhead_time_sec": 0.0,
+          "prefetch_wait_time_sec": 0.0,
+          "prefetch_wait_count": 0
+        }
+      }
+    }
+  ],
+  "post_prefill": {
+    "tag": "post_prefill_all_in_ssd",
+    "alloc_MiB": 37777.548828125,
+    "peak_MiB": 46433.798828125
+  },
+  "simulation": {
+    "duration_sec": 60.0,
+    "total_events": 4,
+    "forward_count": 2,
+    "demote_count": 0,
+    "promote_count": 2,
+    "promote_latency_p50_sec": 9.191,
+    "promote_latency_p95_sec": 9.191,
+    "promote_latency_p99_sec": 9.191,
+    "forward_p50_sec": 30.041,
+    "forward_p95_sec": 30.041,
+    "aggregate_msg_per_sec": 0.033,
+    "per_conv": [
+      {
+        "conv_id": "conv_0",
+        "is_frequent": true,
+        "prefill_tokens": 32768,
+        "total_messages": 1,
+        "tier_stats": {
+          "conv_id": "conv_0",
+          "ssd_state": "ram",
+          "demote_count": 1,
+          "promote_count": 1,
+          "demote_time_sec": 14.505,
+          "promote_time_sec": 7.119,
+          "demote_MiB": 10240.0,
+          "promote_MiB": 10240.0,
+          "idle_seconds": 0.0,
+          "ssd_pool": {
+            "bytes_written_MiB": 10240.0,
+            "bytes_read_MiB": 10240.0,
+            "write_count": 160,
+            "read_count": 160,
+            "write_throughput_MBps": 181.45412339329079,
+            "read_throughput_MBps": 711.6112359859195,
+            "gpu_to_cpu_time_sec": 0.0,
+            "gpu_to_cpu_throughput_GBps": 0,
+            "gpu_to_cpu_count": 0,
+            "submit_overhead_time_sec": 0.0,
+            "prefetch_wait_time_sec": 0.0,
+            "prefetch_wait_count": 0
+          }
+        }
+      },
+      {
+        "conv_id": "conv_1",
+        "is_frequent": false,
+        "prefill_tokens": 32768,
+        "total_messages": 1,
+        "tier_stats": {
+          "conv_id": "conv_1",
+          "ssd_state": "ram",
+          "demote_count": 1,
+          "promote_count": 1,
+          "demote_time_sec": 13.939,
+          "promote_time_sec": 8.91,
+          "demote_MiB": 10240.0,
+          "promote_MiB": 10240.0,
+          "idle_seconds": 35.8,
+          "ssd_pool": {
+            "bytes_written_MiB": 10240.0,
+            "bytes_read_MiB": 10240.0,
+            "write_count": 160,
+            "read_count": 160,
+            "write_throughput_MBps": 186.73307831088704,
+            "read_throughput_MBps": 577.0392973045058,
+            "gpu_to_cpu_time_sec": 0.0,
+            "gpu_to_cpu_throughput_GBps": 0,
+            "gpu_to_cpu_count": 0,
+            "submit_overhead_time_sec": 0.0,
+            "prefetch_wait_time_sec": 0.0,
+            "prefetch_wait_count": 0
+          }
+        }
+      }
+    ]
+  },
+  "post_sim": {
+    "tag": "post_sim",
+    "alloc_MiB": 38034.748046875,
+    "peak_MiB": 49193.0908203125
+  },
+  "events": [
+    {
+      "t": 9.316,
+      "type": "promote",
+      "conv": "conv_1",
+      "dur": 9.191,
+      "promote_MiB": 10240.0
+    },
+    {
+      "t": 39.369,
+      "type": "forward",
+      "conv": "conv_1",
+      "dur": 30.041,
+      "new_tokens": 67,
+      "decode_steps": 64,
+      "ttft_sec": 6.6693,
+      "decode_total_sec": 23.3717,
+      "decode_p50_step_sec": 0.3589,
+      "first_decode_token": 27,
+      "last_decode_token": 578,
+      "kv_len_before": 32768,
+      "kv_len_after": 32899,
+      "total_messages_after": 1
+    },
+    {
+      "t": 46.772,
+      "type": "promote",
+      "conv": "conv_0",
+      "dur": 7.403,
+      "promote_MiB": 10240.0
+    },
+    {
+      "t": 75.204,
+      "type": "forward",
+      "conv": "conv_0",
+      "dur": 28.42,
+      "new_tokens": 112,
+      "decode_steps": 64,
+      "ttft_sec": 5.0767,
+      "decode_total_sec": 23.3435,
+      "decode_p50_step_sec": 0.3591,
+      "first_decode_token": 128009,
+      "last_decode_token": 578,
+      "kv_len_before": 32768,
+      "kv_len_after": 32944,
+      "total_messages_after": 1
+    }
+  ]
+}

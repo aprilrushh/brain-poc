@@ -1,0 +1,388 @@
+{
+  "run_id": "20260425_152744",
+  "started_at": "2026-04-25T15:28:59.121364+00:00",
+  "warmup_sec": 25.45245187499677,
+  "model_load_sec": 31.19602697600203,
+  "sherlock_token_count": 386602,
+  "scenarios": [
+    {
+      "name": "S1_n1_8x32k_15min",
+      "n_convs": 8,
+      "prefill_ctx": 32768,
+      "sim_duration_sec": 900.0,
+      "decode_n": 64,
+      "started_at": "2026-04-25T15:28:59.122333+00:00",
+      "status": "FAILED",
+      "prefill": [
+        {
+          "conv_id": "conv_0",
+          "prefill_sec": 19.299819798994577,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.91816993500106,
+          "argmax_id": 1071,
+          "argmax_text": " said",
+          "logit_hash": "db0706584f6c9288"
+        },
+        {
+          "conv_id": "conv_1",
+          "prefill_sec": 18.84269396700256,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.747823661004077,
+          "argmax_id": 33201,
+          "argmax_text": " dre",
+          "logit_hash": "87b8c4b68a728742"
+        },
+        {
+          "conv_id": "conv_2",
+          "prefill_sec": 18.95962539100583,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 14.378413794001972,
+          "argmax_id": 14254,
+          "argmax_text": " sight",
+          "logit_hash": "600675163fa422da"
+        },
+        {
+          "conv_id": "conv_3",
+          "prefill_sec": 19.009901112003718,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 12.550222229998326,
+          "argmax_id": 902,
+          "argmax_text": " which",
+          "logit_hash": "4c60438c3c18b82a"
+        },
+        {
+          "conv_id": "conv_4",
+          "prefill_sec": 19.0619599069978,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 12.91712750899751,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "74da00fd33e6dc60"
+        },
+        {
+          "conv_id": "conv_5",
+          "prefill_sec": 19.15699489700637,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.01151423000556,
+          "argmax_id": 304,
+          "argmax_text": " in",
+          "logit_hash": "39cdbf5bead3d399"
+        },
+        {
+          "conv_id": "conv_6",
+          "prefill_sec": 19.176206629999797,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.097072395998111,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "3d62aa6a1242822e"
+        },
+        {
+          "conv_id": "conv_7",
+          "prefill_sec": 19.167261677997885,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 12.92264024400356,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "b26d73178a5c5eb0"
+        }
+      ],
+      "post_prefill_gpu": {
+        "alloc_MiB": 37777.5,
+        "peak_MiB": 46433.8
+      },
+      "error": "'Event' object is not callable",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_d_batch_driver.py\", line 143, in run_scenario\n    sim.run()\n  File \"/home/ubuntu/xhbm/scripts/multi_conv_simulator_v2.py\", line 216, in run\n    self.sampler.join(timeout=2.0)\n  File \"/usr/lib/python3.10/threading.py\", line 1100, in join\n    self._wait_for_tstate_lock(timeout=max(timeout, 0))\n  File \"/usr/lib/python3.10/threading.py\", line 1118, in _wait_for_tstate_lock\n    self._stop()\nTypeError: 'Event' object is not callable\n",
+      "finished_at": "2026-04-25T15:48:35.412150+00:00"
+    },
+    {
+      "name": "S2_n2_8x32k_15min",
+      "n_convs": 8,
+      "prefill_ctx": 32768,
+      "sim_duration_sec": 900.0,
+      "decode_n": 64,
+      "started_at": "2026-04-25T15:48:42.930433+00:00",
+      "status": "FAILED",
+      "prefill": [
+        {
+          "conv_id": "conv_0",
+          "prefill_sec": 18.868791094995686,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 14.024333588000445,
+          "argmax_id": 1071,
+          "argmax_text": " said",
+          "logit_hash": "db0706584f6c9288"
+        },
+        {
+          "conv_id": "conv_1",
+          "prefill_sec": 19.072262645997398,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.555684653001663,
+          "argmax_id": 33201,
+          "argmax_text": " dre",
+          "logit_hash": "87b8c4b68a728742"
+        },
+        {
+          "conv_id": "conv_2",
+          "prefill_sec": 19.17335679000098,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.395395307998115,
+          "argmax_id": 14254,
+          "argmax_text": " sight",
+          "logit_hash": "600675163fa422da"
+        },
+        {
+          "conv_id": "conv_3",
+          "prefill_sec": 19.191925111001183,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.988711582998803,
+          "argmax_id": 902,
+          "argmax_text": " which",
+          "logit_hash": "4c60438c3c18b82a"
+        },
+        {
+          "conv_id": "conv_4",
+          "prefill_sec": 19.19581011000264,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.469404433999443,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "74da00fd33e6dc60"
+        },
+        {
+          "conv_id": "conv_5",
+          "prefill_sec": 19.226928702002624,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 14.36619491699821,
+          "argmax_id": 304,
+          "argmax_text": " in",
+          "logit_hash": "39cdbf5bead3d399"
+        },
+        {
+          "conv_id": "conv_6",
+          "prefill_sec": 19.224933160003275,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.294554046995472,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "3d62aa6a1242822e"
+        },
+        {
+          "conv_id": "conv_7",
+          "prefill_sec": 19.224615109997103,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.690835576999234,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "b26d73178a5c5eb0"
+        }
+      ],
+      "post_prefill_gpu": {
+        "alloc_MiB": 37777.5,
+        "peak_MiB": 46433.8
+      },
+      "error": "'Event' object is not callable",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_d_batch_driver.py\", line 143, in run_scenario\n    sim.run()\n  File \"/home/ubuntu/xhbm/scripts/multi_conv_simulator_v2.py\", line 216, in run\n    self.sampler.join(timeout=2.0)\n  File \"/usr/lib/python3.10/threading.py\", line 1100, in join\n    self._wait_for_tstate_lock(timeout=max(timeout, 0))\n  File \"/usr/lib/python3.10/threading.py\", line 1118, in _wait_for_tstate_lock\n    self._stop()\nTypeError: 'Event' object is not callable\n",
+      "finished_at": "2026-04-25T16:08:17.041410+00:00"
+    },
+    {
+      "name": "S3_n3_8x32k_15min",
+      "n_convs": 8,
+      "prefill_ctx": 32768,
+      "sim_duration_sec": 900.0,
+      "decode_n": 64,
+      "started_at": "2026-04-25T16:08:27.204736+00:00",
+      "status": "FAILED",
+      "prefill": [
+        {
+          "conv_id": "conv_0",
+          "prefill_sec": 18.795108669997717,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 14.3262592760002,
+          "argmax_id": 1071,
+          "argmax_text": " said",
+          "logit_hash": "db0706584f6c9288"
+        },
+        {
+          "conv_id": "conv_1",
+          "prefill_sec": 18.894687570995302,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.75320543399721,
+          "argmax_id": 33201,
+          "argmax_text": " dre",
+          "logit_hash": "87b8c4b68a728742"
+        },
+        {
+          "conv_id": "conv_2",
+          "prefill_sec": 18.965870034000545,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.26041592299589,
+          "argmax_id": 14254,
+          "argmax_text": " sight",
+          "logit_hash": "600675163fa422da"
+        },
+        {
+          "conv_id": "conv_3",
+          "prefill_sec": 19.053409357999044,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.203989134999574,
+          "argmax_id": 902,
+          "argmax_text": " which",
+          "logit_hash": "4c60438c3c18b82a"
+        },
+        {
+          "conv_id": "conv_4",
+          "prefill_sec": 19.117697852001584,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.368403020998812,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "74da00fd33e6dc60"
+        },
+        {
+          "conv_id": "conv_5",
+          "prefill_sec": 19.16540657600126,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.170140886999434,
+          "argmax_id": 304,
+          "argmax_text": " in",
+          "logit_hash": "39cdbf5bead3d399"
+        },
+        {
+          "conv_id": "conv_6",
+          "prefill_sec": 19.201603818997683,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.7538524470001,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "3d62aa6a1242822e"
+        },
+        {
+          "conv_id": "conv_7",
+          "prefill_sec": 19.192368101998,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.550655681996432,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "b26d73178a5c5eb0"
+        }
+      ],
+      "post_prefill_gpu": {
+        "alloc_MiB": 37777.5,
+        "peak_MiB": 46433.8
+      },
+      "error": "'Event' object is not callable",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_d_batch_driver.py\", line 143, in run_scenario\n    sim.run()\n  File \"/home/ubuntu/xhbm/scripts/multi_conv_simulator_v2.py\", line 216, in run\n    self.sampler.join(timeout=2.0)\n  File \"/usr/lib/python3.10/threading.py\", line 1100, in join\n    self._wait_for_tstate_lock(timeout=max(timeout, 0))\n  File \"/usr/lib/python3.10/threading.py\", line 1118, in _wait_for_tstate_lock\n    self._stop()\nTypeError: 'Event' object is not callable\n",
+      "finished_at": "2026-04-25T16:28:02.797942+00:00"
+    },
+    {
+      "name": "S4_16x32k_15min",
+      "n_convs": 16,
+      "prefill_ctx": 32768,
+      "sim_duration_sec": 900.0,
+      "decode_n": 64,
+      "started_at": "2026-04-25T16:28:13.455198+00:00",
+      "status": "SKIPPED_INSUFFICIENT_TOKENS"
+    },
+    {
+      "name": "S5_8x64k_15min",
+      "n_convs": 8,
+      "prefill_ctx": 65536,
+      "sim_duration_sec": 900.0,
+      "decode_n": 64,
+      "started_at": "2026-04-25T16:28:13.456405+00:00",
+      "status": "SKIPPED_INSUFFICIENT_TOKENS"
+    },
+    {
+      "name": "S6_8x32k_60min",
+      "n_convs": 8,
+      "prefill_ctx": 32768,
+      "sim_duration_sec": 3600.0,
+      "decode_n": 64,
+      "started_at": "2026-04-25T16:28:13.457528+00:00",
+      "status": "FAILED",
+      "prefill": [
+        {
+          "conv_id": "conv_0",
+          "prefill_sec": 18.76040990099864,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 15.446280295996985,
+          "argmax_id": 1071,
+          "argmax_text": " said",
+          "logit_hash": "db0706584f6c9288"
+        },
+        {
+          "conv_id": "conv_1",
+          "prefill_sec": 18.901937830996758,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 15.241750123997917,
+          "argmax_id": 33201,
+          "argmax_text": " dre",
+          "logit_hash": "87b8c4b68a728742"
+        },
+        {
+          "conv_id": "conv_2",
+          "prefill_sec": 18.948013508997974,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.733923541003605,
+          "argmax_id": 14254,
+          "argmax_text": " sight",
+          "logit_hash": "600675163fa422da"
+        },
+        {
+          "conv_id": "conv_3",
+          "prefill_sec": 19.040390868998657,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.76064539700019,
+          "argmax_id": 902,
+          "argmax_text": " which",
+          "logit_hash": "4c60438c3c18b82a"
+        },
+        {
+          "conv_id": "conv_4",
+          "prefill_sec": 19.06851537500188,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.27956273000018,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "74da00fd33e6dc60"
+        },
+        {
+          "conv_id": "conv_5",
+          "prefill_sec": 19.120907684002304,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 13.271386239001004,
+          "argmax_id": 304,
+          "argmax_text": " in",
+          "logit_hash": "39cdbf5bead3d399"
+        },
+        {
+          "conv_id": "conv_6",
+          "prefill_sec": 19.183989273995394,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 14.95713049799815,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "3d62aa6a1242822e"
+        },
+        {
+          "conv_id": "conv_7",
+          "prefill_sec": 19.160676175000845,
+          "peak_MiB": 46433.798828125,
+          "demote_sec": 15.260491262000869,
+          "argmax_id": 11,
+          "argmax_text": ",",
+          "logit_hash": "b26d73178a5c5eb0"
+        }
+      ],
+      "post_prefill_gpu": {
+        "alloc_MiB": 37777.5,
+        "peak_MiB": 46433.8
+      },
+      "error": "'Event' object is not callable",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_d_batch_driver.py\", line 143, in run_scenario\n    sim.run()\n  File \"/home/ubuntu/xhbm/scripts/multi_conv_simulator_v2.py\", line 216, in run\n    self.sampler.join(timeout=2.0)\n  File \"/usr/lib/python3.10/threading.py\", line 1100, in join\n    self._wait_for_tstate_lock(timeout=max(timeout, 0))\n  File \"/usr/lib/python3.10/threading.py\", line 1118, in _wait_for_tstate_lock\n    self._stop()\nTypeError: 'Event' object is not callable\n",
+      "finished_at": "2026-04-25T17:32:43.571722+00:00"
+    }
+  ],
+  "finished_at": "2026-04-25T17:32:55.450026+00:00"
+}

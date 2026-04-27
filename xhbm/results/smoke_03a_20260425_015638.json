@@ -1,0 +1,174 @@
+{
+  "script": "phase_c_smoke_03a_kvcache_baseline.py",
+  "repo": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+  "use_cache": true,
+  "quantization": {
+    "backend": "bitsandbytes",
+    "load_in_4bit": true,
+    "quant_type": "nf4",
+    "compute_dtype": "bfloat16",
+    "double_quant": true
+  },
+  "run_id": "20260425_015638",
+  "ctx_list": [
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    98304,
+    131072
+  ],
+  "batch": 1,
+  "torch": "2.7.1+cu126",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "reserved_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": true,
+    "seconds": 25.775535364999087,
+    "tag": "post_load",
+    "alloc_MiB": 37745.548828125,
+    "reserved_MiB": 38422.0,
+    "peak_MiB": 38146.7236328125,
+    "param_dtype": "torch.bfloat16",
+    "num_params": 36328185856,
+    "hidden_size": 8192,
+    "num_layers": 80,
+    "vocab_size": 128256,
+    "num_kv_heads": 8,
+    "head_dim": 128
+  },
+  "runs": [
+    {
+      "ctx": 4096,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx4096_pre",
+        "alloc_MiB": 37745.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37745.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 1.930916948003869,
+        "logit_last_hash_fp32": "2419ecc00a9f1ce4",
+        "argmax_last": 128008,
+        "kv_cache_total_MiB": 1280.0,
+        "kv_cache_layers_observed": 80
+      },
+      "post_forward": {
+        "tag": "ctx4096_post",
+        "alloc_MiB": 40059.580078125,
+        "reserved_MiB": 41378.0,
+        "peak_MiB": 40211.611328125
+      }
+    },
+    {
+      "ctx": 8192,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx8192_pre",
+        "alloc_MiB": 37793.548828125,
+        "reserved_MiB": 38422.0,
+        "peak_MiB": 37793.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 3.5290966160027892,
+        "logit_last_hash_fp32": "1b9451d3bdb3b7a1",
+        "argmax_last": 78191,
+        "kv_cache_total_MiB": 2560.0,
+        "kv_cache_layers_observed": 80
+      },
+      "post_forward": {
+        "tag": "ctx8192_post",
+        "alloc_MiB": 42341.611328125,
+        "reserved_MiB": 45226.0,
+        "peak_MiB": 42485.611328125
+      }
+    },
+    {
+      "ctx": 16384,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx16384_pre",
+        "alloc_MiB": 37809.548828125,
+        "reserved_MiB": 38422.0,
+        "peak_MiB": 37809.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 7.782743188006862,
+        "logit_last_hash_fp32": "2e9c62e75bce6902",
+        "argmax_last": 128008,
+        "kv_cache_total_MiB": 5120.0,
+        "kv_cache_layers_observed": 80
+      },
+      "post_forward": {
+        "tag": "ctx16384_post",
+        "alloc_MiB": 46905.673828125,
+        "reserved_MiB": 51774.0,
+        "peak_MiB": 47193.673828125
+      }
+    },
+    {
+      "ctx": 32768,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx32768_pre",
+        "alloc_MiB": 37841.548828125,
+        "reserved_MiB": 39766.0,
+        "peak_MiB": 37841.548828125
+      },
+      "forward": {
+        "ok": true,
+        "seconds": 18.705687002002378,
+        "logit_last_hash_fp32": "6a362ee371f91159",
+        "argmax_last": 128009,
+        "kv_cache_total_MiB": 10240.0,
+        "kv_cache_layers_observed": 80
+      },
+      "post_forward": {
+        "tag": "ctx32768_post",
+        "alloc_MiB": 56033.798828125,
+        "reserved_MiB": 66982.0,
+        "peak_MiB": 56609.798828125
+      }
+    },
+    {
+      "ctx": 65536,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx65536_pre",
+        "alloc_MiB": 37905.548828125,
+        "reserved_MiB": 39766.0,
+        "peak_MiB": 37905.548828125
+      },
+      "forward": {
+        "ok": false,
+        "error_type": "CUDA_OOM",
+        "error_msg": "CUDA out of memory. Tried to allocate 3.50 GiB. GPU 0 has a total capacity of 79.19 GiB of which 3.26 GiB is free. Including non-PyTorch memory, this process has 75.92 GiB memory in use. Of the allocated memory 66.80 GiB is allocated by PyTorch, and 8.53 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:T"
+      }
+    },
+    {
+      "ctx": 98304,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx98304_pre",
+        "alloc_MiB": 37905.548828125,
+        "reserved_MiB": 39766.0,
+        "peak_MiB": 37905.548828125
+      },
+      "forward": {
+        "ok": false,
+        "error_type": "CUDA_OOM",
+        "error_msg": "CUDA out of memory. Tried to allocate 5.25 GiB. GPU 0 has a total capacity of 79.19 GiB of which 4.51 GiB is free. Including non-PyTorch memory, this process has 74.67 GiB memory in use. Of the allocated memory 61.07 GiB is allocated by PyTorch, and 13.02 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:"
+      }
+    }
+  ]
+}

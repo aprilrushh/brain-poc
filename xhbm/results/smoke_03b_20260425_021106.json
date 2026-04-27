@@ -1,0 +1,38 @@
+{
+  "script": "phase_c_smoke_03b_kvoffload.py",
+  "repo": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+  "use_cache": true,
+  "cache_offloading": true,
+  "quantization": {
+    "backend": "bitsandbytes",
+    "load_in_4bit": true,
+    "quant_type": "nf4",
+    "compute_dtype": "bfloat16",
+    "double_quant": true
+  },
+  "run_id": "20260425_021106",
+  "ctx_list": [
+    4096,
+    16384,
+    32768,
+    65536,
+    98304,
+    131072
+  ],
+  "batch": 1,
+  "torch": "2.7.1+cu126",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "reserved_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": false,
+    "error_type": "OutOfMemoryError",
+    "error_msg": "CUDA out of memory. Tried to allocate 35.79 GiB. GPU 0 has a total capacity of 79.19 GiB of which 14.14 GiB is free. Process 12924 has 64.50 GiB memory in use. Including non-PyTorch memory, this process has 448.00 MiB memory in use. Of the allocated memory 0 bytes is allocated by PyTorch, and 0 bytes is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/xhbm/scripts/phase_c_smoke_03b_kvoffload.py\", line 106, in main\n    model = AutoModelForCausalLM.from_pretrained(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py\", line 394, in from_pretrained\n    return model_class.from_pretrained(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/modeling_utils.py\", line 4210, in from_pretrained\n    loading_info, disk_offload_index = cls._load_pretrained_model(model, state_dict, checkpoint_files, load_config)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/modeling_utils.py\", line 4290, in _load_pretrained_model\n    caching_allocator_warmup(model, expanded_device_map, load_config.hf_quantizer)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/modeling_utils.py\", line 4936, in caching_allocator_warmup\n    _ = torch.empty(int(byte_count // 2), dtype=torch.float16, device=device, requires_grad=False)\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 35.79 GiB. GPU 0 has a total capacity of 79.19 GiB of which 14.14 GiB is free. Process 12924 has 64.50 GiB memory in use. Including non-PyTorch memory, this process has 448.00 MiB memory in use. Of the allocated memory 0 bytes is allocated by PyTorch, and 0 bytes is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)\n"
+  },
+  "runs": []
+}

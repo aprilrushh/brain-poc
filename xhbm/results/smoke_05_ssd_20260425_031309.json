@@ -1,0 +1,80 @@
+{
+  "script": "phase_d_smoke_05_ssd_baseline.py",
+  "repo": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+  "use_cache": true,
+  "cache_backend": "SSDOffloadCache",
+  "num_workers": 4,
+  "ssd_dir_base": "/home/ubuntu/xhbm/fio_bench/smoke_05_ssd",
+  "quantization": {
+    "backend": "bitsandbytes",
+    "load_in_4bit": true,
+    "quant_type": "nf4",
+    "compute_dtype": "bfloat16",
+    "double_quant": true
+  },
+  "run_id": "20260425_031309",
+  "ctx_list": [
+    4096,
+    16384,
+    32768,
+    65536,
+    98304,
+    131072
+  ],
+  "batch": 1,
+  "torch": "2.7.1+cu126",
+  "cuda_device": "NVIDIA H100 PCIe",
+  "pre_load": {
+    "tag": "pre_load",
+    "alloc_MiB": 0.0,
+    "reserved_MiB": 0.0,
+    "peak_MiB": 0.0
+  },
+  "load": {
+    "ok": true,
+    "seconds": 529.7296392610006,
+    "tag": "post_load",
+    "alloc_MiB": 37745.548828125,
+    "reserved_MiB": 38422.0,
+    "peak_MiB": 38146.7236328125,
+    "num_params": 36328185856,
+    "hidden_size": 8192,
+    "num_layers": 80,
+    "vocab_size": 128256,
+    "num_kv_heads": 8
+  },
+  "runs": [
+    {
+      "ctx": 4096,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx4096_pre",
+        "alloc_MiB": 37745.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37745.548828125
+      },
+      "forward": {
+        "ok": false,
+        "error_type": "TypeError",
+        "error_msg": "Got unsupported ScalarType BFloat16",
+        "traceback": "*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/llama/modeling_llama.py\", line 316, in forward\n    hidden_states, _ = self.self_attn(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/llama/modeling_llama.py\", line 270, in forward\n    key_states, value_states = past_key_values.update(key_states, value_states, self.layer_idx)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/cache_utils.py\", line 940, in update\n    self.offload(layer_idx, self.only_non_sliding)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/cache_utils.py\", line 908, in offload\n    self.layers[layer_idx].offload()\n  File \"/home/ubuntu/xhbm/scripts/xhbm_ssd_cache.py\", line 141, in offload\n    k_cpu = self.keys.detach().cpu().numpy()\nTypeError: Got unsupported ScalarType BFloat16\n"
+      }
+    },
+    {
+      "ctx": 16384,
+      "batch": 1,
+      "pre_forward": {
+        "tag": "ctx16384_pre",
+        "alloc_MiB": 37777.548828125,
+        "reserved_MiB": 37974.0,
+        "peak_MiB": 37777.548828125
+      },
+      "forward": {
+        "ok": false,
+        "error_type": "TypeError",
+        "error_msg": "Got unsupported ScalarType BFloat16",
+        "traceback": "*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/llama/modeling_llama.py\", line 316, in forward\n    hidden_states, _ = self.self_attn(\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/llama/modeling_llama.py\", line 270, in forward\n    key_states, value_states = past_key_values.update(key_states, value_states, self.layer_idx)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/cache_utils.py\", line 940, in update\n    self.offload(layer_idx, self.only_non_sliding)\n  File \"/home/ubuntu/.local/lib/python3.10/site-packages/transformers/cache_utils.py\", line 908, in offload\n    self.layers[layer_idx].offload()\n  File \"/home/ubuntu/xhbm/scripts/xhbm_ssd_cache.py\", line 141, in offload\n    k_cpu = self.keys.detach().cpu().numpy()\nTypeError: Got unsupported ScalarType BFloat16\n"
+      }
+    }
+  ]
+}
