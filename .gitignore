@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.bin
+*.safetensors
+*.gguf
+data/en_wiki_embeddings.pt
+data/en_wiki_docs.json
+data/ko_wiki_embeddings.pt

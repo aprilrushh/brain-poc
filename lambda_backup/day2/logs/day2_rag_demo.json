@@ -1,0 +1,342 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "n_docs": 5078902,
+  "n_queries": 10,
+  "avg_retrieve_ms": 6.958,
+  "avg_gen_ms": 13934.8,
+  "avg_tok_per_sec": 25.78,
+  "avg_end_to_end_ms": 13990.9,
+  "gpu_memory_gb": 63.81,
+  "results": [
+    {
+      "question": "What is High Bandwidth Memory (HBM) and why is it important for modern AI systems?",
+      "answer": "analysisWe need to answer: What is HBM and why important for modern AI systems. Use only provided sources. Source 1 contains info about HBM: definition, usage, adoption, first chip, etc. It mentions used in high-performance graphics accelerators, network devices, high-performance datacenter AI ASICs, on-package cache in CPUs, on-package RAM in upcoming CPUs, FPGAs, some supercomputers. It also says first chip produced 2013, first devices 2015. It was adopted by JEDEC 2013, HBM2 accepted 2016. It achieves higher bandwidth while using less power in a sub... incomplete. But we can use that.\n\nWe need to explain importance for modern AI systems. Source 1 mentions used in high-performance datacenter AI ASICs. So we can say HBM provides high bandwidth and low power, which is critical for AI workloads that require large memory bandwidth. Also mention that HBM is used in GPUs and AI ASICs. We can cite source 1.\n\nWe should not fabricate. So answer: HBM is a 3D-stacked SDRAM interface, used in GPUs, AI ASICs, etc. It offers higher bandwidth and lower power consumption. It's important for AI because AI workloads need large memory bandwidth to feed data to processors quickly, and HBM provides that. Also mention that HBM2 improved further.\n\nWe need to cite source 1. Use [Source 1] after statements. Also mention that HBM is used in high-performance graphics accelerators, network devices, high-performance datacenter AI ASICs, on-package cache in CPUs, on-package RAM in upcoming CPUs, FPGAs, and some supercomputers. That shows its importance.\n\nWe should not mention other sources unless relevant. Source 3 is about HMC, not HBM. Source 4 is HyperMemory, not HBM. Source 5 is HyperCloud Memory, not HBM. Source",
+      "n_in_tokens": 1067,
+      "n_out_tokens": 400,
+      "tok_per_sec": 25.79793116873232,
+      "t_embed_ms": 59.60667100225692,
+      "t_retrieve_ms": 6.965818000026047,
+      "t_gen_ms": 15505.119281999214,
+      "total_ms": 15571.691771001497,
+      "retrieved_titles": [
+        {
+          "title": "High Bandwidth Memory",
+          "activation": 0.9960732460021973
+        },
+        {
+          "title": "Hierarchical temporal memory",
+          "activation": 0.00044356993748806417
+        },
+        {
+          "title": "Hybrid Memory Cube",
+          "activation": 0.0003130085242446512
+        },
+        {
+          "title": "HyperMemory",
+          "activation": 0.0001506674161646515
+        },
+        {
+          "title": "HyperCloud Memory",
+          "activation": 0.00011682092736009508
+        }
+      ]
+    },
+    {
+      "question": "How does the von Neumann bottleneck limit the performance of large language models?",
+      "answer": "The provided sources do not contain any information about how the von Neumann bottleneck limits the performance of large language models.",
+      "n_in_tokens": 947,
+      "n_out_tokens": 210,
+      "tok_per_sec": 25.668739668377835,
+      "t_embed_ms": 61.750656001095194,
+      "t_retrieve_ms": 6.974681997235166,
+      "t_gen_ms": 8181.1574200000905,
+      "total_ms": 8249.88275799842,
+      "retrieved_titles": [
+        {
+          "title": "Large language model",
+          "activation": 0.1463427096605301
+        },
+        {
+          "title": "Bottleneck (software)",
+          "activation": 0.03461580350995064
+        },
+        {
+          "title": "Von Neumann architecture",
+          "activation": 0.02628839947283268
+        },
+        {
+          "title": "Deutsch limit",
+          "activation": 0.019988518208265305
+        },
+        {
+          "title": "Language model",
+          "activation": 0.014112072065472603
+        }
+      ]
+    },
+    {
+      "question": "What is the Mixture of Experts (MoE) architecture in neural networks?",
+      "answer": "The Mixture of Experts (MoE) architecture is a neural‑network design that splits a problem into several homogeneous sub‑regions by using multiple “expert” networks. Each expert receives the same input and produces its own output. A single gating (weighting) function then takes the same input and generates a vector of weights that determines how much each expert’s output should contribute to the final result. In practice, only one or a few experts are typically activated for any given input, so the MoE runs fewer models than a full ensemble while still allowing specialized processing for different parts of the input space [Source 1].",
+      "n_in_tokens": 939,
+      "n_out_tokens": 218,
+      "tok_per_sec": 26.237216396527327,
+      "t_embed_ms": 18.702010998822516,
+      "t_retrieve_ms": 6.941145002201665,
+      "t_gen_ms": 8308.808247998968,
+      "total_ms": 8334.451403999992,
+      "retrieved_titles": [
+        {
+          "title": "Mixture of experts",
+          "activation": 0.9975165128707886
+        },
+        {
+          "title": "Product of experts",
+          "activation": 0.0018086932832375169
+        },
+        {
+          "title": "Molecular Operating Environment",
+          "activation": 6.0359725466696545e-05
+        },
+        {
+          "title": "Multivariate optical element",
+          "activation": 4.1420000343350694e-05
+        },
+        {
+          "title": "Ensemble averaging (machine learning)",
+          "activation": 1.1626583727775142e-05
+        }
+      ]
+    },
+    {
+      "question": "How do solid-state drives (SSDs) differ from traditional hard disk drives in data centers?",
+      "answer": "Solid‑state drives differ from traditional hard‑disk drives (HDDs) in several key ways that are especially important in data‑center environments:\n\n| Feature | SSD | HDD |\n|---------|-----|-----|\n| **Mechanical parts** | No moving parts; uses flash memory cells on a PCB. | Uses spinning magnetic platters and moving read/write heads. |\n| **Performance** | Higher input/output rates and lower latency due to electronic access of data. | Slower I/O and higher latency because data must be physically moved to the head. |\n|",
+      "n_in_tokens": 965,
+      "n_out_tokens": 400,
+      "tok_per_sec": 25.75243455890348,
+      "t_embed_ms": 61.41641399881337,
+      "t_retrieve_ms": 6.9555450027110055,
+      "t_gen_ms": 15532.512046000193,
+      "total_ms": 15600.884005001717,
+      "retrieved_titles": [
+        {
+          "title": "Solid-state drive",
+          "activation": 0.6094249486923218
+        },
+        {
+          "title": "Solid-state storage",
+          "activation": 0.20533140003681183
+        },
+        {
+          "title": "Hybrid drive",
+          "activation": 0.056303687393665314
+        },
+        {
+          "title": "SSD (disambiguation)",
+          "activation": 0.031058404594659805
+        },
+        {
+          "title": "Board solid-state drive",
+          "activation": 0.029348574578762054
+        }
+      ]
+    },
+    {
+      "question": "What is SK Hynix and what role does it play in the semiconductor industry?",
+      "answer": "SK Hynix Inc. is a South Korean semiconductor company that designs and manufactures dynamic random‑access memory (DRAM) chips and flash memory chips.  It is the world’s second‑largest memory‑chip maker after Samsung Electronics and the third‑largest semiconductor company overall.  Founded in 1983 as Hyundai Electronic Industrial Co., Ltd., it became part of the SK Group in 2012 when SK Telecom became its major shareholder.  SK Hynix supplies memory chips to a wide range of major customers—including Microsoft, Apple, Asus, Dell, MSI, HP Inc. and Hewlett Packard Enterprise—and its products are used in devices such as PCs, servers, mobile phones, TVs, and other consumer electronics.  Thus, SK Hynix plays a central role as a leading global supplier of memory chips that are essential components in a broad spectrum of electronic products. [Source 1]",
+      "n_in_tokens": 977,
+      "n_out_tokens": 361,
+      "tok_per_sec": 25.77989767420512,
+      "t_embed_ms": 20.72305199908442,
+      "t_retrieve_ms": 6.948762002139119,
+      "t_gen_ms": 14003.158761999657,
+      "total_ms": 14030.83057600088,
+      "retrieved_titles": [
+        {
+          "title": "SK Hynix",
+          "activation": 0.981491208076477
+        },
+        {
+          "title": "Helix Semiconductors",
+          "activation": 0.0021943366155028343
+        },
+        {
+          "title": "Dynex Semiconductor",
+          "activation": 0.0010423301719129086
+        },
+        {
+          "title": "SK Group",
+          "activation": 0.0005600953008979559
+        },
+        {
+          "title": "Himax",
+          "activation": 0.0003388012992218137
+        }
+      ]
+    },
+    {
+      "question": "Explain NVIDIA's Grace Hopper architecture and its advantages for AI workloads.",
+      "answer": "NVIDIA’s **Grace Hopper** microarchitecture is a datacenter‑focused GPU design that builds on the company’s earlier Turing and Ampere architectures.  It is implemented on TSMC’s 4N process and contains up to 80 billion transistors and 144 streaming multiprocessors (SMs) [Source 1].  Hopper",
+      "n_in_tokens": 1040,
+      "n_out_tokens": 400,
+      "tok_per_sec": 25.411940168752206,
+      "t_embed_ms": 19.015390000276966,
+      "t_retrieve_ms": 6.943673000932904,
+      "t_gen_ms": 15740.632054999878,
+      "total_ms": 15766.591118001088,
+      "retrieved_titles": [
+        {
+          "title": "Hopper (microarchitecture)",
+          "activation": 0.8684046268463135
+        },
+        {
+          "title": "Kepler (microarchitecture)",
+          "activation": 0.004312221892178059
+        },
+        {
+          "title": "GeForce 600 series",
+          "activation": 0.0030006535816937685
+        },
+        {
+          "title": "Grace Hopper Celebration of Women in Computing",
+          "activation": 0.002242825459688902
+        },
+        {
+          "title": "Ada Lovelace (microarchitecture)",
+          "activation": 0.002149519743397832
+        }
+      ]
+    },
+    {
+      "question": "What is compute-in-memory and why does it matter for AI acceleration?",
+      "answer": "**Compute‑in‑Memory (CIM)**  \nCompute‑in‑Memory is a computing paradigm in which arithmetic or logic operations are performed directly inside the memory array rather than on a separate processor.  In practice this means that the memory chip itself contains processing elements (e.g., vector units, FPGA‑style logic, or simple arithmetic units) that can operate on the data stored in the same physical cells.  The result is a *Processing‑in‑Memory (PIM)* or *Computational RAM (C‑RAM)* architecture that can be used as a SIMD computer and can exploit the high bandwidth of the memory chip for computation [Source 4].",
+      "n_in_tokens": 907,
+      "n_out_tokens": 400,
+      "tok_per_sec": 25.459577361331753,
+      "t_embed_ms": 64.24299600257655,
+      "t_retrieve_ms": 6.977913002629066,
+      "t_gen_ms": 15711.179895999521,
+      "total_ms": 15782.400805004727,
+      "retrieved_titles": [
+        {
+          "title": "In-memory processing",
+          "activation": 0.21352295577526093
+        },
+        {
+          "title": "In-memory database",
+          "activation": 0.07929070293903351
+        },
+        {
+          "title": "Computing with Memory",
+          "activation": 0.031816266477108
+        },
+        {
+          "title": "Computational RAM",
+          "activation": 0.03134690597653389
+        },
+        {
+          "title": "AI accelerator",
+          "activation": 0.014942049048841
+        }
+      ]
+    },
+    {
+      "question": "How do attention mechanisms work in transformer neural networks?",
+      "answer": "In a transformer, every token in the input sequence is first turned into a vector (via an embedding lookup).  At each transformer layer, the model uses a **parallel multi‑head attention** mechanism to let every token “look at” every other token in the same context window.  The attention mechanism assigns a **soft weight** to each pair of tokens—these weights are computed on the fly during inference or training, unlike fixed “hard” weights that are frozen after training.  The soft weights determine how much influence",
+      "n_in_tokens": 949,
+      "n_out_tokens": 400,
+      "tok_per_sec": 25.90101904410822,
+      "t_embed_ms": 62.69504599913489,
+      "t_retrieve_ms": 6.953434000024572,
+      "t_gen_ms": 15443.407818002015,
+      "total_ms": 15513.056298001175,
+      "retrieved_titles": [
+        {
+          "title": "Attention (machine learning)",
+          "activation": 0.39477652311325073
+        },
+        {
+          "title": "Transformer (machine learning model)",
+          "activation": 0.36098164319992065
+        },
+        {
+          "title": "Visual temporal attention",
+          "activation": 0.01771891489624977
+        },
+        {
+          "title": "Perceiver",
+          "activation": 0.009040532633662224
+        },
+        {
+          "title": "GPT-3",
+          "activation": 0.007946864701807499
+        }
+      ]
+    },
+    {
+      "question": "What is the difference between DRAM and NAND flash memory?",
+      "answer": "**DRAM (Dynamic Random‑Access Memory)**  \n* Volatile*: it must be powered continuously; the charge on its capacitors leaks away and the data is lost when power is removed [Source 2, 5].  \n* Cell structure*: each bit is stored in a tiny capacitor that can be charged or discharged, with a transistor to read or write the charge [Source 2].  \n* Refresh requirement*: because the capacitor leaks, an external refresh circuit must periodically rewrite the data to keep it alive [Source 2].  \n* Typical use*: primary memory (RAM) in computers and other devices where fast, random access is needed and data does not need to survive a power‑off.\n\n**NAND flash memory**  \n* Non‑volatile*: it retains data even when",
+      "n_in_tokens": 986,
+      "n_out_tokens": 400,
+      "tok_per_sec": 25.711774765360506,
+      "t_embed_ms": 61.85635200017714,
+      "t_retrieve_ms": 6.964120999327861,
+      "t_gen_ms": 15557.07467299726,
+      "total_ms": 15625.895145996765,
+      "retrieved_titles": [
+        {
+          "title": "Flash memory",
+          "activation": 0.8116560578346252
+        },
+        {
+          "title": "Dynamic random-access memory",
+          "activation": 0.07341541349887848
+        },
+        {
+          "title": "NOR flash replacement",
+          "activation": 0.011637140065431595
+        },
+        {
+          "title": "Non-volatile random-access memory",
+          "activation": 0.00926144141703844
+        },
+        {
+          "title": "Volatile memory",
+          "activation": 0.007365353871136904
+        }
+      ]
+    },
+    {
+      "question": "Why is energy efficiency critical for scaling large-scale AI deployments?",
+      "answer": "Large‑scale AI systems demand enormous amounts of compute, memory, networking and storage that must be added continuously as demand grows.  Each additional node or rack consumes power not only for the processors but also for cooling, power conversion and other infrastructure.  Because the cost of electricity and the environmental impact of that electricity grow with the size of the data‑center, energy efficiency becomes a prerequisite for practical scaling.\n\n* **Power‑usage metrics** – The Green Power Usage Effectiveness (GPUE) metric extends the standard PUE by measuring how much of the power that reaches a data‑center is actually used by the IT equipment versus lost to cooling or other overhead.  A low GPUE (or PUE) means that more of the supplied energy is doing useful work, which is essential when the total",
+      "n_in_tokens": 977,
+      "n_out_tokens": 400,
+      "tok_per_sec": 26.033775353089112,
+      "t_embed_ms": 62.18128199907369,
+      "t_retrieve_ms": 6.950905000849161,
+      "t_gen_ms": 15364.655896999466,
+      "total_ms": 15433.788083999389,
+      "retrieved_titles": [
+        {
+          "title": "Green Power Usage Effectiveness",
+          "activation": 0.011795221827924252
+        },
+        {
+          "title": "Energy Logic",
+          "activation": 0.01067814975976944
+        },
+        {
+          "title": "Hyperscale computing",
+          "activation": 0.009750478900969028
+        },
+        {
+          "title": "Atlas of AI",
+          "activation": 0.008112483657896519
+        },
+        {
+          "title": "Pause Giant AI Experiments: An Open Letter",
+          "activation": 0.007197908591479063
+        }
+      ]
+    }
+  ]
+}

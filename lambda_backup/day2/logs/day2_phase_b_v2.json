@@ -1,0 +1,8 @@
+{
+  "n_docs": 1000000,
+  "skipped": 219354,
+  "embed_gb": 4.096,
+  "embed_time_s": 819.3,
+  "avg_retrieval_ms": 1.536,
+  "key_present": "0/7"
+}

@@ -1,0 +1,117 @@
+{
+  "phase": "Day 2 Phase B",
+  "dataset": "wikimedia/wikipedia 20231101.en",
+  "n_docs_kept": 1000000,
+  "n_docs_skipped": 242054,
+  "embedding_dim": 1024,
+  "embedding_size_gb": 4.096,
+  "load_time_s": 81.2,
+  "embed_time_s": 842.1,
+  "avg_retrieval_ms": 1.536,
+  "sanity_queries": [
+    {
+      "q": "What is High Bandwidth Memory and why is it important for AI?",
+      "latency_ms": 1.5325155996833928,
+      "top5": [
+        {
+          "title": "HyperMemory",
+          "activation": 0.17127051949501038
+        },
+        {
+          "title": "Bandwidth (signal processing)",
+          "activation": 0.09550128877162933
+        },
+        {
+          "title": "Bandwidth (computing)",
+          "activation": 0.04637303203344345
+        },
+        {
+          "title": "Bandwidth extension",
+          "activation": 0.024736907333135605
+        },
+        {
+          "title": "Hierarchical temporal memory",
+          "activation": 0.02237224392592907
+        }
+      ]
+    },
+    {
+      "q": "How do transformer models use attention mechanisms?",
+      "latency_ms": 1.5372484998806613,
+      "top5": [
+        {
+          "title": "Attentional shift",
+          "activation": 0.11342081427574158
+        },
+        {
+          "title": "Buck–boost transformer",
+          "activation": 0.028592070564627647
+        },
+        {
+          "title": "Sensitivity time control",
+          "activation": 0.01682984083890915
+        },
+        {
+          "title": "Transformer types",
+          "activation": 0.01297251507639885
+        },
+        {
+          "title": "Volterra series",
+          "activation": 0.012850049883127213
+        }
+      ]
+    },
+    {
+      "q": "What is SK Hynix and what semiconductors do they make?",
+      "latency_ms": 1.5383909001684515,
+      "top5": [
+        {
+          "title": "Dynex Semiconductor",
+          "activation": 0.3726167678833008
+        },
+        {
+          "title": "Systems on Silicon Manufacturing",
+          "activation": 0.034017711877822876
+        },
+        {
+          "title": "Havok (company)",
+          "activation": 0.010858621448278427
+        },
+        {
+          "title": "Silicon Optix",
+          "activation": 0.010508890263736248
+        },
+        {
+          "title": "Synnex",
+          "activation": 0.00842301081866026
+        }
+      ]
+    },
+    {
+      "q": "Explain the von Neumann architecture and its limitations.",
+      "latency_ms": 1.5370723998785252,
+      "top5": [
+        {
+          "title": "Von Neumann universal constructor",
+          "activation": 0.4294537603855133
+        },
+        {
+          "title": "Von Neumann's inequality",
+          "activation": 0.09384852647781372
+        },
+        {
+          "title": "Von Neumann neighborhood",
+          "activation": 0.07847441732883453
+        },
+        {
+          "title": "Enveloping von Neumann algebra",
+          "activation": 0.04594691842794418
+        },
+        {
+          "title": "Axiom of limitation of size",
+          "activation": 0.04377825930714607
+        }
+      ]
+    }
+  ]
+}
