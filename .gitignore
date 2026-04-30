@@ -1,10 +1,43 @@
+# Python
 .venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Model weights / large binary
 *.bin
 *.safetensors
 *.gguf
+*.pt
+*.pth
+
+# Data + logs (local only)
+data/
+logs/
+
+# Legacy hardcoded entries (kept for safety)
 data/en_wiki_embeddings.pt
 data/en_wiki_docs.json
 data/ko_wiki_embeddings.pt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.bak

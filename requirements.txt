@@ -1,0 +1,11 @@
+torch>=2.0
+transformers>=4.40
+sentence-transformers>=2.7
+datasets>=2.14
+accelerate>=0.30
+faiss-cpu>=1.7
+openai>=1.0
+python-dotenv>=1.0
+pypdf>=4.0
+requests>=2.31
+tqdm>=4.66
