@@ -1,102 +1,1728 @@
 [
-  {"id":"factual_001","category":"factual_single_hop","difficulty":"easy","language":"en","query":"Who wrote the novel 1984?","expected_answer_keywords":["George Orwell","Orwell"],"expected_source_articles":["Nineteen Eighty-Four","George Orwell"],"answerable":true},
-  {"id":"factual_002","category":"factual_single_hop","difficulty":"easy","language":"en","query":"What is the capital of France?","expected_answer_keywords":["Paris"],"expected_source_articles":["Paris","France"],"answerable":true},
-  {"id":"factual_003","category":"factual_single_hop","difficulty":"easy","language":"en","query":"How tall is Mount Everest?","expected_answer_keywords":["8,848","8848","29,029","meters","feet"],"expected_source_articles":["Mount Everest"],"answerable":true},
-  {"id":"factual_004","category":"factual_single_hop","difficulty":"easy","language":"en","query":"Who painted the Mona Lisa?","expected_answer_keywords":["Leonardo da Vinci","da Vinci"],"expected_source_articles":["Mona Lisa","Leonardo da Vinci"],"answerable":true},
-  {"id":"factual_005","category":"factual_single_hop","difficulty":"easy","language":"en","query":"What is the chemical symbol for gold?","expected_answer_keywords":["Au"],"expected_source_articles":["Gold"],"answerable":true},
-  {"id":"factual_006","category":"factual_single_hop","difficulty":"easy","language":"en","query":"In which year did World War II end?","expected_answer_keywords":["1945"],"expected_source_articles":["World War II"],"answerable":true},
-  {"id":"factual_007","category":"factual_single_hop","difficulty":"medium","language":"en","query":"What programming language was created by Guido van Rossum?","expected_answer_keywords":["Python"],"expected_source_articles":["Python (programming language)","Guido van Rossum"],"answerable":true},
-  {"id":"factual_008","category":"factual_single_hop","difficulty":"medium","language":"en","query":"Which scientist proposed the theory of general relativity?","expected_answer_keywords":["Albert Einstein","Einstein"],"expected_source_articles":["General relativity","Albert Einstein"],"answerable":true},
-  {"id":"factual_009","category":"factual_single_hop","difficulty":"medium","language":"en","query":"What is the largest planet in our solar system?","expected_answer_keywords":["Jupiter"],"expected_source_articles":["Jupiter","Solar System"],"answerable":true},
-  {"id":"factual_010","category":"factual_single_hop","difficulty":"medium","language":"en","query":"Who was the first person to walk on the moon?","expected_answer_keywords":["Neil Armstrong","Armstrong"],"expected_source_articles":["Neil Armstrong","Apollo 11"],"answerable":true},
-  {"id":"factual_011","category":"factual_single_hop","difficulty":"medium","language":"en","query":"What is the longest river in the world?","expected_answer_keywords":["Nile","Amazon"],"expected_source_articles":["Nile","Amazon River","List of longest rivers"],"answerable":true,"notes":"Nile vs Amazon disputed"},
-  {"id":"factual_012","category":"factual_single_hop","difficulty":"medium","language":"en","query":"Which country has Tokyo as its capital?","expected_answer_keywords":["Japan"],"expected_source_articles":["Tokyo","Japan"],"answerable":true},
-  {"id":"factual_013","category":"factual_single_hop","difficulty":"medium","language":"en","query":"What does DNA stand for?","expected_answer_keywords":["deoxyribonucleic acid","Deoxyribonucleic"],"expected_source_articles":["DNA"],"answerable":true},
-  {"id":"factual_014","category":"factual_single_hop","difficulty":"medium","language":"en","query":"In what year was the company Apple founded?","expected_answer_keywords":["1976"],"expected_source_articles":["Apple Inc.","Apple Computer"],"answerable":true},
-  {"id":"factual_015","category":"factual_single_hop","difficulty":"medium","language":"en","query":"Which element has the atomic number 1?","expected_answer_keywords":["Hydrogen"],"expected_source_articles":["Hydrogen","Periodic table"],"answerable":true},
-  {"id":"factual_016","category":"factual_single_hop","difficulty":"hard","language":"en","query":"What was the maiden name of Marie Curie?","expected_answer_keywords":["Sklodowska","Skłodowska"],"expected_source_articles":["Marie Curie"],"answerable":true},
-  {"id":"factual_017","category":"factual_single_hop","difficulty":"hard","language":"en","query":"On which date did the Berlin Wall fall?","expected_answer_keywords":["November 9, 1989","9 November 1989","1989"],"expected_source_articles":["Berlin Wall","Fall of the Berlin Wall"],"answerable":true},
-  {"id":"factual_018","category":"factual_single_hop","difficulty":"hard","language":"en","query":"What is the speed of light in vacuum in meters per second?","expected_answer_keywords":["299,792,458","299792458","3x10^8","approximately 300,000"],"expected_source_articles":["Speed of light"],"answerable":true},
-  {"id":"factual_019","category":"factual_single_hop","difficulty":"hard","language":"en","query":"Who composed the opera 'The Magic Flute'?","expected_answer_keywords":["Mozart","Wolfgang Amadeus Mozart"],"expected_source_articles":["The Magic Flute","Wolfgang Amadeus Mozart"],"answerable":true},
-  {"id":"factual_020","category":"factual_single_hop","difficulty":"hard","language":"en","query":"What was the name of the first artificial Earth satellite?","expected_answer_keywords":["Sputnik 1","Sputnik"],"expected_source_articles":["Sputnik 1","Sputnik program"],"answerable":true},
-  {"id":"multihop_001","category":"multi_hop_reasoning","difficulty":"easy","language":"en","query":"Who was the wife of the man who proposed the theory of general relativity?","expected_answer_keywords":["Mileva Maric","Maric","Elsa Einstein","Elsa"],"expected_source_articles":["Albert Einstein","Mileva Maric","Elsa Einstein"],"answerable":true},
-  {"id":"multihop_002","category":"multi_hop_reasoning","difficulty":"easy","language":"en","query":"In what country is the capital city of the nation that hosted the 1988 Summer Olympics?","expected_answer_keywords":["South Korea","Korea","Seoul"],"expected_source_articles":["1988 Summer Olympics","Seoul","South Korea"],"answerable":true},
-  {"id":"multihop_003","category":"multi_hop_reasoning","difficulty":"easy","language":"en","query":"What programming language was created by the founder of Google?","expected_answer_keywords":["Go","Golang","no specific language","neither founded"],"expected_source_articles":["Larry Page","Sergey Brin","Go (programming language)"],"answerable":true,"notes":"Tricky"},
-  {"id":"multihop_004","category":"multi_hop_reasoning","difficulty":"easy","language":"en","query":"Who painted the ceiling of the chapel in Vatican City?","expected_answer_keywords":["Michelangelo"],"expected_source_articles":["Sistine Chapel ceiling","Michelangelo","Sistine Chapel"],"answerable":true},
-  {"id":"multihop_005","category":"multi_hop_reasoning","difficulty":"easy","language":"en","query":"What is the official language of the country where the Eiffel Tower is located?","expected_answer_keywords":["French"],"expected_source_articles":["Eiffel Tower","France","French language"],"answerable":true},
-  {"id":"multihop_006","category":"multi_hop_reasoning","difficulty":"easy","language":"en","query":"Which planet is named after the Roman god of war?","expected_answer_keywords":["Mars"],"expected_source_articles":["Mars","Mars (mythology)"],"answerable":true},
-  {"id":"multihop_007","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"Who was the U.S. president when the first atomic bomb was dropped on Hiroshima?","expected_answer_keywords":["Harry S. Truman","Truman"],"expected_source_articles":["Atomic bombings of Hiroshima and Nagasaki","Harry S. Truman"],"answerable":true},
-  {"id":"multihop_008","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"In which city was the composer of 'The Magic Flute' born?","expected_answer_keywords":["Salzburg"],"expected_source_articles":["The Magic Flute","Wolfgang Amadeus Mozart","Salzburg"],"answerable":true},
-  {"id":"multihop_009","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"What is the largest moon of the planet whose Galilean moons were discovered in 1610?","expected_answer_keywords":["Ganymede"],"expected_source_articles":["Galilean moons","Jupiter","Ganymede (moon)"],"answerable":true},
-  {"id":"multihop_010","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"What university did the founder of Microsoft drop out of?","expected_answer_keywords":["Harvard"],"expected_source_articles":["Bill Gates","Microsoft","Harvard University"],"answerable":true},
-  {"id":"multihop_011","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"What is the currency of the country where the headquarters of the European Union is located?","expected_answer_keywords":["Euro","EUR"],"expected_source_articles":["European Union","Brussels","Belgium","Euro"],"answerable":true},
-  {"id":"multihop_012","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"Who directed the highest-grossing film of 1997?","expected_answer_keywords":["James Cameron","Cameron"],"expected_source_articles":["Titanic (1997 film)","James Cameron"],"answerable":true},
-  {"id":"multihop_013","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"What city is the capital of the country where Machu Picchu is located?","expected_answer_keywords":["Lima"],"expected_source_articles":["Machu Picchu","Peru","Lima"],"answerable":true},
-  {"id":"multihop_014","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"Which Nobel Prize did the discoverer of penicillin win?","expected_answer_keywords":["Physiology or Medicine","Medicine"],"expected_source_articles":["Alexander Fleming","Penicillin","Nobel Prize in Physiology or Medicine"],"answerable":true},
-  {"id":"multihop_015","category":"multi_hop_reasoning","difficulty":"medium","language":"en","query":"What language is spoken in the country whose flag is red with a white maple leaf?","expected_answer_keywords":["English","French"],"expected_source_articles":["Flag of Canada","Canada","Languages of Canada"],"answerable":true},
-  {"id":"multihop_016","category":"multi_hop_reasoning","difficulty":"hard","language":"en","query":"Who was the teacher of the philosopher who taught Alexander the Great?","expected_answer_keywords":["Plato"],"expected_source_articles":["Aristotle","Alexander the Great","Plato"],"answerable":true},
-  {"id":"multihop_017","category":"multi_hop_reasoning","difficulty":"hard","language":"en","query":"In what year did the country that produced Volkswagen reunify?","expected_answer_keywords":["1990"],"expected_source_articles":["Volkswagen","Germany","German reunification"],"answerable":true},
-  {"id":"multihop_018","category":"multi_hop_reasoning","difficulty":"hard","language":"en","query":"What is the atomic number of the element discovered by the scientist who won two Nobel Prizes in different scientific fields?","expected_answer_keywords":["88","Radium","84","Polonium"],"expected_source_articles":["Marie Curie","Radium","Polonium"],"answerable":true},
-  {"id":"multihop_019","category":"multi_hop_reasoning","difficulty":"hard","language":"en","query":"Who succeeded the British monarch who reigned during World War I?","expected_answer_keywords":["Edward VIII","George VI"],"expected_source_articles":["George V","Edward VIII","George VI"],"answerable":true},
-  {"id":"multihop_020","category":"multi_hop_reasoning","difficulty":"hard","language":"en","query":"What is the highest mountain in the country that contains the source of the Amazon River?","expected_answer_keywords":["Huascaran","Huascarán"],"expected_source_articles":["Amazon River","Peru","Huascarán"],"answerable":true},
-  {"id":"multiling_001","category":"multilingual","difficulty":"easy","language":"es","query":"¿Cuál es la capital de Francia?","expected_answer_keywords":["Paris","París"],"expected_source_articles":["Paris","France"],"answerable":true},
-  {"id":"multiling_002","category":"multilingual","difficulty":"medium","language":"es","query":"¿Quién pintó la Mona Lisa?","expected_answer_keywords":["Leonardo da Vinci","da Vinci"],"expected_source_articles":["Mona Lisa","Leonardo da Vinci"],"answerable":true},
-  {"id":"multiling_003","category":"multilingual","difficulty":"hard","language":"es","query":"¿En qué año cayó el Muro de Berlín?","expected_answer_keywords":["1989"],"expected_source_articles":["Berlin Wall","Fall of the Berlin Wall"],"answerable":true},
-  {"id":"multiling_004","category":"multilingual","difficulty":"easy","language":"zh","query":"珠穆朗玛峰有多高?","expected_answer_keywords":["8,848","8848","29,029","meters","feet"],"expected_source_articles":["Mount Everest"],"answerable":true},
-  {"id":"multiling_005","category":"multilingual","difficulty":"medium","language":"zh","query":"谁发明了相对论?","expected_answer_keywords":["Albert Einstein","Einstein"],"expected_source_articles":["Albert Einstein","Theory of relativity"],"answerable":true},
-  {"id":"multiling_006","category":"multilingual","difficulty":"hard","language":"zh","query":"光合作用的化学方程式是什么?","expected_answer_keywords":["6CO2","6H2O","C6H12O6","6O2","carbon dioxide","glucose","oxygen"],"expected_source_articles":["Photosynthesis"],"answerable":true},
-  {"id":"multiling_007","category":"multilingual","difficulty":"easy","language":"ja","query":"1984を書いた作家は誰ですか?","expected_answer_keywords":["George Orwell","Orwell"],"expected_source_articles":["Nineteen Eighty-Four","George Orwell"],"answerable":true},
-  {"id":"multiling_008","category":"multilingual","difficulty":"medium","language":"ja","query":"太陽系で最も大きい惑星は何ですか?","expected_answer_keywords":["Jupiter","木星"],"expected_source_articles":["Jupiter","Solar System"],"answerable":true},
-  {"id":"multiling_009","category":"multilingual","difficulty":"hard","language":"ja","query":"アインシュタインが1921年にノーベル賞を受賞した理由は何ですか?","expected_answer_keywords":["photoelectric effect","光電効果"],"expected_source_articles":["Albert Einstein","Photoelectric effect"],"answerable":true},
-  {"id":"multiling_010","category":"multilingual","difficulty":"easy","language":"fr","query":"Qui a peint la Mona Lisa?","expected_answer_keywords":["Leonardo da Vinci","da Vinci","Léonard"],"expected_source_articles":["Mona Lisa","Leonardo da Vinci"],"answerable":true},
-  {"id":"multiling_011","category":"multilingual","difficulty":"medium","language":"fr","query":"Quel est le langage de programmation créé par Guido van Rossum?","expected_answer_keywords":["Python"],"expected_source_articles":["Python (programming language)","Guido van Rossum"],"answerable":true},
-  {"id":"multiling_012","category":"multilingual","difficulty":"hard","language":"fr","query":"Quel est le nom de jeune fille de Marie Curie?","expected_answer_keywords":["Sklodowska","Skłodowska"],"expected_source_articles":["Marie Curie"],"answerable":true},
-  {"id":"multiling_013","category":"multilingual","difficulty":"easy","language":"de","query":"Was ist die Hauptstadt von Frankreich?","expected_answer_keywords":["Paris"],"expected_source_articles":["Paris","France"],"answerable":true},
-  {"id":"multiling_014","category":"multilingual","difficulty":"medium","language":"de","query":"Wer war der erste Mensch auf dem Mond?","expected_answer_keywords":["Neil Armstrong","Armstrong"],"expected_source_articles":["Neil Armstrong","Apollo 11"],"answerable":true},
-  {"id":"multiling_015","category":"multilingual","difficulty":"hard","language":"de","query":"Wer schlug die allgemeine Relativitätstheorie vor?","expected_answer_keywords":["Albert Einstein","Einstein"],"expected_source_articles":["General relativity","Albert Einstein"],"answerable":true},
-  {"id":"multiling_016","category":"multilingual","difficulty":"easy","language":"hi","query":"फ्रांस की राजधानी क्या है?","expected_answer_keywords":["Paris"],"expected_source_articles":["Paris","France"],"answerable":true},
-  {"id":"multiling_017","category":"multilingual","difficulty":"medium","language":"hi","query":"DNA की खोज किसने की थी?","expected_answer_keywords":["Watson","Crick","Friedrich Miescher","Rosalind Franklin"],"expected_source_articles":["DNA","James Watson","Francis Crick"],"answerable":true},
-  {"id":"multiling_018","category":"multilingual","difficulty":"hard","language":"hi","query":"महात्मा गांधी का जन्म कब हुआ था?","expected_answer_keywords":["1869","October 2, 1869","2 October 1869"],"expected_source_articles":["Mahatma Gandhi"],"answerable":true},
-  {"id":"multiling_019","category":"multilingual","difficulty":"easy","language":"ko","query":"에베레스트 산의 높이는?","expected_answer_keywords":["8,848","8848","29,029","meters"],"expected_source_articles":["Mount Everest"],"answerable":true},
-  {"id":"multiling_020","category":"multilingual","difficulty":"hard","language":"ko","query":"양자역학의 기초를 세운 과학자들은 누구입니까?","expected_answer_keywords":["Planck","Bohr","Heisenberg","Schrödinger","Einstein"],"expected_source_articles":["Quantum mechanics","History of quantum mechanics"],"answerable":true},
-  {"id":"edge_001","category":"edge_no_answer","difficulty":"easy","language":"en","query":"What is the GDP of Wakanda in 2025?","expected_answer_keywords":["fictional","not real","Marvel","fictional country","no GDP"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_002","category":"edge_no_answer","difficulty":"easy","language":"en","query":"Where is Hogwarts School of Witchcraft and Wizardry located in real life?","expected_answer_keywords":["fictional","not real","Harry Potter","fictional school","does not exist"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_003","category":"edge_no_answer","difficulty":"easy","language":"en","query":"Who is the current king of the Seven Kingdoms in Westeros?","expected_answer_keywords":["fictional","Game of Thrones","not real"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_004","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What is the population of Atlantis as of 2024?","expected_answer_keywords":["mythical","legendary","fictional","Plato","no population"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_005","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What was the result of the 2030 U.S. presidential election?","expected_answer_keywords":["future","has not happened","not yet","cannot answer","future event"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_006","category":"edge_no_answer","difficulty":"medium","language":"en","query":"Who will win the FIFA World Cup in 2034?","expected_answer_keywords":["future","has not happened","cannot predict","future event"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_007","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What is the projected world population in 2100?","expected_answer_keywords":["projection","estimate","uncertain","no exact figure","future"],"expected_source_articles":["World population"],"answerable":false},
-  {"id":"edge_008","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What did Albert Einstein eat for breakfast on March 14, 1925?","expected_answer_keywords":["no information","cannot determine","no record","not documented","private"],"expected_source_articles":["Albert Einstein"],"answerable":false},
-  {"id":"edge_009","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What is Tim Cook's home phone number?","expected_answer_keywords":["private","not public","no information","personal","cannot provide"],"expected_source_articles":["Tim Cook"],"answerable":false},
-  {"id":"edge_010","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What is the exact salary of every employee at Google as of last month?","expected_answer_keywords":["private","not public","no information","confidential","individual"],"expected_source_articles":["Google"],"answerable":false},
-  {"id":"edge_011","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What is Barack Obama's current job as President of the United States?","expected_answer_keywords":["former","no longer president","ended","Joe Biden","not current","left office"],"expected_source_articles":["Barack Obama"],"answerable":false},
-  {"id":"edge_012","category":"edge_no_answer","difficulty":"medium","language":"en","query":"What is Elvis Presley's current touring schedule?","expected_answer_keywords":["died","deceased","1977","no longer alive","not touring"],"expected_source_articles":["Elvis Presley"],"answerable":false},
-  {"id":"edge_013","category":"edge_no_answer","difficulty":"hard","language":"en","query":"What is the chemical formula of element 150 on the periodic table?","expected_answer_keywords":["does not exist","no such element","118","Oganesson","not discovered"],"expected_source_articles":["Periodic table","Extended periodic table"],"answerable":false},
-  {"id":"edge_014","category":"edge_no_answer","difficulty":"hard","language":"en","query":"Why did Mahatma Gandhi support nuclear weapons?","expected_answer_keywords":["did not","opposed","non-violence","ahimsa","false premise","incorrect assumption"],"expected_source_articles":["Mahatma Gandhi"],"answerable":false},
-  {"id":"edge_015","category":"edge_no_answer","difficulty":"hard","language":"en","query":"What is the birth name of the AI model GPT-4?","expected_answer_keywords":["AI model","not a person","no birth name","software","language model"],"expected_source_articles":["GPT-4"],"answerable":false},
-  {"id":"edge_016","category":"edge_no_answer","difficulty":"hard","language":"en","query":"What was the name of Aristotle's smartphone?","expected_answer_keywords":["did not exist","anachronism","ancient Greek","no smartphones","lived in"],"expected_source_articles":["Aristotle"],"answerable":false},
-  {"id":"edge_017","category":"edge_no_answer","difficulty":"hard","language":"en","query":"What is the password to the official Wikipedia admin account?","expected_answer_keywords":["cannot provide","private","security","not appropriate","confidential"],"expected_source_articles":[],"answerable":false},
-  {"id":"edge_018","category":"edge_no_answer","difficulty":"hard","language":"en","query":"What did Cleopatra say in her last text message?","expected_answer_keywords":["did not exist","anachronism","ancient","no text","30 BC"],"expected_source_articles":["Cleopatra"],"answerable":false},
-  {"id":"edge_019","category":"edge_no_answer","difficulty":"hard","language":"en","query":"What is the recipe for the legendary Philosopher's Stone?","expected_answer_keywords":["legendary","alchemy","mythical","not real","fictional"],"expected_source_articles":["Philosopher's stone"],"answerable":false},
-  {"id":"edge_020","category":"edge_no_answer","difficulty":"hard","language":"en","query":"How many siblings does the fictional character Sherlock Holmes have, and what are their actual social security numbers?","expected_answer_keywords":["fictional","no SSN","not real","Mycroft","Sherrinford"],"expected_source_articles":["Sherlock Holmes","Mycroft Holmes"],"answerable":false},
-  {"id":"amb_001","category":"ambiguous_negative","difficulty":"easy","language":"en","query":"Tell me about Apple.","expected_answer_keywords":["clarify","company","fruit","Apple Inc.","which","ambiguous"],"expected_source_articles":["Apple Inc.","Apple"],"answerable":true},
-  {"id":"amb_002","category":"ambiguous_negative","difficulty":"easy","language":"en","query":"What is Mercury?","expected_answer_keywords":["planet","element","Roman god","Freddie Mercury","multiple meanings"],"expected_source_articles":["Mercury (planet)","Mercury (element)","Mercury (mythology)"],"answerable":true},
-  {"id":"amb_003","category":"ambiguous_negative","difficulty":"easy","language":"en","query":"Who is the president?","expected_answer_keywords":["which country","clarify","specify","ambiguous"],"expected_source_articles":[],"answerable":false},
-  {"id":"amb_004","category":"ambiguous_negative","difficulty":"easy","language":"en","query":"What is the best programming language?","expected_answer_keywords":["depends","subjective","use case","no single best","context"],"expected_source_articles":["Programming language"],"answerable":false},
-  {"id":"amb_005","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"Which is the largest country?","expected_answer_keywords":["depends","by area","by population","Russia","China","India","clarify"],"expected_source_articles":["List of countries and dependencies by area","List of countries by population"],"answerable":true},
-  {"id":"amb_006","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"Tell me everything about World War II.","expected_answer_keywords":["overview","summary","many aspects","specify","too broad"],"expected_source_articles":["World War II"],"answerable":true},
-  {"id":"amb_007","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"Who is John Smith?","expected_answer_keywords":["multiple","common name","clarify","which one","many people"],"expected_source_articles":["John Smith"],"answerable":false},
-  {"id":"amb_008","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"What is the capital?","expected_answer_keywords":["of which","clarify","specify","country"],"expected_source_articles":[],"answerable":false},
-  {"id":"amb_009","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"Is coffee good or bad for health?","expected_answer_keywords":["depends","moderate","individual","studies","both","context"],"expected_source_articles":["Coffee","Health effects of coffee"],"answerable":true},
-  {"id":"amb_010","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"What languages are not spoken in Africa?","expected_answer_keywords":["many","examples","Korean","Vietnamese","indigenous","specific"],"expected_source_articles":["Languages of Africa"],"answerable":true},
-  {"id":"amb_011","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"Which scientist made the most important discovery?","expected_answer_keywords":["subjective","depends","many scientists","Einstein","Newton","Darwin","no single"],"expected_source_articles":[],"answerable":false},
-  {"id":"amb_012","category":"ambiguous_negative","difficulty":"medium","language":"en","query":"What is the meaning of life?","expected_answer_keywords":["philosophical","subjective","various perspectives","no single answer","42"],"expected_source_articles":["Meaning of life"],"answerable":true},
-  {"id":"amb_013","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"What is Python?","expected_answer_keywords":["programming language","snake","Monty Python","multiple","context"],"expected_source_articles":["Python (programming language)","Pythonidae","Monty Python"],"answerable":true},
-  {"id":"amb_014","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"Are humans causing climate change?","expected_answer_keywords":["yes","scientific consensus","IPCC","anthropogenic","evidence"],"expected_source_articles":["Climate change","Scientific consensus on climate change"],"answerable":true},
-  {"id":"amb_015","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"Which religion is correct?","expected_answer_keywords":["matter of belief","subjective","various","personal","no objective","faith"],"expected_source_articles":["Religion"],"answerable":false},
-  {"id":"amb_016","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"Tell me about the war.","expected_answer_keywords":["which war","many wars","clarify","specify"],"expected_source_articles":[],"answerable":false},
-  {"id":"amb_017","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"What is the second largest moon of Jupiter?","expected_answer_keywords":["Callisto"],"expected_source_articles":["Callisto (moon)","Moons of Jupiter","Ganymede (moon)"],"answerable":true},
-  {"id":"amb_018","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"When did the Roman Empire fall?","expected_answer_keywords":["476","1453","Western","Eastern","Byzantine","depends","two"],"expected_source_articles":["Fall of the Western Roman Empire","Fall of Constantinople","Byzantine Empire"],"answerable":true},
-  {"id":"amb_019","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"What are the side effects of aspirin?","expected_answer_keywords":["bleeding","stomach","ulcer","Reye's syndrome","consult doctor","medical"],"expected_source_articles":["Aspirin","Adverse effect"],"answerable":true},
-  {"id":"amb_020","category":"ambiguous_negative","difficulty":"hard","language":"en","query":"Compare democracy and dictatorship.","expected_answer_keywords":["governance","power","elections","rights","differences","balanced"],"expected_source_articles":["Democracy","Dictatorship","Forms of government"],"answerable":true}
+  {
+    "id": "factual_001",
+    "category": "factual_single_hop",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Who wrote the novel 1984?",
+    "expected_answer_keywords": [
+      "George Orwell",
+      "Orwell"
+    ],
+    "expected_source_articles": [
+      "Nineteen Eighty-Four",
+      "George Orwell"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_002",
+    "category": "factual_single_hop",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What is the capital of France?",
+    "expected_answer_keywords": [
+      "Paris"
+    ],
+    "expected_source_articles": [
+      "Paris",
+      "France"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_003",
+    "category": "factual_single_hop",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "How tall is Mount Everest?",
+    "expected_answer_keywords": [
+      "8,848",
+      "8848",
+      "29,029",
+      "meters",
+      "feet",
+      "29,031",
+      "8849",
+      "8,849",
+      "metres"
+    ],
+    "expected_source_articles": [
+      "Mount Everest"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_004",
+    "category": "factual_single_hop",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Who painted the Mona Lisa?",
+    "expected_answer_keywords": [
+      "Leonardo da Vinci",
+      "da Vinci"
+    ],
+    "expected_source_articles": [
+      "Mona Lisa",
+      "Leonardo da Vinci"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_005",
+    "category": "factual_single_hop",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What is the chemical symbol for gold?",
+    "expected_answer_keywords": [
+      "Au"
+    ],
+    "expected_source_articles": [
+      "Gold"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_006",
+    "category": "factual_single_hop",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "In which year did World War II end?",
+    "expected_answer_keywords": [
+      "1945"
+    ],
+    "expected_source_articles": [
+      "World War II"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_007",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What programming language was created by Guido van Rossum?",
+    "expected_answer_keywords": [
+      "Python"
+    ],
+    "expected_source_articles": [
+      "Python (programming language)",
+      "Guido van Rossum"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_008",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Which scientist proposed the theory of general relativity?",
+    "expected_answer_keywords": [
+      "Albert Einstein",
+      "Einstein"
+    ],
+    "expected_source_articles": [
+      "General relativity",
+      "Albert Einstein"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_009",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the largest planet in our solar system?",
+    "expected_answer_keywords": [
+      "Jupiter"
+    ],
+    "expected_source_articles": [
+      "Jupiter",
+      "Solar System"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_010",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Who was the first person to walk on the moon?",
+    "expected_answer_keywords": [
+      "Neil Armstrong",
+      "Armstrong"
+    ],
+    "expected_source_articles": [
+      "Neil Armstrong",
+      "Apollo 11"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_011",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the longest river in the world?",
+    "expected_answer_keywords": [
+      "Nile",
+      "Amazon"
+    ],
+    "expected_source_articles": [
+      "Nile",
+      "Amazon River",
+      "List of longest rivers"
+    ],
+    "answerable": true,
+    "notes": "Nile vs Amazon disputed"
+  },
+  {
+    "id": "factual_012",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Which country has Tokyo as its capital?",
+    "expected_answer_keywords": [
+      "Japan"
+    ],
+    "expected_source_articles": [
+      "Tokyo",
+      "Japan"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_013",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What does DNA stand for?",
+    "expected_answer_keywords": [
+      "deoxyribonucleic acid",
+      "Deoxyribonucleic"
+    ],
+    "expected_source_articles": [
+      "DNA"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_014",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "In what year was the company Apple founded?",
+    "expected_answer_keywords": [
+      "1976"
+    ],
+    "expected_source_articles": [
+      "Apple Inc.",
+      "Apple Computer"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_015",
+    "category": "factual_single_hop",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Which element has the atomic number 1?",
+    "expected_answer_keywords": [
+      "Hydrogen"
+    ],
+    "expected_source_articles": [
+      "Hydrogen",
+      "Periodic table"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_016",
+    "category": "factual_single_hop",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What was the maiden name of Marie Curie?",
+    "expected_answer_keywords": [
+      "Sklodowska",
+      "Skłodowska"
+    ],
+    "expected_source_articles": [
+      "Marie Curie"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_017",
+    "category": "factual_single_hop",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "On which date did the Berlin Wall fall?",
+    "expected_answer_keywords": [
+      "November 9, 1989",
+      "9 November 1989",
+      "1989"
+    ],
+    "expected_source_articles": [
+      "Berlin Wall",
+      "Fall of the Berlin Wall"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_018",
+    "category": "factual_single_hop",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the speed of light in vacuum in meters per second?",
+    "expected_answer_keywords": [
+      "299,792,458",
+      "299792458",
+      "3x10^8",
+      "approximately 300,000"
+    ],
+    "expected_source_articles": [
+      "Speed of light"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_019",
+    "category": "factual_single_hop",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Who composed the opera 'The Magic Flute'?",
+    "expected_answer_keywords": [
+      "Mozart",
+      "Wolfgang Amadeus Mozart"
+    ],
+    "expected_source_articles": [
+      "The Magic Flute",
+      "Wolfgang Amadeus Mozart"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "factual_020",
+    "category": "factual_single_hop",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What was the name of the first artificial Earth satellite?",
+    "expected_answer_keywords": [
+      "Sputnik 1",
+      "Sputnik"
+    ],
+    "expected_source_articles": [
+      "Sputnik 1",
+      "Sputnik program"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_001",
+    "category": "multi_hop_reasoning",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Who was the wife of the man who proposed the theory of general relativity?",
+    "expected_answer_keywords": [
+      "Marić",
+      "Elsa Einstein",
+      "Mileva Maric",
+      "Elsa",
+      "Mileva",
+      "Maric"
+    ],
+    "expected_source_articles": [
+      "Albert Einstein",
+      "Mileva Maric",
+      "Elsa Einstein"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_002",
+    "category": "multi_hop_reasoning",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "In what country is the capital city of the nation that hosted the 1988 Summer Olympics?",
+    "expected_answer_keywords": [
+      "South Korea",
+      "Korea",
+      "Seoul"
+    ],
+    "expected_source_articles": [
+      "1988 Summer Olympics",
+      "Seoul",
+      "South Korea"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_003",
+    "category": "multi_hop_reasoning",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What programming language was created by the founder of Google?",
+    "expected_answer_keywords": [
+      "Go",
+      "Golang",
+      "no specific language",
+      "neither founded"
+    ],
+    "expected_source_articles": [
+      "Larry Page",
+      "Sergey Brin",
+      "Go (programming language)"
+    ],
+    "answerable": true,
+    "notes": "Tricky"
+  },
+  {
+    "id": "multihop_004",
+    "category": "multi_hop_reasoning",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Who painted the ceiling of the chapel in Vatican City?",
+    "expected_answer_keywords": [
+      "Michelangelo"
+    ],
+    "expected_source_articles": [
+      "Sistine Chapel ceiling",
+      "Michelangelo",
+      "Sistine Chapel"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_005",
+    "category": "multi_hop_reasoning",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What is the official language of the country where the Eiffel Tower is located?",
+    "expected_answer_keywords": [
+      "French"
+    ],
+    "expected_source_articles": [
+      "Eiffel Tower",
+      "France",
+      "French language"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_006",
+    "category": "multi_hop_reasoning",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Which planet is named after the Roman god of war?",
+    "expected_answer_keywords": [
+      "Mars"
+    ],
+    "expected_source_articles": [
+      "Mars",
+      "Mars (mythology)"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_007",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Who was the U.S. president when the first atomic bomb was dropped on Hiroshima?",
+    "expected_answer_keywords": [
+      "Harry S. Truman",
+      "Truman"
+    ],
+    "expected_source_articles": [
+      "Atomic bombings of Hiroshima and Nagasaki",
+      "Harry S. Truman"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_008",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "In which city was the composer of 'The Magic Flute' born?",
+    "expected_answer_keywords": [
+      "Salzburg"
+    ],
+    "expected_source_articles": [
+      "The Magic Flute",
+      "Wolfgang Amadeus Mozart",
+      "Salzburg"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_009",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the largest moon of the planet whose Galilean moons were discovered in 1610?",
+    "expected_answer_keywords": [
+      "Ganymede"
+    ],
+    "expected_source_articles": [
+      "Galilean moons",
+      "Jupiter",
+      "Ganymede (moon)"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_010",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What university did the founder of Microsoft drop out of?",
+    "expected_answer_keywords": [
+      "Harvard"
+    ],
+    "expected_source_articles": [
+      "Bill Gates",
+      "Microsoft",
+      "Harvard University"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_011",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the currency of the country where the headquarters of the European Union is located?",
+    "expected_answer_keywords": [
+      "Euro",
+      "EUR"
+    ],
+    "expected_source_articles": [
+      "European Union",
+      "Brussels",
+      "Belgium",
+      "Euro"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_012",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Who directed the highest-grossing film of 1997?",
+    "expected_answer_keywords": [
+      "James Cameron",
+      "Cameron"
+    ],
+    "expected_source_articles": [
+      "Titanic (1997 film)",
+      "James Cameron"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_013",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What city is the capital of the country where Machu Picchu is located?",
+    "expected_answer_keywords": [
+      "Lima"
+    ],
+    "expected_source_articles": [
+      "Machu Picchu",
+      "Peru",
+      "Lima"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_014",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Which Nobel Prize did the discoverer of penicillin win?",
+    "expected_answer_keywords": [
+      "Physiology or Medicine",
+      "Medicine"
+    ],
+    "expected_source_articles": [
+      "Alexander Fleming",
+      "Penicillin",
+      "Nobel Prize in Physiology or Medicine"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_015",
+    "category": "multi_hop_reasoning",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What language is spoken in the country whose flag is red with a white maple leaf?",
+    "expected_answer_keywords": [
+      "English",
+      "French"
+    ],
+    "expected_source_articles": [
+      "Flag of Canada",
+      "Canada",
+      "Languages of Canada"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_016",
+    "category": "multi_hop_reasoning",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Who was the teacher of the philosopher who taught Alexander the Great?",
+    "expected_answer_keywords": [
+      "Plato"
+    ],
+    "expected_source_articles": [
+      "Aristotle",
+      "Alexander the Great",
+      "Plato"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_017",
+    "category": "multi_hop_reasoning",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "In what year did the country that produced Volkswagen reunify?",
+    "expected_answer_keywords": [
+      "1990"
+    ],
+    "expected_source_articles": [
+      "Volkswagen",
+      "Germany",
+      "German reunification"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_018",
+    "category": "multi_hop_reasoning",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the atomic number of the element discovered by the scientist who won two Nobel Prizes in different scientific fields?",
+    "expected_answer_keywords": [
+      "Marie Curie",
+      "Radium",
+      "two Nobel Prizes",
+      "84",
+      "Polonium",
+      "88"
+    ],
+    "expected_source_articles": [
+      "Marie Curie",
+      "Radium",
+      "Polonium"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_019",
+    "category": "multi_hop_reasoning",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Who succeeded the British monarch who reigned during World War I?",
+    "expected_answer_keywords": [
+      "his son",
+      "George VI",
+      "Edward VIII"
+    ],
+    "expected_source_articles": [
+      "George V",
+      "Edward VIII",
+      "George VI"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multihop_020",
+    "category": "multi_hop_reasoning",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the highest mountain in the country that contains the source of the Amazon River?",
+    "expected_answer_keywords": [
+      "Huascaran",
+      "Huascarán"
+    ],
+    "expected_source_articles": [
+      "Amazon River",
+      "Peru",
+      "Huascarán"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_001",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "es",
+    "query": "¿Cuál es la capital de Francia?",
+    "expected_answer_keywords": [
+      "Paris",
+      "París"
+    ],
+    "expected_source_articles": [
+      "Paris",
+      "France"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_002",
+    "category": "multilingual",
+    "difficulty": "medium",
+    "language": "es",
+    "query": "¿Quién pintó la Mona Lisa?",
+    "expected_answer_keywords": [
+      "Leonardo da Vinci",
+      "da Vinci"
+    ],
+    "expected_source_articles": [
+      "Mona Lisa",
+      "Leonardo da Vinci"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_003",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "es",
+    "query": "¿En qué año cayó el Muro de Berlín?",
+    "expected_answer_keywords": [
+      "1989"
+    ],
+    "expected_source_articles": [
+      "Berlin Wall",
+      "Fall of the Berlin Wall"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_004",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "zh",
+    "query": "珠穆朗玛峰有多高?",
+    "expected_answer_keywords": [
+      "8,848",
+      "8848",
+      "29,029",
+      "meters",
+      "feet"
+    ],
+    "expected_source_articles": [
+      "Mount Everest"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_005",
+    "category": "multilingual",
+    "difficulty": "medium",
+    "language": "zh",
+    "query": "谁发明了相对论?",
+    "expected_answer_keywords": [
+      "Albert Einstein",
+      "Einstein"
+    ],
+    "expected_source_articles": [
+      "Albert Einstein",
+      "Theory of relativity"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_006",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "zh",
+    "query": "光合作用的化学方程式是什么?",
+    "expected_answer_keywords": [
+      "carbon dioxide",
+      "oxygen",
+      "6H2O",
+      "6O2",
+      "葡萄糖",
+      "glucose",
+      "氧气",
+      "C6H12O6",
+      "6CO2",
+      "二氧化碳"
+    ],
+    "expected_source_articles": [
+      "Photosynthesis"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_007",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "ja",
+    "query": "1984を書いた作家は誰ですか?",
+    "expected_answer_keywords": [
+      "George Orwell",
+      "Orwell"
+    ],
+    "expected_source_articles": [
+      "Nineteen Eighty-Four",
+      "George Orwell"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_008",
+    "category": "multilingual",
+    "difficulty": "medium",
+    "language": "ja",
+    "query": "太陽系で最も大きい惑星は何ですか?",
+    "expected_answer_keywords": [
+      "Jupiter",
+      "木星"
+    ],
+    "expected_source_articles": [
+      "Jupiter",
+      "Solar System"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_009",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "ja",
+    "query": "アインシュタインが1921年にノーベル賞を受賞した理由は何ですか?",
+    "expected_answer_keywords": [
+      "photoelectric effect",
+      "光電効果"
+    ],
+    "expected_source_articles": [
+      "Albert Einstein",
+      "Photoelectric effect"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_010",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "fr",
+    "query": "Qui a peint la Mona Lisa?",
+    "expected_answer_keywords": [
+      "Leonardo da Vinci",
+      "da Vinci",
+      "Léonard"
+    ],
+    "expected_source_articles": [
+      "Mona Lisa",
+      "Leonardo da Vinci"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_011",
+    "category": "multilingual",
+    "difficulty": "medium",
+    "language": "fr",
+    "query": "Quel est le langage de programmation créé par Guido van Rossum?",
+    "expected_answer_keywords": [
+      "Python"
+    ],
+    "expected_source_articles": [
+      "Python (programming language)",
+      "Guido van Rossum"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_012",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "fr",
+    "query": "Quel est le nom de jeune fille de Marie Curie?",
+    "expected_answer_keywords": [
+      "Sklodowska",
+      "Skłodowska"
+    ],
+    "expected_source_articles": [
+      "Marie Curie"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_013",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "de",
+    "query": "Was ist die Hauptstadt von Frankreich?",
+    "expected_answer_keywords": [
+      "Paris"
+    ],
+    "expected_source_articles": [
+      "Paris",
+      "France"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_014",
+    "category": "multilingual",
+    "difficulty": "medium",
+    "language": "de",
+    "query": "Wer war der erste Mensch auf dem Mond?",
+    "expected_answer_keywords": [
+      "Neil Armstrong",
+      "Armstrong"
+    ],
+    "expected_source_articles": [
+      "Neil Armstrong",
+      "Apollo 11"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_015",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "de",
+    "query": "Wer schlug die allgemeine Relativitätstheorie vor?",
+    "expected_answer_keywords": [
+      "Albert Einstein",
+      "Einstein"
+    ],
+    "expected_source_articles": [
+      "General relativity",
+      "Albert Einstein"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_016",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "hi",
+    "query": "फ्रांस की राजधानी क्या है?",
+    "expected_answer_keywords": [
+      "पेरिस",
+      "Paris"
+    ],
+    "expected_source_articles": [
+      "Paris",
+      "France"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_017",
+    "category": "multilingual",
+    "difficulty": "medium",
+    "language": "hi",
+    "query": "DNA की खोज किसने की थी?",
+    "expected_answer_keywords": [
+      "Watson",
+      "Crick",
+      "Friedrich Miescher",
+      "Rosalind Franklin"
+    ],
+    "expected_source_articles": [
+      "DNA",
+      "James Watson",
+      "Francis Crick"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_018",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "hi",
+    "query": "महात्मा गांधी का जन्म कब हुआ था?",
+    "expected_answer_keywords": [
+      "1869",
+      "October 2, 1869",
+      "2 October 1869"
+    ],
+    "expected_source_articles": [
+      "Mahatma Gandhi"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_019",
+    "category": "multilingual",
+    "difficulty": "easy",
+    "language": "ko",
+    "query": "에베레스트 산의 높이는?",
+    "expected_answer_keywords": [
+      "8,848",
+      "8848",
+      "29,029",
+      "meters",
+      "미터",
+      "8849",
+      "8,849"
+    ],
+    "expected_source_articles": [
+      "Mount Everest"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multiling_020",
+    "category": "multilingual",
+    "difficulty": "hard",
+    "language": "ko",
+    "query": "양자역학의 기초를 세운 과학자들은 누구입니까?",
+    "expected_answer_keywords": [
+      "Planck",
+      "Bohr",
+      "Heisenberg",
+      "Schrödinger",
+      "Einstein"
+    ],
+    "expected_source_articles": [
+      "Quantum mechanics",
+      "History of quantum mechanics"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "edge_001",
+    "category": "edge_no_answer",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What is the GDP of Wakanda in 2025?",
+    "expected_answer_keywords": [
+      "fictional",
+      "not real",
+      "Marvel",
+      "fictional country",
+      "no GDP"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_002",
+    "category": "edge_no_answer",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Where is Hogwarts School of Witchcraft and Wizardry located in real life?",
+    "expected_answer_keywords": [
+      "fictional",
+      "not real",
+      "Harry Potter",
+      "fictional school",
+      "does not exist"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_003",
+    "category": "edge_no_answer",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Who is the current king of the Seven Kingdoms in Westeros?",
+    "expected_answer_keywords": [
+      "fictional",
+      "Game of Thrones",
+      "not real"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_004",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the population of Atlantis as of 2024?",
+    "expected_answer_keywords": [
+      "mythical",
+      "legendary",
+      "fictional",
+      "Plato",
+      "no population"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_005",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What was the result of the 2030 U.S. presidential election?",
+    "expected_answer_keywords": [
+      "future",
+      "has not happened",
+      "not yet",
+      "cannot answer",
+      "future event"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_006",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Who will win the FIFA World Cup in 2034?",
+    "expected_answer_keywords": [
+      "future",
+      "has not happened",
+      "cannot predict",
+      "future event"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_007",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the projected world population in 2100?",
+    "expected_answer_keywords": [
+      "projection",
+      "estimate",
+      "uncertain",
+      "no exact figure",
+      "future"
+    ],
+    "expected_source_articles": [
+      "World population"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_008",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What did Albert Einstein eat for breakfast on March 14, 1925?",
+    "expected_answer_keywords": [
+      "no information",
+      "cannot determine",
+      "no record",
+      "not documented",
+      "private"
+    ],
+    "expected_source_articles": [
+      "Albert Einstein"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_009",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is Tim Cook's home phone number?",
+    "expected_answer_keywords": [
+      "private",
+      "not public",
+      "no information",
+      "personal",
+      "cannot provide"
+    ],
+    "expected_source_articles": [
+      "Tim Cook"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_010",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the exact salary of every employee at Google as of last month?",
+    "expected_answer_keywords": [
+      "private",
+      "not public",
+      "no information",
+      "confidential",
+      "individual"
+    ],
+    "expected_source_articles": [
+      "Google"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_011",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is Barack Obama's current job as President of the United States?",
+    "expected_answer_keywords": [
+      "former",
+      "no longer president",
+      "ended",
+      "Joe Biden",
+      "not current",
+      "left office"
+    ],
+    "expected_source_articles": [
+      "Barack Obama"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_012",
+    "category": "edge_no_answer",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is Elvis Presley's current touring schedule?",
+    "expected_answer_keywords": [
+      "died",
+      "deceased",
+      "1977",
+      "no longer alive",
+      "not touring"
+    ],
+    "expected_source_articles": [
+      "Elvis Presley"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_013",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the chemical formula of element 150 on the periodic table?",
+    "expected_answer_keywords": [
+      "does not exist",
+      "no such element",
+      "118",
+      "Oganesson",
+      "not discovered"
+    ],
+    "expected_source_articles": [
+      "Periodic table",
+      "Extended periodic table"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_014",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Why did Mahatma Gandhi support nuclear weapons?",
+    "expected_answer_keywords": [
+      "did not",
+      "opposed",
+      "non-violence",
+      "ahimsa",
+      "false premise",
+      "incorrect assumption"
+    ],
+    "expected_source_articles": [
+      "Mahatma Gandhi"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_015",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the birth name of the AI model GPT-4?",
+    "expected_answer_keywords": [
+      "AI model",
+      "not a person",
+      "no birth name",
+      "software",
+      "language model"
+    ],
+    "expected_source_articles": [
+      "GPT-4"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_016",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What was the name of Aristotle's smartphone?",
+    "expected_answer_keywords": [
+      "did not exist",
+      "anachronism",
+      "ancient Greek",
+      "no smartphones",
+      "lived in"
+    ],
+    "expected_source_articles": [
+      "Aristotle"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_017",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the password to the official Wikipedia admin account?",
+    "expected_answer_keywords": [
+      "cannot provide",
+      "private",
+      "security",
+      "not appropriate",
+      "confidential"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "edge_018",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What did Cleopatra say in her last text message?",
+    "expected_answer_keywords": [
+      "did not exist",
+      "anachronism",
+      "ancient",
+      "no text",
+      "30 BC"
+    ],
+    "expected_source_articles": [
+      "Cleopatra"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_019",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the recipe for the legendary Philosopher's Stone?",
+    "expected_answer_keywords": [
+      "legendary",
+      "alchemy",
+      "mythical",
+      "not real",
+      "fictional"
+    ],
+    "expected_source_articles": [
+      "Philosopher's stone"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "edge_020",
+    "category": "edge_no_answer",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "How many siblings does the fictional character Sherlock Holmes have, and what are their actual social security numbers?",
+    "expected_answer_keywords": [
+      "fictional",
+      "no SSN",
+      "not real",
+      "Mycroft",
+      "Sherrinford"
+    ],
+    "expected_source_articles": [
+      "Sherlock Holmes",
+      "Mycroft Holmes"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "amb_001",
+    "category": "ambiguous_negative",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Tell me about Apple.",
+    "expected_answer_keywords": [
+      "clarify",
+      "company",
+      "fruit",
+      "Apple Inc.",
+      "which",
+      "ambiguous"
+    ],
+    "expected_source_articles": [
+      "Apple Inc.",
+      "Apple"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_002",
+    "category": "ambiguous_negative",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What is Mercury?",
+    "expected_answer_keywords": [
+      "planet",
+      "element",
+      "Roman god",
+      "Freddie Mercury",
+      "multiple meanings"
+    ],
+    "expected_source_articles": [
+      "Mercury (planet)",
+      "Mercury (element)",
+      "Mercury (mythology)"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_003",
+    "category": "ambiguous_negative",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "Who is the president?",
+    "expected_answer_keywords": [
+      "ambiguous",
+      "clarify",
+      "which country",
+      "Joe Biden",
+      "specify",
+      "United States"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "amb_004",
+    "category": "ambiguous_negative",
+    "difficulty": "easy",
+    "language": "en",
+    "query": "What is the best programming language?",
+    "expected_answer_keywords": [
+      "depends",
+      "subjective",
+      "use case",
+      "no single best",
+      "context"
+    ],
+    "expected_source_articles": [
+      "Programming language"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "amb_005",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Which is the largest country?",
+    "expected_answer_keywords": [
+      "depends",
+      "by area",
+      "by population",
+      "Russia",
+      "China",
+      "India",
+      "clarify"
+    ],
+    "expected_source_articles": [
+      "List of countries and dependencies by area",
+      "List of countries by population"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_006",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Tell me everything about World War II.",
+    "expected_answer_keywords": [
+      "summary",
+      "1945",
+      "1939",
+      "Axis",
+      "overview",
+      "global",
+      "specify",
+      "Allied",
+      "many aspects",
+      "too broad"
+    ],
+    "expected_source_articles": [
+      "World War II"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_007",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Who is John Smith?",
+    "expected_answer_keywords": [
+      "clarify",
+      "many",
+      "common name",
+      "many people",
+      "multiple",
+      "which one"
+    ],
+    "expected_source_articles": [
+      "John Smith"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "amb_008",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the capital?",
+    "expected_answer_keywords": [
+      "clarify",
+      "country",
+      "specify",
+      "Washington",
+      "of which"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "amb_009",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Is coffee good or bad for health?",
+    "expected_answer_keywords": [
+      "depends",
+      "moderate",
+      "individual",
+      "studies",
+      "both",
+      "context"
+    ],
+    "expected_source_articles": [
+      "Coffee",
+      "Health effects of coffee"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_010",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What languages are not spoken in Africa?",
+    "expected_answer_keywords": [
+      "indigenous",
+      "specific",
+      "many",
+      "Vietnamese",
+      "examples",
+      "Asian",
+      "Korean"
+    ],
+    "expected_source_articles": [
+      "Languages of Africa"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_011",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "Which scientist made the most important discovery?",
+    "expected_answer_keywords": [
+      "subjective",
+      "depends",
+      "many scientists",
+      "Einstein",
+      "Newton",
+      "Darwin",
+      "no single"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "amb_012",
+    "category": "ambiguous_negative",
+    "difficulty": "medium",
+    "language": "en",
+    "query": "What is the meaning of life?",
+    "expected_answer_keywords": [
+      "philosophical",
+      "subjective",
+      "various perspectives",
+      "no single answer",
+      "42"
+    ],
+    "expected_source_articles": [
+      "Meaning of life"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_013",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is Python?",
+    "expected_answer_keywords": [
+      "programming language",
+      "snake",
+      "Monty Python",
+      "multiple",
+      "context"
+    ],
+    "expected_source_articles": [
+      "Python (programming language)",
+      "Pythonidae",
+      "Monty Python"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_014",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Are humans causing climate change?",
+    "expected_answer_keywords": [
+      "yes",
+      "scientific consensus",
+      "IPCC",
+      "anthropogenic",
+      "evidence"
+    ],
+    "expected_source_articles": [
+      "Climate change",
+      "Scientific consensus on climate change"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_015",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Which religion is correct?",
+    "expected_answer_keywords": [
+      "matter of belief",
+      "subjective",
+      "various",
+      "personal",
+      "no objective",
+      "faith"
+    ],
+    "expected_source_articles": [
+      "Religion"
+    ],
+    "answerable": false
+  },
+  {
+    "id": "amb_016",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Tell me about the war.",
+    "expected_answer_keywords": [
+      "many wars",
+      "clarify",
+      "specify",
+      "armed conflict",
+      "which war"
+    ],
+    "expected_source_articles": [],
+    "answerable": false
+  },
+  {
+    "id": "amb_017",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What is the second largest moon of Jupiter?",
+    "expected_answer_keywords": [
+      "Callisto"
+    ],
+    "expected_source_articles": [
+      "Callisto (moon)",
+      "Moons of Jupiter",
+      "Ganymede (moon)"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_018",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "When did the Roman Empire fall?",
+    "expected_answer_keywords": [
+      "476",
+      "1453",
+      "Western",
+      "Eastern",
+      "Byzantine",
+      "depends",
+      "two"
+    ],
+    "expected_source_articles": [
+      "Fall of the Western Roman Empire",
+      "Fall of Constantinople",
+      "Byzantine Empire"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_019",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "What are the side effects of aspirin?",
+    "expected_answer_keywords": [
+      "bleeding",
+      "stomach",
+      "ulcer",
+      "Reye's syndrome",
+      "consult doctor",
+      "medical"
+    ],
+    "expected_source_articles": [
+      "Aspirin",
+      "Adverse effect"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "amb_020",
+    "category": "ambiguous_negative",
+    "difficulty": "hard",
+    "language": "en",
+    "query": "Compare democracy and dictatorship.",
+    "expected_answer_keywords": [
+      "governance",
+      "power",
+      "elections",
+      "rights",
+      "differences",
+      "balanced"
+    ],
+    "expected_source_articles": [
+      "Democracy",
+      "Dictatorship",
+      "Forms of government"
+    ],
+    "answerable": true
+  }
 ]

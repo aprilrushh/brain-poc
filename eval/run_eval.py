@@ -21,6 +21,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+# Load .env before any module that reads os.environ
+from dotenv import load_dotenv
+load_dotenv(ROOT / '.env')
+
 import torch
 from sentence_transformers import SentenceTransformer
 
@@ -104,7 +108,7 @@ def main():
     # Setup orchestrator (skip if --skip-llm)
     orchestrator = None
     if not args.skip_llm:
-        orchestrator = RAGOrchestrator(brain=brain, encoder=encoder, top_k=5)
+        orchestrator = RAGOrchestrator(brain=brain, encoder=encoder, top_k=10)
         print(f"LLM model: {orchestrator.model}")
 
     # Run evaluation
