@@ -141,6 +141,8 @@ class RAGOrchestrator:
                     "score": r["score"],
                     "title": r["doc"].get("title"),
                     "page": r["doc"].get("page"),
+                    "url": r["doc"].get("url", ""),
+                    "text": (r["doc"].get("text", "") or "")[:300],
                 }
                 for r in retrieved
             ],
