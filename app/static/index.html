@@ -1,602 +1,359 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brain — Upload & Ask</title>
+<title>Brain</title>
 <style>
+:root {
+  --bg: #faf9f6; --bg-sidebar: #f4f3ed; --bg-elevated: #ffffff;
+  --border: #e8e5dc; --border-strong: #d4d0c4;
+  --text: #1f1c18; --text-muted: #76705f; --text-subtle: #a8a293;
+  --accent: #c96342; --accent-hover: #b45638; --accent-bg: rgba(201,99,66,0.08);
+  --shadow: 0 1px 2px rgba(31,28,24,0.04), 0 4px 12px rgba(31,28,24,0.04);
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f7f7f8;
-  color: #2d2d2d;
-  line-height: 1.5;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-family: 'Charter', 'Iowan Old Style', Georgia, serif;
+  font-size: 15px; line-height: 1.6; color: var(--text);
+  background: var(--bg); height: 100vh; overflow: hidden;
 }
-header {
-  background: #1a1a1a;
-  color: #fff;
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.app { display: flex; height: 100vh; }
+.sidebar {
+  width: 260px; flex-shrink: 0; background: var(--bg-sidebar);
+  border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px;
 }
-header h1 { font-size: 17px; font-weight: 600; }
-header .subtitle { font-size: 11px; color: #aaa; margin-top: 2px; }
-.status {
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 10px;
-  background: #2d2d2d;
+.sidebar-brand {
+  padding: 12px 8px 16px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em;
 }
-.status.ready { background: #1e8e3e; }
-.status.loading { background: #f29900; }
-.status.error { background: #d93025; }
-
-.app {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
+.sidebar-brand .dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); margin-right: 8px; vertical-align: middle;
 }
-
-aside {
-  width: 290px;
-  background: #fff;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+.new-chat-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 10px 12px; background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); font-family: inherit; font-size: 14px;
+  cursor: pointer; transition: all 0.15s ease; margin-bottom: 16px;
 }
-.sidebar-section {
-  padding: 14px 16px;
-  border-bottom: 1px solid #f0f0f0;
+.new-chat-btn:hover { border-color: var(--border-strong); box-shadow: var(--shadow); }
+.sidebar-section { margin-top: 16px; }
+.sidebar-label {
+  padding: 6px 8px; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-subtle);
+  display: flex; justify-content: space-between; align-items: center;
 }
-.sidebar-section h3 {
-  font-size: 11px;
-  font-weight: 700;
-  color: #5f6368;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
+.sidebar-label button {
+  background: none; border: none; color: var(--text-subtle); cursor: pointer;
+  font-size: 14px; padding: 0 4px; line-height: 1;
 }
-
-#dropzone {
-  border: 2px dashed #c0c0c0;
-  border-radius: 8px;
-  padding: 24px 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s;
-  background: #fafafa;
+.sidebar-label button:hover { color: var(--text); }
+.sidebar-list { list-style: none; max-height: 220px; overflow-y: auto; }
+.sidebar-item {
+  padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 14px;
+  color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background 0.1s ease;
 }
-#dropzone:hover, #dropzone.dragging {
-  border-color: #1a73e8;
-  background: #e8f0fe;
+.sidebar-item:hover { background: rgba(31,28,24,0.05); }
+.sidebar-item.active { background: var(--accent-bg); color: var(--accent); }
+.sidebar-item .meta { display: block; font-size: 11px; color: var(--text-subtle); margin-top: 2px; }
+.sidebar-footer {
+  margin-top: auto; padding: 10px 8px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted);
 }
-#dropzone .icon { font-size: 28px; margin-bottom: 6px; }
-#dropzone .label { font-size: 13px; font-weight: 600; color: #2d2d2d; }
-#dropzone .hint { font-size: 11px; color: #5f6368; margin-top: 4px; }
-#file-input { display: none; }
-
-.usage-bar {
-  margin-top: 10px;
-  font-size: 11px;
-  color: #5f6368;
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; font-family: system-ui;
 }
-.usage-bar .bar-bg {
-  height: 4px;
-  background: #e0e0e0;
-  border-radius: 2px;
-  margin-top: 4px;
-  overflow: hidden;
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.main-header {
+  padding: 16px 32px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-muted); min-height: 56px;
 }
-.usage-bar .bar-fill {
-  height: 100%;
-  background: #1a73e8;
-  width: 0%;
-  transition: width 0.3s;
+.breadcrumb-link { color: var(--text-muted); cursor: pointer; }
+.breadcrumb-link:hover { color: var(--text); }
+.breadcrumb-sep { color: var(--text-subtle); }
+.breadcrumb-current { color: var(--text); font-weight: 500; }
+.view-project, .view-chat, .empty-state { display: none; }
+.view-project.visible { display: block; flex: 1; overflow-y: auto; padding: 48px 64px; max-width: 920px; margin: 0 auto; width: 100%; }
+.view-chat.visible { display: flex; flex: 1; flex-direction: column; overflow: hidden; }
+.empty-state.visible { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-align: center; padding: 64px 32px; }
+.project-title { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
+.project-desc { color: var(--text-muted); font-size: 16px; margin-bottom: 40px; }
+.section-title {
+  font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+  margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
 }
-
-.file-list { padding: 0; max-height: 300px; overflow-y: auto; }
-.file-item {
-  padding: 8px 16px;
-  border-bottom: 1px solid #f5f5f5;
-  font-size: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-.file-item .name {
-  font-weight: 500;
-  color: #2d2d2d;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
-.file-item .meta { font-size: 10px; color: #5f6368; white-space: nowrap; }
-.file-item.uploading { opacity: 0.6; }
-.file-item .spinner {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border: 2px solid #e0e0e0;
-  border-top-color: #1a73e8;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: #f7f7f8;
-}
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  max-width: 920px;
-  width: 100%;
-  margin: 0 auto;
-}
-.empty-state {
-  text-align: center;
-  color: #5f6368;
-  padding: 60px 20px;
-}
-.empty-state h2 { font-size: 22px; margin-bottom: 8px; color: #2d2d2d; }
-.empty-state p { font-size: 14px; }
-
-.message { margin-bottom: 22px; }
-.message.user { text-align: right; }
-.message.user .bubble {
-  background: #1a73e8;
-  color: #fff;
-  display: inline-block;
-  padding: 10px 14px;
-  border-radius: 16px 16px 4px 16px;
-  max-width: 75%;
-  text-align: left;
-  font-size: 14px;
-}
-.message.assistant .bubble {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  padding: 14px 18px;
-  border-radius: 4px 16px 16px 16px;
-  white-space: pre-wrap;
-  font-size: 14px;
-  line-height: 1.6;
-}
-.message.assistant .timings {
-  font-size: 10px;
-  color: #5f6368;
-  margin-top: 6px;
-  font-family: 'SF Mono', Monaco, monospace;
-}
-.message.assistant .sources {
-  margin-top: 10px;
-  border-top: 1px solid #e0e0e0;
-  padding-top: 10px;
-}
-.message.assistant .sources-title {
-  font-size: 10px;
-  color: #5f6368;
-  font-weight: 700;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-.source {
-  background: #f7f7f8;
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
-  padding: 8px 10px;
-  margin-bottom: 5px;
-  font-size: 12px;
-}
-.source .header {
-  font-weight: 600;
-  color: #1a73e8;
-  display: flex;
-  justify-content: space-between;
-}
-.source .snippet {
-  color: #5f6368;
-  margin-top: 3px;
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-footer {
-  background: #fff;
-  border-top: 1px solid #e0e0e0;
-  padding: 14px 20px;
-}
-.input-wrapper {
-  max-width: 920px;
-  margin: 0 auto;
-  display: flex;
-  gap: 8px;
-}
-#query-input {
-  flex: 1;
-  border: 1px solid #d0d0d0;
-  border-radius: 22px;
-  padding: 10px 16px;
-  font-size: 14px;
-  outline: none;
-  font-family: inherit;
-}
-#query-input:focus { border-color: #1a73e8; }
-#query-input:disabled { background: #f5f5f5; color: #999; }
-#submit-btn {
-  background: #1a73e8;
-  color: #fff;
-  border: 0;
-  border-radius: 22px;
-  padding: 0 22px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-#submit-btn:hover:not(:disabled) { background: #1557b0; }
-#submit-btn:disabled { background: #c0c0c0; cursor: not-allowed; }
-
-.spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid #e0e0e0;
-  border-top-color: #1a73e8;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  margin-right: 6px;
-  vertical-align: middle;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.toast {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #d93025;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 13px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 100;
-  display: none;
-}
+.knowledge-zone { border: 1.5px dashed var(--border-strong); border-radius: 14px; padding: 24px; background: var(--bg-elevated); margin-bottom: 40px; }
+.file-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; list-style: none; }
+.file-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); font-size: 14px; }
+.file-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-bg); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-meta { font-size: 12px; color: var(--text-subtle); font-family: system-ui; }
+.file-remove { background: none; border: none; color: var(--text-subtle); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-family: system-ui; }
+.file-remove:hover { background: rgba(31,28,24,0.06); color: var(--text); }
+.upload-cta { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 13px; color: var(--text); font-family: inherit; }
+.upload-cta:hover { border-color: var(--accent); color: var(--accent); }
+.chat-list { display: flex; flex-direction: column; gap: 4px; }
+.chat-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 10px; cursor: pointer; transition: background 0.1s ease; }
+.chat-row:hover { background: var(--bg-elevated); }
+.chat-row .chat-title-text { font-size: 15px; font-weight: 500; }
+.chat-row .chat-meta { font-size: 12px; color: var(--text-subtle); font-family: system-ui; }
+.chat-stream { flex: 1; overflow-y: auto; padding: 32px 0; }
+.chat-stream-inner { max-width: 760px; margin: 0 auto; padding: 0 32px; display: flex; flex-direction: column; gap: 32px; }
+.msg { display: flex; flex-direction: column; gap: 8px; }
+.msg-role { font-family: system-ui; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-subtle); font-weight: 600; }
+.msg-content { font-size: 16px; line-height: 1.7; color: var(--text); }
+.msg.user { align-items: flex-end; }
+.msg.user .msg-content { background: var(--bg-elevated); padding: 14px 18px; border-radius: 14px; max-width: 75%; border: 1px solid var(--border); }
+.msg-sources { margin-top: 12px; font-size: 13px; color: var(--text-muted); border-left: 2px solid var(--accent); padding: 8px 12px; background: var(--accent-bg); border-radius: 0 8px 8px 0; font-family: system-ui; }
+.input-area { padding: 16px 32px 24px; border-top: 1px solid var(--border); background: var(--bg); }
+.input-shell { max-width: 760px; margin: 0 auto; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); transition: border-color 0.15s ease; }
+.input-shell:focus-within { border-color: var(--border-strong); }
+.input-attached { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.input-attached:empty { display: none; }
+.file-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-bg); color: var(--accent); border-radius: 16px; font-size: 12px; font-family: system-ui; }
+.file-chip button { background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; line-height: 1; font-size: 14px; }
+textarea.input { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; line-height: 1.5; background: transparent; color: var(--text); min-height: 24px; max-height: 200px; }
+.input-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.input-actions { display: flex; gap: 6px; }
+.icon-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.icon-btn:hover { background: rgba(31,28,24,0.05); color: var(--text); }
+.send-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--accent); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.15s ease; }
+.send-btn:hover { background: var(--accent-hover); }
+.send-btn:disabled { background: var(--border-strong); cursor: not-allowed; }
+.hidden { display: none !important; }
+.empty-state h2 { font-size: 28px; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-size: 15px; }
 </style>
 </head>
 <body>
-
-<header>
-  <div>
-    <h1>Brain</h1>
-    <div class="subtitle">Upload your files. Ask anything. Powered by Qwen3-235B.</div>
-  </div>
-  <div id="status" class="status">checking...</div>
-</header>
-
 <div class="app">
-
-<aside>
-  <div class="sidebar-section">
-    <h3>Upload</h3>
-    <div id="dropzone">
-      <div class="icon">📄</div>
-      <div class="label">Drop files or click</div>
-      <div class="hint">PDF · TXT · MD<br>Up to 100MB / file</div>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="dot"></span>Brain</div>
+    <button class="new-chat-btn" id="new-chat-btn"><span>＋</span><span>New chat</span></button>
+    <div class="sidebar-section">
+      <div class="sidebar-label"><span>Projects</span><button id="new-project-btn" title="New project">＋</button></div>
+      <ul class="sidebar-list" id="project-list"></ul>
     </div>
-    <input type="file" id="file-input" accept=".pdf,.txt,.md" multiple>
-    <div class="usage-bar">
-      <div id="usage-text">Session: 0 / 500 MB · 0 chunks</div>
-      <div class="bar-bg"><div class="bar-fill" id="usage-fill"></div></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label"><span>Recents</span></div>
+      <ul class="sidebar-list" id="recent-chat-list"></ul>
     </div>
-  </div>
-
-  <div class="sidebar-section" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-    <h3>Files in session</h3>
-    <div id="file-list" class="file-list">
-      <div style="padding: 16px; color: #999; font-size: 12px; text-align: center;">No files yet</div>
-    </div>
-  </div>
-</aside>
-
-<main>
-  <div id="messages">
-    <div class="empty-state" id="empty-state">
-      <h2>Upload a file to begin</h2>
-      <p>Drop a PDF or TXT in the sidebar.<br>Then ask any question — Brain finds the relevant parts, Qwen answers.</p>
-    </div>
-  </div>
-
-  <footer>
-    <div class="input-wrapper">
-      <input type="text" id="query-input" placeholder="Upload a file first, then ask..." disabled>
-      <button id="submit-btn" disabled>Send</button>
-    </div>
-  </footer>
-</main>
-
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-const dropzone = document.getElementById('dropzone');
-const fileInput = document.getElementById('file-input');
-const fileList = document.getElementById('file-list');
-const usageText = document.getElementById('usage-text');
-const usageFill = document.getElementById('usage-fill');
-const messagesEl = document.getElementById('messages');
-const emptyState = document.getElementById('empty-state');
-const inputEl = document.getElementById('query-input');
-const submitBtn = document.getElementById('submit-btn');
-const statusEl = document.getElementById('status');
-const toastEl = document.getElementById('toast');
-
-let SESSION_ID = null;
-let MAX_FILE_MB = 100;
-let MAX_SESSION_MB = 500;
-
-function showToast(msg, ms=4000) {
-  toastEl.textContent = msg;
-  toastEl.style.display = 'block';
-  setTimeout(() => { toastEl.style.display = 'none'; }, ms);
-}
-
-function fmtBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1024*1024) return (b/1024).toFixed(0) + ' KB';
-  return (b/1024/1024).toFixed(1) + ' MB';
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  })[c]);
-}
-
-async function checkHealth() {
-  try {
-    const r = await fetch('/api/health');
-    const d = await r.json();
-    MAX_FILE_MB = d.max_file_mb || 100;
-    MAX_SESSION_MB = d.max_session_mb || 500;
-    if (d.encoder_loaded) {
-      statusEl.textContent = `READY · ${d.model || 'LLM'}`;
-      statusEl.className = 'status ready';
-    } else if (d.error) {
-      statusEl.textContent = `ERROR: ${d.error.slice(0,40)}`;
-      statusEl.className = 'status error';
-    } else {
-      statusEl.textContent = 'LOADING';
-      statusEl.className = 'status loading';
-    }
-  } catch (e) {
-    statusEl.textContent = 'OFFLINE';
-    statusEl.className = 'status error';
-  }
-}
-
-async function ensureSession() {
-  if (SESSION_ID) return SESSION_ID;
-  const r = await fetch('/api/sessions', { method: 'POST' });
-  if (!r.ok) throw new Error('Failed to create session');
-  const d = await r.json();
-  SESSION_ID = d.session_id;
-  console.log('Session created:', SESSION_ID);
-  return SESSION_ID;
-}
-
-function renderFileList(files, totalBytes, totalChunks) {
-  if (!files || files.length === 0) {
-    fileList.innerHTML = '<div style="padding:16px; color:#999; font-size:12px; text-align:center;">No files yet</div>';
-  } else {
-    fileList.innerHTML = files.map(f => `
-      <div class="file-item">
-        <span class="name" title="${escapeHtml(f.filename)}">${escapeHtml(f.filename)}</span>
-        <span class="meta">${fmtBytes(f.bytes)} · ${f.chunks}c</span>
+    <div class="sidebar-footer"><div class="avatar">A</div><div>Andy Lee</div></div>
+  </aside>
+  <main class="main">
+    <header class="main-header" id="breadcrumb"></header>
+    <section class="view-project" id="view-project">
+      <h1 class="project-title" id="project-title"></h1>
+      <p class="project-desc" id="project-desc"></p>
+      <div class="section-title"><span>Project knowledge</span></div>
+      <div class="knowledge-zone">
+        <ul class="file-list" id="file-list"></ul>
+        <button class="upload-cta" id="project-upload-btn"><span>📎</span><span>Add files</span></button>
+        <input type="file" id="project-file-input" class="hidden" multiple>
       </div>
-    `).join('');
-  }
-  const mbUsed = totalBytes / (1024*1024);
-  const pct = Math.min(100, (mbUsed / MAX_SESSION_MB) * 100);
-  usageText.textContent = `Session: ${mbUsed.toFixed(1)} / ${MAX_SESSION_MB} MB · ${totalChunks} chunks`;
-  usageFill.style.width = pct + '%';
-}
-
-async function refreshSession() {
-  if (!SESSION_ID) return;
-  const r = await fetch(`/api/sessions/${SESSION_ID}`);
-  if (!r.ok) return;
-  const d = await r.json();
-  renderFileList(d.files, d.total_bytes, d.total_chunks);
-  if (d.total_chunks > 0) {
-    inputEl.disabled = false;
-    submitBtn.disabled = false;
-    inputEl.placeholder = 'Ask about your files...';
-    inputEl.focus();
-  }
-}
-
-async function uploadFile(file) {
-  if (file.size > MAX_FILE_MB * 1024 * 1024) {
-    showToast(`File too large: ${fmtBytes(file.size)} > ${MAX_FILE_MB}MB`);
-    return;
-  }
-
-  await ensureSession();
-
-  // Optimistic UI: show file as uploading
-  const tempId = 'temp-' + Date.now();
-  const item = document.createElement('div');
-  item.className = 'file-item uploading';
-  item.id = tempId;
-  item.innerHTML = `
-    <span class="name">${escapeHtml(file.name)}</span>
-    <span class="meta"><span class="spinner"></span></span>
-  `;
-  if (fileList.querySelector('div[style*="No files yet"]')) {
-    fileList.innerHTML = '';
-  }
-  fileList.appendChild(item);
-
-  const fd = new FormData();
-  fd.append('file', file);
-
-  try {
-    const r = await fetch(`/api/sessions/${SESSION_ID}/upload`, {
-      method: 'POST',
-      body: fd,
-    });
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({detail: r.statusText}));
-      showToast(`Upload failed: ${err.detail || r.statusText}`);
-      document.getElementById(tempId)?.remove();
-      return;
-    }
-    const d = await r.json();
-    console.log(`Uploaded ${file.name}: ${d.num_chunks} chunks in ${d.encoding_seconds}s`);
-    document.getElementById(tempId)?.remove();
-    await refreshSession();
-  } catch (e) {
-    showToast(`Network error: ${e.message}`);
-    document.getElementById(tempId)?.remove();
-  }
-}
-
-dropzone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => {
-  for (const f of e.target.files) uploadFile(f);
-  fileInput.value = '';
-});
-dropzone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropzone.classList.add('dragging');
-});
-dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragging'));
-dropzone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropzone.classList.remove('dragging');
-  for (const f of e.dataTransfer.files) uploadFile(f);
-});
-
-function addUserMessage(text) {
-  if (emptyState) emptyState.style.display = 'none';
-  const div = document.createElement('div');
-  div.className = 'message user';
-  div.innerHTML = `<div class="bubble">${escapeHtml(text)}</div>`;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-function addThinking() {
-  const div = document.createElement('div');
-  div.className = 'message assistant';
-  div.innerHTML = `<div class="bubble"><span class="spinner"></span>Brain searching · Qwen thinking...</div>`;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-  return div;
-}
-
-function renderAnswer(data) {
-  const div = document.createElement('div');
-  div.className = 'message assistant';
-
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = data.answer;
-  div.appendChild(bubble);
-
-  const t = data.timings_ms;
-  const timings = document.createElement('div');
-  timings.className = 'timings';
-  timings.textContent = `Brain recall: ${t.retrieve_ms.toFixed(2)}ms · Qwen: ${(t.generate_ms/1000).toFixed(2)}s · top1: ${data.top1_score.toFixed(3)}`;
-  div.appendChild(timings);
-
-  if (data.sources && data.sources.length > 0) {
-    const sources = document.createElement('div');
-    sources.className = 'sources';
-    sources.innerHTML = `<div class="sources-title">Sources (${data.sources.length})</div>`;
-    data.sources.forEach(s => {
-      const sDiv = document.createElement('div');
-      sDiv.className = 'source';
-      const pageStr = s.page ? ` p.${s.page}` : '';
-      sDiv.innerHTML = `
-        <div class="header">
-          <span>[${s.rank}] ${escapeHtml(s.filename)}${pageStr}</span>
-          <span style="color:#5f6368; font-weight:normal;">${s.score.toFixed(4)}</span>
+      <div class="section-title">
+        <span>Chats in this project</span>
+        <button class="upload-cta" id="new-chat-in-project-btn">＋ New chat</button>
+      </div>
+      <div class="chat-list" id="project-chat-list"></div>
+    </section>
+    <section class="view-chat" id="view-chat">
+      <div class="chat-stream"><div class="chat-stream-inner" id="message-stream"></div></div>
+      <div class="input-area">
+        <div class="input-shell">
+          <div class="input-attached" id="chat-attached"></div>
+          <textarea class="input" id="chat-input" rows="1" placeholder="Reply to Brain..."></textarea>
+          <div class="input-row">
+            <div class="input-actions"><button class="icon-btn" id="chat-attach-btn" title="Attach file">📎</button></div>
+            <button class="send-btn" id="send-btn">→</button>
+          </div>
+          <input type="file" id="chat-file-input" class="hidden" multiple>
         </div>
-        <div class="snippet">${escapeHtml(s.snippet)}</div>
-      `;
-      sources.appendChild(sDiv);
-    });
-    div.appendChild(sources);
-  }
+      </div>
+    </section>
+    <section class="empty-state visible" id="empty-state">
+      <h2>Welcome back, Andy.</h2>
+      <p>Pick a project or start a new chat.</p>
+    </section>
+  </main>
+</div>
+<script>
+const state = { view: 'empty', projects: [], currentProjectId: null, currentChatId: null, chatAttached: [] };
 
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function fmtBytes(n) { if (!n) return ''; if (n < 1024) return n+' B'; if (n < 1048576) return Math.round(n/1024)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+function fmtTime(s) { if (!s) return ''; return s.replace(/^2026-/, '').replace(/:\d\d$/, ''); }
+
+async function api(method, path, body) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const r = await fetch('/api' + path, opts);
+  if (!r.ok) { const t = await r.text(); throw new Error(`${method} ${path} → ${r.status} ${t}`); }
+  return r.json();
 }
 
-async function sendQuery(query) {
-  if (!query.trim()) return;
-  if (!SESSION_ID) {
-    showToast('Upload a file first');
-    return;
-  }
+async function uploadFile(path, file) {
+  const fd = new FormData(); fd.append('file', file);
+  const r = await fetch('/api' + path, { method:'POST', body: fd });
+  if (!r.ok) { const t = await r.text(); throw new Error(`upload ${path} → ${r.status} ${t}`); }
+  return r.json();
+}
 
-  addUserMessage(query);
-  inputEl.value = '';
-  submitBtn.disabled = true;
-  inputEl.disabled = true;
+async function fetchProjects() {
+  const { projects } = await api('GET', '/projects');
+  const detailed = await Promise.all(projects.map(p => api('GET', `/projects/${p.id}`)));
+  state.projects = detailed.map(p => ({...p, chats: p.chats || [], files: p.files || []}));
+}
 
-  const thinkingDiv = addThinking();
+async function fetchMessages(chatId) {
+  const { messages } = await api('GET', `/chats/${chatId}/messages`);
+  return messages;
+}
 
+async function fetchChatFiles(chatId) {
+  const { files } = await api('GET', `/chats/${chatId}/files`);
+  return files;
+}
+
+function renderSidebar() {
+  document.getElementById('project-list').innerHTML = state.projects.map(p => `<li class="sidebar-item ${state.currentProjectId===p.id&&state.view==='project'?'active':''}" onclick="openProject(${p.id})">${escapeHtml(p.name)}<span class="meta">${(p.chats||[]).length} chats · ${(p.files||[]).length} files</span></li>`).join('') || '<li style="color:var(--text-subtle);font-size:12px;padding:8px;">No projects yet</li>';
+  const all = [];
+  state.projects.forEach(p => (p.chats||[]).forEach(c => all.push({...c, projectId: p.id, projectName: p.name})));
+  all.sort((a,b) => (b.updated_at||'').localeCompare(a.updated_at||''));
+  document.getElementById('recent-chat-list').innerHTML = all.slice(0,10).map(c => `<li class="sidebar-item ${state.currentChatId===c.id?'active':''}" onclick="openChat(${c.projectId},${c.id})">${escapeHtml(c.title)}<span class="meta">${escapeHtml(c.projectName)} · ${fmtTime(c.updated_at)}</span></li>`).join('') || '<li style="color:var(--text-subtle);font-size:12px;padding:8px;">No recents</li>';
+}
+
+function renderProject() {
+  const p = state.projects.find(x => x.id === state.currentProjectId); if (!p) return;
+  document.getElementById('project-title').textContent = p.name;
+  document.getElementById('project-desc').textContent = p.description || '';
+  document.getElementById('breadcrumb').innerHTML = `<span class="breadcrumb-current">${escapeHtml(p.name)}</span>`;
+  document.getElementById('file-list').innerHTML = (p.files||[]).map(f => `<li class="file-item"><div class="file-icon">📄</div><div class="file-name">${escapeHtml(f.filename)}</div><div class="file-meta">${fmtBytes(f.size_bytes)}</div><button class="file-remove" onclick="deleteProjectFile(${f.id});event.stopPropagation();">✕</button></li>`).join('') || '<li style="color:var(--text-subtle);font-size:13px;padding:8px;list-style:none;">No files yet. Click Add files below.</li>';
+  document.getElementById('project-chat-list').innerHTML = (p.chats||[]).length ? p.chats.map(c => `<div class="chat-row" onclick="openChat(${p.id},${c.id})"><div class="chat-title-text">${escapeHtml(c.title)}</div><div class="chat-meta">${fmtTime(c.updated_at)}</div></div>`).join('') : '<div style="color:var(--text-subtle);font-size:13px;padding:16px;">No chats yet.</div>';
+}
+
+async function renderChat() {
+  const p = state.projects.find(x => x.id === state.currentProjectId); if (!p) return;
+  const c = (p.chats||[]).find(x => x.id === state.currentChatId); if (!c) return;
+  document.getElementById('breadcrumb').innerHTML = `<span class="breadcrumb-link" onclick="openProject(${p.id})">${escapeHtml(p.name)}</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">${escapeHtml(c.title)}</span>`;
+  const msgs = await fetchMessages(c.id);
+  c.messages = msgs;
+  const stream = document.getElementById('message-stream');
+  stream.innerHTML = msgs.length ? msgs.map(m => {
+    let srcHtml = '';
+    if (m.sources_json) { try { const s = JSON.parse(m.sources_json); if (Array.isArray(s) && s.length) srcHtml = `<div class="msg-sources">📎 ${s.length} sources</div>`; } catch {} }
+    return `<div class="msg ${m.role}"><div class="msg-role">${m.role==='user'?'You':'Brain'}</div><div class="msg-content">${escapeHtml(m.content)}</div>${srcHtml}</div>`;
+  }).join('') : '<div style="text-align:center;color:var(--text-subtle);padding:64px 16px;">대화를 시작해보세요.</div>';
+  // chat-scoped attachments restore
+  state.chatAttached = await fetchChatFiles(c.id);
+  renderChatChips();
+  setTimeout(() => { const sc = stream.parentElement; sc.scrollTop = sc.scrollHeight; }, 50);
+}
+
+function renderChatChips() {
+  document.getElementById('chat-attached').innerHTML = state.chatAttached.map(f => `<span class="file-chip">📎 ${escapeHtml(f.filename)} <button onclick="deleteChatFile(${f.id})">×</button></span>`).join('');
+}
+
+function setView(v) {
+  state.view = v;
+  document.getElementById('view-project').classList.toggle('visible', v === 'project');
+  document.getElementById('view-chat').classList.toggle('visible', v === 'chat');
+  document.getElementById('empty-state').classList.toggle('visible', v === 'empty');
+  document.getElementById('breadcrumb').style.display = v === 'empty' ? 'none' : 'flex';
+}
+
+async function openProject(id) {
+  state.currentProjectId = id; state.currentChatId = null; state.chatAttached = [];
+  const detail = await api('GET', `/projects/${id}`);
+  const idx = state.projects.findIndex(x => x.id === id);
+  if (idx >= 0) state.projects[idx] = {...detail, chats: detail.chats||[], files: detail.files||[]};
+  setView('project'); renderSidebar(); renderProject();
+}
+
+async function openChat(pid, cid) {
+  state.currentProjectId = pid; state.currentChatId = cid; state.chatAttached = [];
+  setView('chat'); renderSidebar(); await renderChat(); document.getElementById('chat-input').focus();
+}
+
+async function newProject() {
+  const name = prompt('새 프로젝트 이름?'); if (!name) return;
+  try { const p = await api('POST', '/projects', { name, description: '' }); await fetchProjects(); openProject(p.id); }
+  catch (e) { alert('Failed: ' + e.message); }
+}
+
+async function newChat(pid) {
+  if (!pid) return;
+  try { const c = await api('POST', `/projects/${pid}/chats`, {}); await fetchProjects(); openChat(pid, c.id); }
+  catch (e) { alert('Failed: ' + e.message); }
+}
+
+async function newChatGlobal() {
+  if (!state.projects.length) { alert('먼저 프로젝트를 만드세요.'); await newProject(); return; }
+  await newChat(state.currentProjectId || state.projects[0].id);
+}
+
+async function deleteProjectFile(fid) {
+  if (!confirm('이 파일을 삭제하시겠어요?')) return;
+  try { await api('DELETE', `/files/${fid}`); await openProject(state.currentProjectId); }
+  catch (e) { alert('Delete failed: ' + e.message); }
+}
+
+async function deleteChatFile(fid) {
+  try { await api('DELETE', `/files/${fid}`); state.chatAttached = state.chatAttached.filter(f => f.id !== fid); renderChatChips(); }
+  catch (e) { alert('Delete failed: ' + e.message); }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input'); const text = input.value.trim();
+  if (!text && !state.chatAttached.length) return;
+  if (!state.currentChatId) return;
+  const sendBtn = document.getElementById('send-btn'); sendBtn.disabled = true;
+  const note = state.chatAttached.length ? ` [+${state.chatAttached.length} files attached]` : '';
+  input.value = ''; input.style.height = 'auto';
   try {
-    const r = await fetch(`/api/sessions/${SESSION_ID}/query`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ query, top_k: 10 }),
-    });
-    thinkingDiv.remove();
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({detail: r.statusText}));
-      const div = document.createElement('div');
-      div.className = 'message assistant';
-      div.innerHTML = `<div class="bubble" style="color:#d93025">Error: ${escapeHtml(err.detail || r.statusText)}</div>`;
-      messagesEl.appendChild(div);
-      return;
-    }
-    const data = await r.json();
-    renderAnswer(data);
-  } catch (e) {
-    thinkingDiv.remove();
-    showToast(`Error: ${e.message}`);
-  } finally {
-    submitBtn.disabled = false;
-    inputEl.disabled = false;
-    inputEl.focus();
-  }
+    await api('POST', `/chats/${state.currentChatId}/messages`, { content: text + note });
+    await fetchProjects();
+    await renderChat(); renderSidebar();
+  } catch (e) { alert('Send failed: ' + e.message); }
+  finally { sendBtn.disabled = false; input.focus(); }
 }
 
-submitBtn.addEventListener('click', () => sendQuery(inputEl.value));
-inputEl.addEventListener('keydown', e => {
-  if (e.key === 'Enter') sendQuery(inputEl.value);
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('new-chat-btn').addEventListener('click', newChatGlobal);
+  document.getElementById('new-project-btn').addEventListener('click', newProject);
+  document.getElementById('new-chat-in-project-btn').addEventListener('click', () => newChat(state.currentProjectId));
+  // Project knowledge upload
+  document.getElementById('project-upload-btn').addEventListener('click', () => document.getElementById('project-file-input').click());
+  document.getElementById('project-file-input').addEventListener('change', async (e) => {
+    const pid = state.currentProjectId; if (!pid) return;
+    for (const f of Array.from(e.target.files)) {
+      try { await uploadFile(`/projects/${pid}/files`, f); } catch (err) { alert(`Upload failed (${f.name}): ` + err.message); }
+    }
+    e.target.value = '';
+    await openProject(pid);
+  });
+  // Chat-scoped attachment
+  document.getElementById('chat-attach-btn').addEventListener('click', () => document.getElementById('chat-file-input').click());
+  document.getElementById('chat-file-input').addEventListener('change', async (e) => {
+    const cid = state.currentChatId; if (!cid) return;
+    for (const f of Array.from(e.target.files)) {
+      try { const row = await uploadFile(`/chats/${cid}/files`, f); state.chatAttached.push(row); }
+      catch (err) { alert(`Attach failed (${f.name}): ` + err.message); }
+    }
+    e.target.value = '';
+    renderChatChips();
+  });
+  const ta = document.getElementById('chat-input');
+  ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 200)+'px'; });
+  ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  document.getElementById('send-btn').addEventListener('click', sendMessage);
+  try { await fetchProjects(); renderSidebar(); } catch (e) { console.error('Init load failed:', e); }
 });
 
-checkHealth();
-setInterval(checkHealth, 30000);
 </script>
 </body>
 </html>

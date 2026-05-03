@@ -41,3 +41,7 @@ Thumbs.db
 
 # Backup files
 *.bak
+
+# D3+D4 backups (2026-05-03)
+*.bak.*
+.env.backup

@@ -11,6 +11,7 @@ Endpoints:
 - POST /api/sessions/{sid}/query      -> {query} -> answer + sources
 """
 from __future__ import annotations
+import concurrent.futures
 import os
 import sys
 import time
@@ -155,6 +156,7 @@ class SourceItem(BaseModel):
 
 class QueryResponse(BaseModel):
     answer: str
+    answer_general: str = ""
     sources: list[SourceItem]
     timings_ms: dict
     top1_score: float
@@ -337,21 +339,47 @@ def query_session(session_id: str, req: QueryRequest):
         )
     context = "\n\n".join(chunks_text)
 
-    # 4. LLM call
+    # 4. LLM dual call (parallel: doc-grounded + general knowledge)
+    from src.orchestrator import GENERAL_KNOWLEDGE_PROMPT
     t = time.perf_counter()
-    try:
-        completion = llm_client.chat.completions.create(
-            model=llm_model,
+    max_tokens = req.max_tokens or 512
+
+    def _call_doc():
+        # llm_client is now an LLMAdapter (OpenAIAdapter or AnthropicAdapter)
+        result = llm_client.chat_complete(
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"SOURCES:\n{context}\n\nQUESTION: {req.query}"},
             ],
-            max_tokens=req.max_tokens or 512,
+            max_tokens=max_tokens,
             temperature=0.3,
         )
-        answer = (completion.choices[0].message.content or "").strip()
-    except Exception as e:
-        raise HTTPException(500, f"LLM call failed: {e}")
+        return (result.get("text") or "").strip()
+
+    def _call_general():
+        result = llm_client.chat_complete(
+            messages=[
+                {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                {"role": "user", "content": req.query},
+            ],
+            max_tokens=max_tokens,
+            temperature=0.3,
+        )
+        return (result.get("text") or "").strip()
+
+    answer = ""
+    answer_general = ""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+        fut_doc = ex.submit(_call_doc)
+        fut_general = ex.submit(_call_general)
+        try:
+            answer = fut_doc.result(timeout=60)
+        except Exception as e:
+            raise HTTPException(500, f"Document LLM call failed: {e}")
+        try:
+            answer_general = fut_general.result(timeout=60)
+        except Exception as e:
+            answer_general = f"[General knowledge unavailable: {e}]"
     timings["generate_ms"] = (time.perf_counter() - t) * 1000
     timings["total_ms"] = sum(timings.values())
 
@@ -372,6 +400,7 @@ def query_session(session_id: str, req: QueryRequest):
 
     return QueryResponse(
         answer=answer,
+        answer_general=answer_general,
         sources=sources,
         timings_ms={k: round(v, 2) for k, v in timings.items()},
         top1_score=retrieved[0]["score"] if retrieved else 0.0,
@@ -395,3 +424,7 @@ def index():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# Phase 1 D4.5b — Project/Chat/Message CRUD router
+from app.api_d4 import router as _d4_router
+app.include_router(_d4_router)

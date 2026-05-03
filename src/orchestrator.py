@@ -6,6 +6,7 @@ from __future__ import annotations
 import time
 from typing import List, Dict, Any, Optional
 
+import concurrent.futures
 import torch
 from sentence_transformers import SentenceTransformer
 
@@ -38,6 +39,20 @@ Notes (apply only when relevant, do not over-apply):
 Default to giving the answer. Only refuse when the sources truly lack the information."""
 
 
+GENERAL_KNOWLEDGE_PROMPT = """You are a helpful assistant answering from your general knowledge.
+
+The user is using a document-grounded research tool, but they may also benefit from broader context. Provide a concise answer to their question using your general knowledge.
+
+Style:
+- Be concise (2-4 sentences).
+- Do NOT cite sources or pretend you have access to documents.
+- Start with the direct answer.
+- If the question asks about something fictional or impossible (Wakanda GDP, future events), briefly note that.
+- If you genuinely don't know, say so. Don't invent facts.
+
+This answer will be displayed alongside a separate document-grounded answer; the user will see both."""
+
+
 class RAGOrchestrator:
     def __init__(
         self,
@@ -50,8 +65,9 @@ class RAGOrchestrator:
         self.encoder = encoder
         self.top_k = top_k
         self.max_chunk_chars = max_chunk_chars
-        self.client = get_llm_client()
-        self.model = get_llm_model()
+        # adapter is LLMAdapter (OpenAIAdapter or AnthropicAdapter)
+        self.adapter = get_llm_client()
+        self.model = self.adapter.model
 
     def encode_query(self, query: str) -> torch.Tensor:
         emb = self.encoder.encode(
@@ -104,33 +120,59 @@ class RAGOrchestrator:
             user_msg = "/no_think " + user_msg
 
         t0 = time.perf_counter()
-        kwargs = dict(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_msg},
-            ],
-            max_tokens=max_tokens,
-            temperature=0.7,
-        )
+        # Build provider-aware kwargs (shared for both calls)
+        base_kwargs = {"max_tokens": max_tokens, "temperature": 0.7}
         if is_openrouter():
-            kwargs["extra_body"] = {"reasoning": {"enabled": thinking_enabled}}
+            base_kwargs["extra_body"] = {
+                "reasoning": {"enabled": thinking_enabled}
+            }
 
-        response = self.client.chat.completions.create(**kwargs)
+        # Two parallel calls:
+        #  1. Document-grounded (uses SYSTEM_PROMPT + sources)
+        #  2. General knowledge (uses GENERAL_KNOWLEDGE_PROMPT, no sources)
+        def _call_doc():
+            return self.adapter.chat_complete(
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_msg},
+                ],
+                **base_kwargs,
+            )
+
+        def _call_general():
+            return self.adapter.chat_complete(
+                messages=[
+                    {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                    {"role": "user", "content": question},
+                ],
+                **base_kwargs,
+            )
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+            fut_doc = ex.submit(_call_doc)
+            fut_general = ex.submit(_call_general)
+            try:
+                result = fut_doc.result(timeout=60)
+            except Exception as e:
+                result = {"text": f"[Document answer error: {e}]",
+                          "input_tokens": 0, "output_tokens": 0,
+                          "stop_reason": "error", "model": self.model}
+            try:
+                result_general = fut_general.result(timeout=60)
+            except Exception as e:
+                result_general = {"text": f"[General answer error: {e}]",
+                                  "input_tokens": 0, "output_tokens": 0,
+                                  "stop_reason": "error", "model": self.model}
+
         timings["generate_ms"] = (time.perf_counter() - t0) * 1000
 
-        answer = response.choices[0].message.content or ""
-        usage = response.usage
-
+        answer = result["text"]
+        answer_general = result_general["text"]
         timings["total_ms"] = (
             timings["embed_ms"] + timings["retrieve_ms"] + timings["generate_ms"]
         )
 
         reasoning_tokens = 0
-        if hasattr(usage, "completion_tokens_details"):
-            details = getattr(usage, "completion_tokens_details", None)
-            if details is not None:
-                reasoning_tokens = getattr(details, "reasoning_tokens", 0) or 0
 
         return {
             "question": question,
@@ -150,9 +192,16 @@ class RAGOrchestrator:
             "thinking_reason": thinking_reason,
             "retrieval_pattern": retrieval_pattern,
             "timings": timings,
+            "answer_general": answer_general.strip(),
             "usage": {
-                "prompt_tokens": getattr(usage, "prompt_tokens", 0),
-                "completion_tokens": getattr(usage, "completion_tokens", 0),
+                "prompt_tokens": result["input_tokens"] + result_general["input_tokens"],
+                "completion_tokens": result["output_tokens"] + result_general["output_tokens"],
                 "reasoning_tokens": reasoning_tokens,
+                "doc_prompt_tokens": result["input_tokens"],
+                "doc_completion_tokens": result["output_tokens"],
+                "general_prompt_tokens": result_general["input_tokens"],
+                "general_completion_tokens": result_general["output_tokens"],
             },
+            "stop_reason": result["stop_reason"],
+            "model_used": result["model"],
         }
