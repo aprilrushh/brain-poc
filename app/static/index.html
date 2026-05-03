@@ -142,7 +142,13 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <div class="sidebar-label"><span>Recents</span></div>
       <ul class="sidebar-list" id="recent-chat-list"></ul>
     </div>
-    <div class="sidebar-footer"><div class="avatar">A</div><div>Andy Lee</div></div>
+    <div class="sidebar-footer" id="sidebar-footer">
+  <div class="avatar" id="user-avatar">A</div>
+  <div style="flex:1;min-width:0;">
+    <div id="user-name" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">…</div>
+    <a href="/auth/logout" style="font-size:11px;color:#999;text-decoration:none;">Sign out</a>
+  </div>
+</div>
   </aside>
   <main class="main">
     <header class="main-header" id="breadcrumb"></header>
@@ -176,12 +182,48 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       </div>
     </section>
     <section class="empty-state visible" id="empty-state">
-      <h2>Welcome back, Andy.</h2>
+      <h2 id="welcome-heading">Welcome back.</h2>
       <p>Pick a project or start a new chat.</p>
     </section>
   </main>
 </div>
 <script>
+
+// === D4.5e-6: OAuth session 검증 (2026-05-03) ===
+let currentUser = null;
+async function checkAuth() {
+  try {
+    const r = await fetch('/auth/me');
+    const data = await r.json();
+    if (!data.authenticated) {
+      window.location.href = '/auth/login';
+      return false;
+    }
+    currentUser = data;
+    // footer 업데이트
+    const av = document.getElementById('user-avatar');
+    const nm = document.getElementById('user-name');
+    const wh = document.getElementById('welcome-heading');
+    if (av) {
+      if (data.picture_url) {
+        av.innerHTML = '<img src="' + data.picture_url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+      } else {
+        av.textContent = (data.display_name || data.email || '?').charAt(0).toUpperCase();
+      }
+    }
+    if (nm) nm.textContent = data.display_name || data.email;
+    if (wh) {
+      const firstName = (data.display_name || '').split(' ')[0] || data.email.split('@')[0];
+      wh.textContent = 'Welcome back, ' + firstName + '.';
+    }
+    return true;
+  } catch (e) {
+    console.error('auth check failed', e);
+    window.location.href = '/auth/login';
+    return false;
+  }
+}
+// === end D4.5e-6 ===
 const state = { view: 'empty', projects: [], currentProjectId: null, currentChatId: null, chatAttached: [] };
 
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -323,6 +365,7 @@ async function sendMessage() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  if (!await checkAuth()) return;
   document.getElementById('new-chat-btn').addEventListener('click', newChatGlobal);
   document.getElementById('new-project-btn').addEventListener('click', newProject);
   document.getElementById('new-chat-in-project-btn').addEventListener('click', () => newChat(state.currentProjectId));
