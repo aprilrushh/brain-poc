@@ -26,6 +26,7 @@ load_dotenv(ROOT / '.env')
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -427,4 +428,9 @@ if __name__ == "__main__":
 
 # Phase 1 D4.5b — Project/Chat/Message CRUD router
 from app.api_d4 import router as _d4_router
+from src.auth import router as auth_router
 app.include_router(_d4_router)
+app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SESSION_SECRET", "fallback-dev-secret-change-in-production"), same_site="lax", https_only=False)
+app.include_router(auth_router)
+
+# reload trigger 2026-05-03 OAuth

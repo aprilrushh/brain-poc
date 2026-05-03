@@ -11,3 +11,8 @@ requests>=2.31
 tqdm>=4.66
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
+
+# OAuth (D4.5e, 2026-05-03)
+Authlib>=1.6
+itsdangerous>=2.2
+httpx>=0.27

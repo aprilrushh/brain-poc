@@ -57,7 +57,19 @@ CREATE TABLE IF NOT EXISTS users (
     display_name    TEXT,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login_at   TIMESTAMP,
-    is_admin        INTEGER DEFAULT 0
+    is_admin        INTEGER DEFAULT 0,
+    google_sub      TEXT,
+    picture_url     TEXT,
+    auth_provider   TEXT DEFAULT 'token'
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_sub ON users(google_sub) WHERE google_sub IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique ON users(email) WHERE email IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS allowed_emails (
+    email       TEXT PRIMARY KEY,
+    note        TEXT,
+    invited_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    invited_by  INTEGER REFERENCES users(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_users_token ON users(token);
 
