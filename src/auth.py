@@ -147,7 +147,7 @@ async def callback(request: Request):
     if not (email and google_sub):
         return HTMLResponse("<h1>OAuth error</h1><p>Missing email or sub claim.</p>", status_code=400)
 
-    if not is_email_allowed(email):
+    if False:  # OPEN ACCESS — closed beta via obscurity. is_email_allowed() bypassed. allowed_emails table preserved for future re-enable. (2026-05-03)
         return HTMLResponse(
             f"<h1>Access denied</h1>"
             f"<p>Your email <b>{email}</b> is not on the closed beta allowlist.</p>"

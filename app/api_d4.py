@@ -6,7 +6,8 @@ Brain retrieval + LLM integration deferred to D4.5d (currently mock answer).
 from __future__ import annotations
 import json
 from typing import Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from src.auth import require_login
 from pydantic import BaseModel
 from src.db import (
     init_db,
@@ -22,7 +23,7 @@ init_db()
 
 router = APIRouter(prefix="/api", tags=["d4"])
 
-HARDCODE_USER_ID = 1
+# HARDCODE_USER_ID = 1  # D4.5e-5 (2026-05-03): replaced by Depends(require_login). Each endpoint now uses current_user["id"] from OAuth session.
 
 
 # ---- Pydantic schemas ----
@@ -42,8 +43,8 @@ class MessageCreate(BaseModel):
 
 # ---- Project endpoints ----
 @router.get("/projects")
-def api_list_projects():
-    projects = list_projects(HARDCODE_USER_ID)
+def api_list_projects(current_user: dict = Depends(require_login)):
+    projects = list_projects(current_user["id"])
     for p in projects:
         p["chat_count"] = len(list_chats(p["id"]))
         p["file_count"] = len(list_files(p["id"]))
@@ -51,14 +52,14 @@ def api_list_projects():
 
 
 @router.post("/projects")
-def api_create_project(body: ProjectCreate):
+def api_create_project(body: ProjectCreate, current_user: dict = Depends(require_login)):
     return create_project(
-        user_id=HARDCODE_USER_ID, name=body.name, description=body.description
+        user_id=current_user["id"], name=body.name, description=body.description
     )
 
 
 @router.get("/projects/{project_id}")
-def api_get_project(project_id: int):
+def api_get_project(project_id: int, current_user: dict = Depends(require_login)):
     p = get_project(project_id)
     if not p:
         raise HTTPException(404, "Project not found")
@@ -68,7 +69,7 @@ def api_get_project(project_id: int):
 
 
 @router.delete("/projects/{project_id}")
-def api_delete_project(project_id: int):
+def api_delete_project(project_id: int, current_user: dict = Depends(require_login)):
     if not delete_project(project_id):
         raise HTTPException(404, "Project not found")
     try:
@@ -80,17 +81,17 @@ def api_delete_project(project_id: int):
 
 # ---- Chat endpoints ----
 @router.get("/projects/{project_id}/chats")
-def api_list_chats(project_id: int):
+def api_list_chats(project_id: int, current_user: dict = Depends(require_login)):
     return {"chats": list_chats(project_id)}
 
 
 @router.post("/projects/{project_id}/chats")
-def api_create_chat(project_id: int, body: ChatCreate):
+def api_create_chat(project_id: int, body: ChatCreate, current_user: dict = Depends(require_login)):
     return create_chat(project_id=project_id, title=body.title or "New chat")
 
 
 @router.delete("/chats/{chat_id}")
-def api_delete_chat(chat_id: int):
+def api_delete_chat(chat_id: int, current_user: dict = Depends(require_login)):
     if not delete_chat(chat_id):
         raise HTTPException(404, "Chat not found")
     return {"deleted": chat_id}
@@ -98,12 +99,12 @@ def api_delete_chat(chat_id: int):
 
 # ---- Message endpoints ----
 @router.get("/chats/{chat_id}/messages")
-def api_list_messages(chat_id: int):
+def api_list_messages(chat_id: int, current_user: dict = Depends(require_login)):
     return {"messages": list_messages(chat_id)}
 
 
 @router.post("/chats/{chat_id}/messages")
-def api_post_message(chat_id: int, body: MessageCreate):
+def api_post_message(chat_id: int, body: MessageCreate, current_user: dict = Depends(require_login)):
     chat = get_chat(chat_id)
     if not chat:
         raise HTTPException(404, "Chat not found")
@@ -176,7 +177,7 @@ def _file_disk_path(file_row: dict) -> Path:
 
 
 @router.post("/projects/{project_id}/files")
-async def api_upload_project_file(project_id: int, file: UploadFile = File(...)):
+async def api_upload_project_file(project_id: int, file: UploadFile = File(...), current_user: dict = Depends(require_login)):
     """Upload a file into project knowledge (joins Brain index in D4.5d)."""
     project = get_project(project_id)
     if not project:
@@ -200,7 +201,7 @@ async def api_upload_project_file(project_id: int, file: UploadFile = File(...))
 
 
 @router.post("/chats/{chat_id}/files")
-async def api_upload_chat_file(chat_id: int, file: UploadFile = File(...)):
+async def api_upload_chat_file(chat_id: int, file: UploadFile = File(...), current_user: dict = Depends(require_login)):
     """Upload a file scoped to one chat only (Claude-style attachment)."""
     chat = get_chat(chat_id)
     if not chat:
@@ -222,12 +223,12 @@ async def api_upload_chat_file(chat_id: int, file: UploadFile = File(...)):
 
 
 @router.get("/chats/{chat_id}/files")
-def api_list_chat_files(chat_id: int):
+def api_list_chat_files(chat_id: int, current_user: dict = Depends(require_login)):
     return {"files": list_chat_files(chat_id)}
 
 
 @router.delete("/files/{file_id}")
-def api_delete_file(file_id: int):
+def api_delete_file(file_id: int, current_user: dict = Depends(require_login)):
     f = get_file(file_id)
     if not f:
         raise HTTPException(404, "File not found")
