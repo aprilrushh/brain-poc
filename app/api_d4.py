@@ -125,7 +125,7 @@ def api_post_message(chat_id: int, body: MessageCreate, current_user: dict = Dep
             for cf in chat_files:
                 fpath = _file_disk_path(cf)
                 if fpath.exists():
-                    chunks = _document_load_file(fpath, fname=cf["filename"])
+                    chunks = _load_file(fpath.read_bytes(), cf["filename"])
                     parts = []
                     for c in chunks:
                         if c.text:
@@ -137,7 +137,38 @@ def api_post_message(chat_id: int, body: MessageCreate, current_user: dict = Dep
                         chat_attached_text += nl + "--- " + fname + " ---" + nl + file_text[:50000] + nl
         except Exception as e:
             print(f"[D4.5d-bonus] chat file load failed: {e}")
-        result = orch.query(body.content, extra_context=chat_attached_text or None)
+        # Option B (D5.0): build general_extra_context = project knowledge + chat attached
+        # full file content (size-capped). General LLM gets reference docs so its answer
+        # is grounded in same material as Doc-grounded answer (Brain retrieval).
+        general_attached_text = ""
+        try:
+            _GEN_PER_FILE = 200 * 1024
+            _GEN_TOTAL = 800 * 1024
+            _gen_total_size = 0
+            _proj_files = list_files(project_id)
+            _chat_files_for_gen = list_chat_files(chat_id)
+            _all_files = [(_f, "project knowledge") for _f in _proj_files] + [(_f, "chat-attached") for _f in _chat_files_for_gen]
+            for _fr, _scope in _all_files:
+                if _gen_total_size >= _GEN_TOTAL:
+                    break
+                _fpath = _file_disk_path(_fr)
+                if not _fpath.exists():
+                    continue
+                try:
+                    _chunks_g = _load_file(_fpath.read_bytes(), _fr["filename"])
+                    _file_text_g = chr(10).join(_c.text for _c in _chunks_g if _c.text)
+                    if not _file_text_g:
+                        continue
+                    _file_text_g = _file_text_g[:_GEN_PER_FILE]
+                    _remaining = _GEN_TOTAL - _gen_total_size
+                    _file_text_g = _file_text_g[:_remaining]
+                    general_attached_text += chr(10) + "--- " + _fr["filename"] + " (" + _scope + ") ---" + chr(10) + _file_text_g + chr(10)
+                    _gen_total_size += len(_file_text_g)
+                except Exception as _ee:
+                    print("[OptionB] file load failed: " + str(_ee))
+        except Exception as _e:
+            print("[OptionB] general_extra_context build failed: " + str(_e))
+        result = orch.query(body.content, extra_context=chat_attached_text or None, general_extra_context=general_attached_text or None)
         # Compose visible answer = doc-grounded + general knowledge (separator marker)
         answer_text = result["answer"]
         if result.get("answer_general"):
