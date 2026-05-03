@@ -108,6 +108,29 @@ body {
 .msg-content { font-size: 16px; line-height: 1.7; color: var(--text); }
 .msg.user { align-items: flex-end; }
 .msg.user .msg-content { background: var(--bg-elevated); padding: 14px 18px; border-radius: 14px; max-width: 75%; border: 1px solid var(--border); }
+.msg.assistant .msg-content h1 { font-size: 22px; font-weight: 700; margin: 22px 0 12px; line-height: 1.3; color: var(--text); }
+.msg.assistant .msg-content h2 { font-size: 19px; font-weight: 700; margin: 20px 0 10px; line-height: 1.3; color: var(--text); }
+.msg.assistant .msg-content h3 { font-size: 16px; font-weight: 700; margin: 16px 0 8px; line-height: 1.3; color: var(--text); }
+.msg.assistant .msg-content h4 { font-size: 14px; font-weight: 700; margin: 12px 0 6px; line-height: 1.3; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.msg.assistant .msg-content p { margin: 8px 0; }
+.msg.assistant .msg-content strong { font-weight: 700; color: var(--text); }
+.msg.assistant .msg-content em { font-style: italic; }
+.msg.assistant .msg-content ul, .msg.assistant .msg-content ol { margin: 10px 0; padding-left: 26px; }
+.msg.assistant .msg-content li { margin: 4px 0; line-height: 1.65; }
+.msg.assistant .msg-content li > p { margin: 2px 0; }
+.msg.assistant .msg-content code { background: var(--accent-bg); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+.msg.assistant .msg-content pre { background: var(--bg-sidebar); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin: 12px 0; overflow-x: auto; }
+.msg.assistant .msg-content pre code { background: none; color: var(--text); padding: 0; font-size: 13px; line-height: 1.55; }
+.msg.assistant .msg-content blockquote { border-left: 3px solid var(--accent); padding: 6px 14px; margin: 12px 0; color: var(--text-muted); background: var(--accent-bg); border-radius: 0 6px 6px 0; }
+.msg.assistant .msg-content table { border-collapse: collapse; margin: 12px 0; width: 100%; font-size: 14px; }
+.msg.assistant .msg-content th, .msg.assistant .msg-content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+.msg.assistant .msg-content th { background: var(--bg-sidebar); font-weight: 700; }
+.msg.assistant .msg-content tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
+.msg.assistant .msg-content hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+.msg.assistant .msg-content a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.msg.assistant .msg-content a:hover { color: var(--accent-hover); }
+.msg.assistant .msg-content > *:first-child { margin-top: 0; }
+.msg.assistant .msg-content > *:last-child { margin-bottom: 0; }
 .msg-sources { margin-top: 12px; font-size: 13px; color: var(--text-muted); border-left: 2px solid var(--accent); padding: 8px 12px; background: var(--accent-bg); border-radius: 0 8px 8px 0; font-family: system-ui; }
 .input-area { padding: 16px 32px 24px; border-top: 1px solid var(--border); background: var(--bg); }
 .input-shell { max-width: 760px; margin: 0 auto; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); transition: border-color 0.15s ease; }
@@ -127,7 +150,26 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .hidden { display: none !important; }
 .empty-state h2 { font-size: 28px; margin-bottom: 8px; color: var(--text); }
 .empty-state p { font-size: 15px; }
+
+.thinking-indicator { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin-top: 8px; }
+.brain-loader { width: 56px; height: 46px; flex-shrink: 0; }
+.brain-loader .stroke { fill: none; stroke: var(--text); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.brain-loader .chip { fill: var(--bg); stroke: var(--text); stroke-width: 5; stroke-linejoin: round; }
+.brain-loader .node { fill: var(--bg); stroke: var(--text); stroke-width: 5; animation: nodeFlash 1.2s linear infinite; }
+.brain-loader .n1 { animation-delay: 0s; }
+.brain-loader .n2 { animation-delay: 0.15s; }
+.brain-loader .n3 { animation-delay: 0.3s; }
+.brain-loader .n4 { animation-delay: 0.45s; }
+@keyframes nodeFlash {
+  0%, 70%, 100% { fill: var(--bg); filter: none; }
+  15%, 35% { fill: var(--accent); filter: drop-shadow(0 0 3px rgba(201,99,66,0.85)) drop-shadow(0 0 6px rgba(201,99,66,0.5)); }
+}
+.thinking-text { color: var(--text-muted); font-size: 14px; font-style: italic; }
+.thinking-text .dots::after { content: ''; animation: dotsAnim 1.4s steps(4) infinite; }
+@keyframes dotsAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75%, 100% { content: '...'; } }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -288,7 +330,10 @@ async function renderChat() {
   stream.innerHTML = msgs.length ? msgs.map(m => {
     let srcHtml = '';
     if (m.sources_json) { try { const s = JSON.parse(m.sources_json); if (Array.isArray(s) && s.length) srcHtml = `<div class="msg-sources">📎 ${s.length} sources</div>`; } catch {} }
-    return `<div class="msg ${m.role}"><div class="msg-role">${m.role==='user'?'You':'Brain'}</div><div class="msg-content">${escapeHtml(m.content)}</div>${srcHtml}</div>`;
+    const rendered = m.role === 'assistant'
+      ? DOMPurify.sanitize(marked.parse(m.content))
+      : escapeHtml(m.content).replace(/\n/g, '<br>');
+    return `<div class="msg ${m.role}"><div class="msg-role">${m.role==='user'?'You':'Brain'}</div><div class="msg-content">${rendered}</div>${srcHtml}</div>`;
   }).join('') : '<div style="text-align:center;color:var(--text-subtle);padding:64px 16px;">대화를 시작해보세요.</div>';
   // chat-scoped attachments restore
   state.chatAttached = await fetchChatFiles(c.id);
@@ -356,11 +401,42 @@ async function sendMessage() {
   const sendBtn = document.getElementById('send-btn'); sendBtn.disabled = true;
   const note = state.chatAttached.length ? ` [+${state.chatAttached.length} files attached]` : '';
   input.value = ''; input.style.height = 'auto';
+  // D4.5g: optimistic UI — show user msg + Brain thinking indicator immediately
+  const stream = document.getElementById('message-stream');
+  if (stream) {
+    const userPreview = (text + note).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    stream.insertAdjacentHTML('beforeend',
+      `<div class="msg user"><div class="msg-role">You</div><div class="msg-content">${userPreview.replace(/\n/g, '<br>')}</div></div>` +
+      `<div class="msg assistant thinking-indicator" id="brain-thinking">` +
+        `<svg class="brain-loader" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">` +
+          `<path class="stroke" d="M95 28 C85 12, 62 18, 62 38 C50 34, 40 43, 39 57 C26 62, 22 76, 29 88 C19 100, 25 118, 40 122 C41 137, 55 146, 68 138 C73 156, 94 153, 95 135 Z"/>` +
+          `<path class="stroke" d="M39 57 C47 59, 52 63, 55 70"/>` +
+          `<path class="stroke" d="M29 88 C36 87, 42 88, 48 92"/>` +
+          `<path class="stroke" d="M40 122 C48 121, 55 124, 60 130"/>` +
+          `<path class="stroke" d="M68 138 C67 132, 69 127, 74 123"/>` +
+          `<rect class="chip" x="88" y="72" width="48" height="40" rx="2"/>` +
+          `<path class="stroke" d="M136 82 H158 V52 H178"/>` +
+          `<path class="stroke" d="M136 92 H182"/>` +
+          `<path class="stroke" d="M136 102 H182"/>` +
+          `<path class="stroke" d="M136 112 H158 V142 H178"/>` +
+          `<circle class="node n1" cx="186" cy="52" r="9"/>` +
+          `<circle class="node n2" cx="192" cy="92" r="9"/>` +
+          `<circle class="node n3" cx="192" cy="102" r="9"/>` +
+          `<circle class="node n4" cx="186" cy="142" r="9"/>` +
+        `</svg>` +
+        `<div class="thinking-text">Brain이 답변 검색 중<span class="dots"></span></div>` +
+      `</div>`);
+    const sc = stream.parentElement;
+    if (sc) setTimeout(() => { sc.scrollTop = sc.scrollHeight; }, 30);
+  }
   try {
     await api('POST', `/chats/${state.currentChatId}/messages`, { content: text + note });
     await fetchProjects();
     await renderChat(); renderSidebar();
-  } catch (e) { alert('Send failed: ' + e.message); }
+  } catch (e) {
+    document.getElementById('brain-thinking')?.remove();
+    alert('Send failed: ' + e.message);
+  }
   finally { sendBtn.disabled = false; input.focus(); }
 }
 
@@ -392,7 +468,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   const ta = document.getElementById('chat-input');
   ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 200)+'px'; });
-  ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+      e.preventDefault();
+      if (ta.value.trim().length < 1) return;
+      sendMessage();
+    }
+  });
   document.getElementById('send-btn').addEventListener('click', sendMessage);
   try { await fetchProjects(); renderSidebar(); } catch (e) { console.error('Init load failed:', e); }
 });

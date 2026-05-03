@@ -141,9 +141,18 @@ def api_post_message(chat_id: int, body: MessageCreate, current_user: dict = Dep
         # Compose visible answer = doc-grounded + general knowledge (separator marker)
         answer_text = result["answer"]
         if result.get("answer_general"):
-            answer_text = (
-                result["answer"] + "\n\n— — —\n[General knowledge]\n" + result["answer_general"]
-            )
+            doc_ans = result["answer"].strip()
+            gen_ans = result["answer_general"].strip()
+            if doc_ans.startswith("I don't have information"):
+                answer_text = (
+                    "**📄 본 문서 기반:** 해당 내용 없음.\n\n"
+                    "**🌐 일반 지식 답변:**\n\n" + gen_ans
+                )
+            else:
+                answer_text = (
+                    "**📄 본 문서 기반:**\n\n" + doc_ans
+                    + "\n\n---\n\n**🌐 일반 지식 답변:**\n\n" + gen_ans
+                )
         sources_payload = result.get("retrieved", [])
         timings_payload = result.get("timings", {})
     except HTTPException as he:
@@ -322,20 +331,44 @@ def _encode_and_index_file(project_id: int, filename: str, file_bytes: bytes) ->
         chunks=chunks,
         embeddings=embeddings,
     )
+    # D4.5g: persist Brain index to disk (uvicorn reload safe)
+    try:
+        session = sm.get_session(sid)
+        save_dir = f"data/projects/{project_id}/brain_index"
+        session.brain.save(save_dir)
+        from src.db import update_project
+        update_project(project_id, brain_index_path=save_dir, n_chunks=len(session.brain.docs))
+    except Exception as e:
+        print(f"[D4.5g] persist save failed for project {project_id}: {e}")
     return len(chunks)
 
 
 def _get_orchestrator(project_id: int) -> _RAGOrchestrator:
-    """Build a RAGOrchestrator pointing at the project's BrainMemory."""
+    """Build a RAGOrchestrator pointing at the project's BrainMemory.
+    D4.5g: Lazy reload from disk if session evicted (uvicorn reload / TTL / LRU)."""
     state = _get_state()
     sm = state["session_manager"]
     sid = _pid_to_sid.get(project_id)
-    if not sid:
-        raise HTTPException(400, f"Project {project_id} has no Brain index yet (upload at least one file).")
-    session = sm.get_session(sid)
-    if not session:
-        del _pid_to_sid[project_id]
-        raise HTTPException(410, f"Project {project_id} index expired (TTL/LRU). Please re-upload files.")
+    session = sm.get_session(sid) if sid else None
+    if session is None:
+        # Try lazy reload from disk
+        from src.db import get_project
+        from src.brain import BrainMemory
+        from pathlib import Path as _P
+        proj = get_project(project_id)
+        idx_path = (proj or {}).get("brain_index_path")
+        if not idx_path or not _P(idx_path).exists():
+            _pid_to_sid.pop(project_id, None)
+            raise HTTPException(400, f"Project {project_id} has no Brain index yet (upload at least one file).")
+        try:
+            new_session = sm.create_session()
+            new_session.brain = BrainMemory.load(idx_path, device=state["device"])
+            _pid_to_sid[project_id] = new_session.session_id
+            session = new_session
+            print(f"[D4.5g] lazy-reloaded Brain index for project {project_id} from {idx_path}")
+        except Exception as e:
+            _pid_to_sid.pop(project_id, None)
+            raise HTTPException(500, f"Failed to reload Brain index for project {project_id}: {e}")
     return _RAGOrchestrator(brain=session.brain, encoder=state["encoder"])
 
 
