@@ -95,6 +95,7 @@ class RAGOrchestrator:
         question: str,
         user_thinking_override: Optional[str] = None,
         max_tokens: int = 1024,
+        extra_context: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Run full pipeline: encode -> retrieve -> generate.
@@ -115,7 +116,11 @@ class RAGOrchestrator:
         )
 
         context = self.build_context(retrieved)
-        user_msg = f"Sources:\n\n{context}\n\nQuestion: {question}"
+        # D4.5d-bonus: chat-scoped attached files (Claude-style 📎) injected as separate section
+        attached_section = ""
+        if extra_context:
+            attached_section = f"\n\n=== Attached files (chat-scoped) ===\n{extra_context}\n=== End attached ===\n"
+        user_msg = f"Sources:\n\n{context}{attached_section}\n\nQuestion: {question}"
         if not thinking_enabled:
             user_msg = "/no_think " + user_msg
 

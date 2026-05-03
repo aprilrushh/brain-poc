@@ -118,7 +118,26 @@ def api_post_message(chat_id: int, body: MessageCreate, current_user: dict = Dep
     project_id = chat["project_id"]
     try:
         orch = _get_orchestrator(project_id)
-        result = orch.query(body.content)
+        # D4.5d-bonus: chat-scoped 📎 files → LLM context
+        chat_attached_text = ""
+        try:
+            chat_files = list_chat_files(chat_id)
+            for cf in chat_files:
+                fpath = _file_disk_path(cf)
+                if fpath.exists():
+                    chunks = _document_load_file(fpath, fname=cf["filename"])
+                    parts = []
+                    for c in chunks:
+                        if c.text:
+                            parts.append(c.text)
+                    nl = chr(10)
+                    file_text = nl.join(parts)
+                    if file_text:
+                        fname = cf["filename"]
+                        chat_attached_text += nl + "--- " + fname + " ---" + nl + file_text[:50000] + nl
+        except Exception as e:
+            print(f"[D4.5d-bonus] chat file load failed: {e}")
+        result = orch.query(body.content, extra_context=chat_attached_text or None)
         # Compose visible answer = doc-grounded + general knowledge (separator marker)
         answer_text = result["answer"]
         if result.get("answer_general"):
