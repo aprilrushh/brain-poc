@@ -890,3 +890,25 @@ def count_unread_events(chat_id: int) -> int:
             (chat_id,),
         ).fetchone()
         return row[0]
+
+
+def list_recent_brain_events_by_user(user_id: int, limit: int = 5) -> list[dict]:
+    """Cross-chat recent visible Brain events — sidebar Second Brain section render.
+
+    Ownership chain: chat_brain_events → chats → projects.user_id
+    """
+    sql = """
+        SELECT cbe.id, cbe.chat_id, cbe.event_type, cbe.summary_text, cbe.icon,
+               cbe.occurred_at, cbe.seen_at,
+               c.title AS chat_title, c.project_id,
+               p.name AS project_name
+        FROM chat_brain_events cbe
+        JOIN chats    c ON c.id = cbe.chat_id
+        JOIN projects p ON p.id = c.project_id
+        WHERE p.user_id = ? AND cbe.visible_to_user = 1
+        ORDER BY cbe.occurred_at DESC
+        LIMIT ?
+    """
+    with get_conn() as conn:
+        rows = conn.execute(sql, [user_id, limit]).fetchall()
+        return [dict(r) for r in rows]

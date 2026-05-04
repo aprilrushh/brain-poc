@@ -167,6 +167,53 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .thinking-text { color: var(--text-muted); font-size: 14px; font-style: italic; }
 .thinking-text .dots::after { content: ''; animation: dotsAnim 1.4s steps(4) infinite; }
 @keyframes dotsAnim { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75%, 100% { content: '...'; } }
+
+/* Second Brain — chat tail timeline (ledger v0.6 paradigm visible signature) */
+.brain-events-timeline {
+  margin-top: 32px; padding: 16px 0 8px; border-top: 1px solid var(--border);
+}
+.brain-events-header {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-subtle); margin-bottom: 12px;
+}
+.brain-events-header > span:first-child { font-size: 13px; color: var(--text-muted); text-transform: none; letter-spacing: 0; font-weight: 500; }
+.brain-event {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px; margin-bottom: 8px;
+  background: var(--accent-bg, #fff5f0); border-radius: 8px;
+  border-left: 3px solid var(--accent); font-size: 14px; line-height: 1.5;
+}
+.brain-event-icon { font-size: 16px; flex-shrink: 0; }
+.brain-event-text { flex: 1; }
+.brain-event-time { color: var(--text-subtle); font-size: 12px; margin-top: 2px; }
+.brain-event.unread { box-shadow: 0 0 0 1px var(--accent); }
+.brain-trigger-btn {
+  padding: 4px 10px; font-size: 11px; background: transparent;
+  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  color: var(--text-muted); font-family: inherit;
+}
+.brain-trigger-btn:hover { border-color: var(--accent); color: var(--accent); }
+.brain-trigger-btn:disabled { opacity: 0.5; cursor: wait; }
+.brain-trigger-status { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+.brain-events-empty { color: var(--text-subtle); font-size: 12px; padding: 8px 0; }
+.brain-detail-panel { margin-top: 12px; padding: 12px; background: var(--surface-2, #faf6f2); border-radius: 8px; border: 1px solid var(--border); }
+.brain-detail-section { margin-bottom: 12px; }
+.brain-detail-section:last-child { margin-bottom: 0; }
+.brain-detail-label { font-family: var(--font-sans, system-ui); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px; display: block; }
+.brain-detail-list { margin: 0; padding-left: 0; list-style: none; }
+.brain-detail-list li { font-size: 13px; line-height: 1.5; padding: 4px 0; color: var(--text); }
+.brain-detail-list li::before { content: "•"; color: var(--accent); margin-right: 8px; }
+.brain-vocab-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.brain-vocab-tag { font-size: 11px; padding: 2px 8px; background: var(--accent-bg, #fff5f0); color: var(--accent); border-radius: 4px; border: 1px solid var(--accent); }
+.brain-confidence { color: var(--text-subtle); font-size: 11px; margin-left: 6px; }
+/* Sidebar Second Brain section */
+.sidebar-section.brain-summary { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.sidebar-section.brain-summary .sidebar-label { color: var(--accent); }
+.brain-summary-stats { font-size: 12px; color: var(--text-muted); padding: 8px 12px; line-height: 1.7; }
+.brain-summary-stat { display: flex; justify-content: space-between; }
+.brain-summary-stat strong { color: var(--text); font-weight: 600; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
@@ -176,6 +223,10 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
   <aside class="sidebar">
     <div class="sidebar-brand"><span class="dot"></span>Brain</div>
     <button class="new-chat-btn" id="new-chat-btn"><span>＋</span><span>New chat</span></button>
+    <div class="sidebar-section brain-summary">
+      <div class="sidebar-label"><span>Second Brain</span></div>
+      <ul class="sidebar-list" id="brain-events-recent"></ul>
+    </div>
     <div class="sidebar-section">
       <div class="sidebar-label"><span>Projects</span><button id="new-project-btn" title="New project">＋</button></div>
       <ul class="sidebar-list" id="project-list"></ul>
@@ -210,7 +261,15 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <div class="chat-list" id="project-chat-list"></div>
     </section>
     <section class="view-chat" id="view-chat">
-      <div class="chat-stream"><div class="chat-stream-inner" id="message-stream"></div></div>
+      <div class="chat-stream"><div class="chat-stream-inner" id="message-stream"></div>
+<div id="brain-events" class="brain-events-timeline" style="display:none;">
+  <div class="brain-events-header">
+    <span>🌳 Brain</span>
+    <button class="brain-trigger-btn" onclick="triggerG1Now()">Trigger now</button>
+    <span id="brain-trigger-status" class="brain-trigger-status"></span>
+  </div>
+  <div id="brain-events-list"></div>
+</div></div>
       <div class="input-area">
         <div class="input-shell">
           <div class="input-attached" id="chat-attached"></div>
@@ -338,6 +397,7 @@ async function renderChat() {
   // chat-scoped attachments restore
   state.chatAttached = await fetchChatFiles(c.id);
   renderChatChips();
+  renderBrainEvents();
   setTimeout(() => { const sc = stream.parentElement; sc.scrollTop = sc.scrollHeight; }, 50);
 }
 
@@ -479,6 +539,131 @@ document.addEventListener('DOMContentLoaded', async () => {
   try { await fetchProjects(); renderSidebar(); } catch (e) { console.error('Init load failed:', e); }
 });
 
+
+// === Second Brain — sidebar recent events (ledger v0.9 paradigm visible signature) ===
+async function loadRecentBrainEvents() {
+  try {
+    const res = await fetch('/api/brain-events/recent?limit=5', { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const events = data.events || [];
+    const ul = document.getElementById('brain-events-recent');
+    if (!ul) return;
+    if (events.length === 0) {
+      ul.innerHTML = '<li style="color:var(--text-subtle);font-size:12px;padding:8px;">아직 추출 항목 없음</li>';
+      return;
+    }
+    ul.innerHTML = events.map(e => {
+      const isActive = (typeof state !== 'undefined' && state.currentChatId === e.chat_id) ? 'active' : '';
+      const title = escapeHtml(e.chat_title || '(no title)');
+      const summary = escapeHtml(e.summary_text || '');
+      return '<li class="sidebar-item ' + isActive + '" onclick="openChat(' + e.project_id + ',' + e.chat_id + ')">' + title + '<span class="meta">' + summary + '</span></li>';
+    }).join('');
+  } catch (err) { console.error('loadRecentBrainEvents:', err); }
+}
+function _initBrainSidebar() {
+  loadRecentBrainEvents();
+  setInterval(loadRecentBrainEvents, 30000);
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initBrainSidebar);
+} else {
+  _initBrainSidebar();
+}
+
+// === Second Brain — chat tail timeline (ledger v0.6 paradigm visible signature) ===
+async function renderBrainEvents() {
+  const host = document.getElementById('brain-events');
+  if (!host) return;
+  if (!state.currentChatId) { host.style.display = 'none'; return; }
+  host.style.display = 'block';
+  const list = document.getElementById('brain-events-list');
+  try {
+    const data = await api('GET', `/chats/${state.currentChatId}/brain-events`);
+    const events = data.events || [];
+    const detail = data.extraction_detail;
+    if (events.length === 0 && !detail) {
+      list.innerHTML = '<div class="brain-events-empty">아직 추출된 내용이 없습니다. 30분 idle 후 자동 또는 Trigger now 클릭.</div>';
+      renderBrainSidebarSummary(null);
+      return;
+    }
+    let html = events.map(e => `
+      <div class="brain-event ${e.seen_at ? '' : 'unread'}">
+        <div class="brain-event-icon">${escapeHtml(e.icon || '✨')}</div>
+        <div class="brain-event-text">
+          ${escapeHtml(e.summary_text)}
+          <div class="brain-event-time">${fmtTime(e.occurred_at)}</div>
+        </div>
+      </div>`).join('');
+
+    if (detail) {
+      const sections = [];
+      if (detail.mechanisms && detail.mechanisms.length) {
+        sections.push(`<div class="brain-detail-section"><span class="brain-detail-label">⚙️ Mechanisms (${detail.mechanisms.length})</span><ul class="brain-detail-list">${detail.mechanisms.map(m => `<li>${escapeHtml(m.statement)}</li>`).join('')}</ul></div>`);
+      }
+      if (detail.open_questions && detail.open_questions.length) {
+        sections.push(`<div class="brain-detail-section"><span class="brain-detail-label">❓ Open Questions (${detail.open_questions.length})</span><ul class="brain-detail-list">${detail.open_questions.map(q => `<li>${escapeHtml(q.text || q)}${q.confidence !== undefined ? `<span class="brain-confidence">conf ${q.confidence}</span>` : ''}</li>`).join('')}</ul></div>`);
+      }
+      if (detail.methods && detail.methods.length) {
+        sections.push(`<div class="brain-detail-section"><span class="brain-detail-label">🔬 Methods (${detail.methods.length})</span><ul class="brain-detail-list">${detail.methods.map(m => `<li>${escapeHtml(m.name || m)}</li>`).join('')}</ul></div>`);
+      }
+      if (detail.frameworks && detail.frameworks.length) {
+        sections.push(`<div class="brain-detail-section"><span class="brain-detail-label">📐 Frameworks (${detail.frameworks.length})</span><ul class="brain-detail-list">${detail.frameworks.map(f => `<li>${escapeHtml(f.name || f)}</li>`).join('')}</ul></div>`);
+      }
+      if (detail.vocabulary && detail.vocabulary.length) {
+        sections.push(`<div class="brain-detail-section"><span class="brain-detail-label">📚 Vocabulary (${detail.vocabulary.length})</span><div class="brain-vocab-tags">${detail.vocabulary.map(v => `<span class="brain-vocab-tag">${escapeHtml(v.term || v)}</span>`).join('')}</div></div>`);
+      }
+      if (sections.length) {
+        html += `<div class="brain-detail-panel">${sections.join('')}</div>`;
+      }
+    }
+
+    list.innerHTML = html;
+    renderBrainSidebarSummary(detail, events.length);
+    api('POST', `/chats/${state.currentChatId}/brain-events/mark-seen`).catch(() => {});
+  } catch (e) {
+    console.error('brain events fetch failed:', e);
+    list.innerHTML = '<div class="brain-events-empty">Brain events 불러오기 실패: ' + escapeHtml(e.message || String(e)) + '</div>';
+  }
+}
+
+function renderBrainSidebarSummary(detail, eventCount) {
+  const sec = document.getElementById('brain-summary-section');
+  if (!sec) return;
+  if (!detail && !eventCount) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('bs-extractions').textContent = detail ? '1' : '0';
+  document.getElementById('bs-mechanisms').textContent = detail && detail.mechanisms ? detail.mechanisms.length : '0';
+  document.getElementById('bs-events').textContent = eventCount || '0';
+}
+
+async function triggerG1Now() {
+  if (!state.currentChatId) return;
+  const btn = document.querySelector('.brain-trigger-btn');
+  const status = document.getElementById('brain-trigger-status');
+  if (btn) btn.disabled = true;
+  if (status) status.textContent = '⏳ Brain 분석 중... (~20s)';
+  try {
+    const data = await api('POST', `/chats/${state.currentChatId}/extract-now`);
+    if (data.status === 'completed') {
+      const cost = data.cost_usd ? `$${data.cost_usd.toFixed(4)}` : '';
+      if (status) status.textContent = `✅ ${data.mechanism_count}개 mechanism (${cost})`;
+      await renderBrainEvents();
+    } else if (data.status === 'skipped_already_done') {
+      if (status) status.textContent = `⚪ 이미 추출됨`;
+      await renderBrainEvents();
+    } else if (data.status === 'skipped_too_short') {
+      if (status) status.textContent = `⚪ message 부족 (최소 2개 필요)`;
+    } else {
+      if (status) status.textContent = `❌ ${data.status}: ${((data.error||'')+'').slice(0,80)}`;
+    }
+  } catch (e) {
+    if (status) status.textContent = `❌ ${e.message || e}`;
+  } finally {
+    if (btn) btn.disabled = false;
+    setTimeout(() => { if (status) status.textContent = ''; }, 8000);
+  }
+}
 </script>
 </body>
 </html>

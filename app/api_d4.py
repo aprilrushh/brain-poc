@@ -420,16 +420,35 @@ from src.db_second_brain import (
     list_brain_events as _sb_list_events,
     mark_events_seen as _sb_mark_events_seen,
     count_unread_events as _sb_count_unread,
+    get_chat_extraction_by_chat as _sb_get_extraction,
+    list_mechanisms_by_extraction as _sb_list_mechs,
+    list_recent_brain_events_by_user as _sb_list_recent_by_user,
 )
+import json as _sb_json
 from src.g1_extractor import run_g1_extraction as _sb_run_g1
 
 
 @router.get("/chats/{chat_id}/brain-events")
 def api_list_brain_events(chat_id: int, current_user: dict = Depends(require_login)):
-    """Brain timeline events for chat tail render."""
+    """Brain timeline events + latest extraction detail for chat tail render."""
     events = _sb_list_events(chat_id, only_visible=True, only_unread=False)
     unread = _sb_count_unread(chat_id)
-    return {"events": events, "unread_count": unread}
+    extraction = _sb_get_extraction(chat_id)
+    detail = None
+    if extraction:
+        mechs = _sb_list_mechs(extraction['id'])
+        def _parse(col):
+            v = extraction[col]
+            return _sb_json.loads(v) if v else []
+        detail = {
+            'extraction_id': extraction['id'],
+            'mechanisms':    [{'id': m['id'], 'statement': m['statement'], 'position_in_chat': m['position_in_chat']} for m in mechs],
+            'open_questions': _parse('open_questions_json'),
+            'methods':        _parse('methods_json'),
+            'frameworks':     _parse('frameworks_json'),
+            'vocabulary':     _parse('vocabulary_json'),
+        }
+    return {"events": events, "unread_count": unread, "extraction_detail": detail}
 
 
 @router.post("/chats/{chat_id}/brain-events/mark-seen")
@@ -452,3 +471,11 @@ def api_extract_now(chat_id: int, current_user: dict = Depends(require_login)):
         "latency_ms": result.latency_ms,
         "error": result.error,
     }
+
+@router.get("/brain-events/recent")
+def api_recent_brain_events(limit: int = 5, current_user: dict = Depends(require_login)):
+    """Cross-chat recent visible Brain events for sidebar Second Brain section."""
+    limit = max(1, min(20, limit))
+    events = _sb_list_recent_by_user(current_user["id"], limit)
+    return {"events": events, "count": len(events)}
+
