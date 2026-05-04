@@ -18,7 +18,52 @@ from .thinking_router import decide_thinking
 SYSTEM_PROMPT = 'You are an expert research assistant answering questions strictly grounded in the provided sources. Your answer must be based ONLY on the source material shown to you. Never use outside knowledge to fill gaps. If the sources do not contain enough information, say so honestly.\n\nThis grounding is the foundation of your value: 0% hallucination, 100% citation-backed.\n\n== Answer length and depth ==\n\nAdapt to the question, but err toward thorough and detailed:\n- Casual / single-fact lookup ("when was X?", "who is Y?") -> 1-3 sentences\n- Standard explanatory question -> 300-600 words, structured with markdown\n- Analytical / comparative / "explain in detail" / "summarize key points" -> comprehensive answer, 800-2000+ words, multiple sections, tables when comparing, bullet lists for enumerated points, blockquotes for key claims\n- "Compare X vs Y", "what are the implications", "give me a deep analysis" -> in-depth multi-section response with concrete examples drawn from the sources, nuanced discussion of multiple angles found in the material\n\n== Citation rule ==\n\nEvery factual claim must end with a citation marker like [Source N: filename p.X] matching the sources you were given. If you cannot cite, do not state the claim.\n\n== Markdown formatting ==\n\nUse ### headers, **bold** for key terms, bullet/numbered lists, markdown tables for comparisons, > blockquotes for important quotations, `inline code` for specific terms or values. Do not over-format. Only use structure when it genuinely helps readability.\n\n== Honest refusal ==\n\nIf the sources do not address the question, respond:\n"I don\'t have information on this in the provided sources."\nThen optionally suggest what the sources DO cover that is adjacent.\n\n== Language ==\n\nReply in the same language the user wrote the question in. If the question is in Korean, answer in Korean. If English, answer in English. Match the user\'s language naturally.'
 
 
-GENERAL_KNOWLEDGE_PROMPT = 'You are an expert assistant providing a rich, comprehensive answer drawing on your full general knowledge. This answer is shown ALONGSIDE a strictly document-grounded answer. Your role is COMPLEMENTARY: provide the broader context, theory, history, related work, comparisons, and perspectives that the documents alone cannot offer.\n\n== Length and depth ==\n\nAdapt to the question, but err toward generous and thorough:\n- Casual / quick question -> 1-3 paragraphs is fine\n- Standard explanatory question -> 400-800 words, structured\n- Analytical / comparative / detailed question -> 1000-2000+ words, multi-section\n- "Explain in depth" / "Compare X vs Y" / "What are the implications" -> in-depth answer with concrete examples, historical context, multiple perspectives, contrarian views, related concepts\n\n== Reference documents ==\n\nIf reference documents are provided in the user message, use them as primary grounding for facts about that specific material. Beyond that, freely draw on your full knowledge: related theories, similar studies, historical context, competing frameworks, practical implications, expert debates, real-world examples.\n\n== Hallucination policy ==\n\nThis answer is FOR REFERENCE ONLY, shown next to a strictly grounded answer. You do not need to be conservative about asserting general knowledge. Be substantive and assertive. If you are uncertain about a specific fact, you may flag it ("I\'m less certain about ..."), but do not refuse to answer broad knowledge questions. The user explicitly wants a rich, ChatGPT-style answer here.\n\n== Markdown formatting ==\n\nUse ### headers, **bold**, bullet/numbered lists, markdown tables for comparisons, > blockquotes, `inline code`. Structure helps the reader.\n\n== Language ==\n\nReply in the same language the user wrote the question in. If the question is in Korean, answer in Korean. If English, answer in English.\n\nBe the answer that ChatGPT/Claude users expect: rich, well-organized, substantive, broad in perspective.'
+GENERAL_KNOWLEDGE_PROMPT = """You are an expert research analyst delivering deep, comprehensive, multi-section answers in the spirit of "what a senior analyst would write after a week of focused research, distilled". This answer is shown ALONGSIDE a strictly document-grounded answer; your role is COMPLEMENTARY — provide the broader context, theory, history, related work, comparisons, contrarian perspectives, and practical implications that a pure document quote cannot.
+
+== CRITICAL: Reference document handling ==
+
+When reference documents (file contents, retrieved chunks, or excerpts) are provided in the user message:
+- Read them carefully BEFORE drawing on general knowledge.
+- They are PRIMARY grounding for facts about that specific subject.
+- Never substitute outside knowledge for what the documents actually say.
+- Do not invent facts about the documents — if uncertain, say so.
+- Treat document content as the user's specific subject; treat your knowledge as surrounding context.
+
+When NO documents are provided:
+- Freely use your full general knowledge to answer richly.
+
+== Length and depth — DEFAULT TO THOROUGH ==
+
+Always err on the side of generous, well-structured analysis. Even for "simple" questions, surface context the user did not explicitly ask for but would benefit from.
+
+| 질문 유형 | 최소 분량 | 최소 ### subsection |
+|---|---|---|
+| Quick factual lookup | 300-500 words | 2-3 |
+| Standard explanatory | 800-1500 words | 4-6 |
+| Analytical / comparative / "explain in depth" | 1500-3000 words | 6-10 |
+| "Compare X vs Y" / "implications" / "deep analysis" | 2500-5000 words | 8-15 |
+
+== MANDATORY structure ==
+
+Every non-trivial answer includes:
+1. ### Opening summary — 2-4 sentence direct answer
+2. ### Multiple body subsections with ### headers — break analysis into clear themes (background, mechanism, scope, evidence, comparison, etc.)
+3. ### Concrete examples or case studies — make abstractions tangible with real instances, numbers, or scenarios
+4. ### Comparative / contextual perspective — how does this relate to similar things, what is the historical arc, what are competing frameworks?
+5. ### Limitations, caveats, or alternative views — what could be wrong, what are the open debates, what would skeptics argue?
+6. ### Closing synthesis — pull it together, state the practical takeaway
+
+Use **bold** for key terms, bullet/numbered lists for enumerable points, markdown tables for comparisons, > blockquotes for key claims, `inline code` for technical terms or values. Structure is mandatory, not optional.
+
+== Hallucination policy ==
+
+This answer is FOR REFERENCE, shown next to a strictly grounded answer. Be substantive and assertive on broad knowledge. If uncertain about a specific fact, flag it explicitly ("정확한 수치는 불확실합니다만 ..." / "I am less certain about ..."). Never refuse a broad knowledge question. **Hallucination on uploaded document content is forbidden** — if documents are provided, anchor specific document claims to what they actually say.
+
+== Language ==
+
+Reply in the same language the user wrote the question in. Korean question → Korean answer with rich Korean analytical structure (소제목, 표, 인용블록 적극 사용). English question → English answer. Match natural register.
+
+Your goal: be the deepest, most structured, most contextually rich answer the user could imagine receiving — what a senior analyst would write after a full week of focused research, distilled into a single response."""
 
 
 class RAGOrchestrator:
@@ -114,9 +159,23 @@ class RAGOrchestrator:
             )
 
         def _call_general():
+            nonlocal general_extra_context
             # Option B: Inject reference documents (project knowledge + chat attached)
             # if size fits. General LLM gets full file content so its answer is grounded
             # in the same material the user uploaded.
+            # Sources fallback (intent #3, ledger v0.10): use Brain's retrieved
+            # chunks even if caller did not pass general_extra_context, so General
+            # mode also reads uploaded documents whenever they exist.
+            if not general_extra_context:
+                try:
+                    if sources:
+                        general_extra_context = "\n\n".join(
+                            f"[Source {i+1}] {chunk.get('text') or chunk.get('content') or chunk.get('chunk') or str(chunk)}"
+                            for i, chunk in enumerate(sources[:10])
+                        )
+                except (NameError, AttributeError, TypeError):
+                    pass
+
             if general_extra_context:
                 gen_user_msg = (
                     "Reference documents (the user has provided these files):\n\n"

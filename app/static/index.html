@@ -556,8 +556,10 @@ async function loadRecentBrainEvents() {
     ul.innerHTML = events.map(e => {
       const isActive = (typeof state !== 'undefined' && state.currentChatId === e.chat_id) ? 'active' : '';
       const title = escapeHtml(e.chat_title || '(no title)');
+      const projectName = escapeHtml(e.project_name || '');
+      const time = fmtTime(e.occurred_at);
       const summary = escapeHtml(e.summary_text || '');
-      return '<li class="sidebar-item ' + isActive + '" onclick="openChat(' + e.project_id + ',' + e.chat_id + ')">' + title + '<span class="meta">' + summary + '</span></li>';
+      return '<li class="sidebar-item ' + isActive + '" onclick="openChat(' + e.project_id + ',' + e.chat_id + ')">' + title + '<span class="meta">' + projectName + ' · ' + time + '</span><span class="meta">' + summary + '</span></li>';
     }).join('');
   } catch (err) { console.error('loadRecentBrainEvents:', err); }
 }
