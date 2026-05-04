@@ -42,6 +42,30 @@ from src.session_manager import (
 
 app = FastAPI(title="Brain RAG (File Upload)", version="0.2.0")
 
+
+# Second Brain — DB schema init (core + 13 SB tables) + Pipeline (5min poll)
+# ledger v0.7/v0.8 — Step 2 production wire
+from src.db import init_db as _sb_init_db
+from src.pipeline import start_pipeline as _sb_start_pipeline, stop_pipeline as _sb_stop_pipeline
+
+
+@app.on_event("startup")
+async def _second_brain_startup():
+    """Init DB schema (core + 13 SB tables, idempotent) + start G1 idle-poll (5min, UTC)."""
+    _sb_init_db()
+    print("[second_brain] DB schema initialized (core 6 + SB 13 tables)", flush=True)
+    _sb_start_pipeline()
+    print("[second_brain] G1 idle-poll pipeline started (5min interval, UTC)", flush=True)
+
+
+@app.on_event("shutdown")
+async def _second_brain_shutdown():
+    """Gracefully stop the pipeline scheduler."""
+    _sb_stop_pipeline()
+    print("[second_brain] pipeline stopped", flush=True)
+
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

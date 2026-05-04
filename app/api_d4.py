@@ -410,3 +410,45 @@ def _drop_project_session(project_id: int):
     sid = _pid_to_sid.pop(project_id, None)
     if sid:
         sm.delete_session(sid)
+
+
+# ============================================================
+# Second Brain — chat events + manual G1 trigger
+# Step 2 production wire (ledger v0.7/v0.8)
+# ============================================================
+from src.db_second_brain import (
+    list_brain_events as _sb_list_events,
+    mark_events_seen as _sb_mark_events_seen,
+    count_unread_events as _sb_count_unread,
+)
+from src.g1_extractor import run_g1_extraction as _sb_run_g1
+
+
+@router.get("/chats/{chat_id}/brain-events")
+def api_list_brain_events(chat_id: int, current_user: dict = Depends(require_login)):
+    """Brain timeline events for chat tail render."""
+    events = _sb_list_events(chat_id, only_visible=True, only_unread=False)
+    unread = _sb_count_unread(chat_id)
+    return {"events": events, "unread_count": unread}
+
+
+@router.post("/chats/{chat_id}/brain-events/mark-seen")
+def api_mark_events_seen(chat_id: int, current_user: dict = Depends(require_login)):
+    """Mark all unread events as seen (called on chat enter)."""
+    n = _sb_mark_events_seen(chat_id)
+    return {"marked_seen": n}
+
+
+@router.post("/chats/{chat_id}/extract-now")
+def api_extract_now(chat_id: int, current_user: dict = Depends(require_login)):
+    """Manual G1 trigger — bypass 30min idle wait. Closed beta debug + web validation."""
+    result = _sb_run_g1(chat_id)
+    return {
+        "status": result.status,
+        "extraction_id": result.extraction_id,
+        "mechanism_count": len(result.mechanism_ids),
+        "event_id": result.event_id,
+        "cost_usd": result.cost_usd,
+        "latency_ms": result.latency_ms,
+        "error": result.error,
+    }
