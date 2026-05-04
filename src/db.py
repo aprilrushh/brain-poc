@@ -122,9 +122,14 @@ CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id);
 
 
 def init_db() -> None:
-    """Create schema if not exists. Idempotent."""
+    """Create schema if not exists. Idempotent.
+    Includes Second Brain layer (13 tables) — ledger v0.5 + v0.6.
+    """
     with get_conn() as conn:
         conn.executescript(SCHEMA_SQL)
+        # Second Brain layer (idempotent, same connection same DB file)
+        from src.db_second_brain import SB_SCHEMA_SQL
+        conn.executescript(SB_SCHEMA_SQL)
 
 
 # ============================================================
