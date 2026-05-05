@@ -104,10 +104,12 @@ def api_list_messages(chat_id: int, current_user: dict = Depends(require_login))
 
 
 @router.post("/chats/{chat_id}/messages")
-def api_post_message(chat_id: int, body: MessageCreate, current_user: dict = Depends(require_login)):
+def api_post_message(chat_id: int, body: MessageCreate, stream: int = 0, current_user: dict = Depends(require_login)):
     chat = get_chat(chat_id)
     if not chat:
         raise HTTPException(404, "Chat not found")
+    if stream == 1:
+        return _api_post_message_stream(chat_id, body, chat)
     user_msg = create_message(chat_id=chat_id, role="user", content=body.content)
     # Auto-title from first user message
     msgs = list_messages(chat_id)
@@ -310,6 +312,8 @@ import torch as _torch
 from src.document_loader import load_file as _load_file
 from src.session_manager import get_session_manager as _get_sm
 from src.orchestrator import RAGOrchestrator as _RAGOrchestrator
+from fastapi.responses import StreamingResponse as _SSEResponse
+import json as _sse_json
 
 # Module-level mapping (in-memory; cleared on uvicorn reload)
 _pid_to_sid: dict[int, str] = {}
@@ -478,4 +482,161 @@ def api_recent_brain_events(limit: int = 5, current_user: dict = Depends(require
     limit = max(1, min(20, limit))
     events = _sb_list_recent_by_user(current_user["id"], limit)
     return {"events": events, "count": len(events)}
+
+
+# ============================================================
+# Streaming chat endpoint (ledger v0.11) — SSE event flow
+# Reuses RAGOrchestrator.query_stream() generator.
+# 4 SSE event types: start / brain_chunk / brain_done / general / meta / done / error
+# DB save happens once at end (full assistant message, no partial).
+# ============================================================
+
+def _api_post_message_stream(chat_id: int, body, chat):
+    user_msg = create_message(chat_id=chat_id, role="user", content=body.content)
+    msgs = list_messages(chat_id)
+    if chat["title"] == "New chat" and len([m for m in msgs if m["role"] == "user"]) == 1:
+        new_title = body.content.strip()[:40] or "New chat"
+        update_chat_title(chat_id, new_title)
+    project_id = chat["project_id"]
+
+    def _event(name: str, data: dict) -> bytes:
+        return ("event: " + name + "\n" + "data: " + _sse_json.dumps(data, ensure_ascii=False) + "\n\n").encode("utf-8")
+
+    def _generate():
+        try:
+            print(f"[stream {chat_id}] generate start", flush=True)
+            yield _event("user_msg", {"id": user_msg["id"], "content": user_msg["content"]})
+            print(f"[stream {chat_id}] user_msg yielded", flush=True)
+
+            orch = _get_orchestrator(project_id)
+            print(f"[stream {chat_id}] orchestrator ready", flush=True)
+
+            # chat-attached 📎 files (same as non-streaming path)
+            chat_attached_text = ""
+            print(f"[stream {chat_id}] loading chat files...", flush=True)
+            try:
+                chat_files = list_chat_files(chat_id)
+                print(f"[stream {chat_id}] chat_files count={len(chat_files)}", flush=True)
+                for cf in chat_files:
+                    fpath = _file_disk_path(cf)
+                    if fpath.exists():
+                        chunks = _load_file(fpath.read_bytes(), cf["filename"])
+                        nl = chr(10)
+                        file_text = nl.join(c.text for c in chunks if c.text)
+                        if file_text:
+                            chat_attached_text += nl + "--- " + cf["filename"] + " ---" + nl + file_text[:50000] + nl
+            except Exception as e:
+                print("[stream] chat file load failed:", e)
+
+            # general_extra_context build (same OptionB pattern)
+            general_attached_text = ""
+            print(f"[stream {chat_id}] building general_extra_context...", flush=True)
+            try:
+                _GEN_PER_FILE = 200 * 1024
+                _GEN_TOTAL = 800 * 1024
+                _gen_total_size = 0
+                _all_files = (
+                    [(_f, "project knowledge") for _f in list_files(project_id)]
+                    + [(_f, "chat-attached") for _f in list_chat_files(chat_id)]
+                )
+                for _fr, _scope in _all_files:
+                    if _gen_total_size >= _GEN_TOTAL:
+                        break
+                    _fpath = _file_disk_path(_fr)
+                    if not _fpath.exists():
+                        continue
+                    try:
+                        _chunks_g = _load_file(_fpath.read_bytes(), _fr["filename"])
+                        _file_text_g = chr(10).join(_c.text for _c in _chunks_g if _c.text)
+                        if not _file_text_g:
+                            continue
+                        _file_text_g = _file_text_g[:_GEN_PER_FILE]
+                        _remaining = _GEN_TOTAL - _gen_total_size
+                        _file_text_g = _file_text_g[:_remaining]
+                        general_attached_text += chr(10) + "--- " + _fr["filename"] + " (" + _scope + ") ---" + chr(10) + _file_text_g + chr(10)
+                        _gen_total_size += len(_file_text_g)
+                    except Exception as _ee:
+                        print("[stream OptionB] file load failed:", _ee)
+            except Exception as _e:
+                print("[stream OptionB] build failed:", _e)
+
+            brain_text_acc = []
+            general_text_final = ""
+            meta_final = {}
+            stop_reason = None
+            model_used = None
+
+            retrieved_count_for_compose = 0
+            print(f"[stream {chat_id}] starting query_stream chat_attached={len(chat_attached_text)} general={len(general_attached_text)}", flush=True)
+            _kind_counts = {"start":0, "brain_chunk":0, "brain_done":0, "general":0, "meta":0}
+            for kind, val in orch.query_stream(
+                body.content,
+                extra_context=chat_attached_text or None,
+                general_extra_context=general_attached_text or None,
+            ):
+                _kind_counts[kind] = _kind_counts.get(kind, 0) + 1
+                if kind == "start":
+                    retrieved_count_for_compose = len(val.get("retrieved", []) or [])
+                    print(f"[stream {chat_id}] start: retrieved={retrieved_count_for_compose}", flush=True)
+                    yield _event("start", val)
+                elif kind == "brain_chunk":
+                    brain_text_acc.append(val)
+                    yield _event("brain_chunk", {"text": val})
+                elif kind == "brain_done":
+                    yield _event("brain_done", val)
+                elif kind == "general":
+                    general_text_final = val.get("text", "")
+                    print(f"[stream {chat_id}] general: len={len(general_text_final)}", flush=True)
+                    yield _event("general", val)
+                elif kind == "meta":
+                    meta_final = val
+                    stop_reason = val.get("stop_reason")
+                    model_used = val.get("model_used")
+                    print(f"[stream {chat_id}] meta: timings={val.get('timings')}", flush=True)
+                    yield _event("meta", val)
+
+            # Compose final visible answer (ledger v0.11: retrieved=0 → General only, no prefix)
+            doc_ans = "".join(brain_text_acc).strip()
+            gen_ans = (general_text_final or "").strip()
+            _has_sources = bool(retrieved_count_for_compose)
+            if not _has_sources:
+                # No documents uploaded — Big Brain answers with general knowledge only
+                final_text = gen_ans or doc_ans
+            elif any(marker in doc_ans[:200] for marker in [
+                "I don't have information", "I do not have information",
+                "해당 내용 없음", "제공된 소스에는", "관련 정보가 없",
+                "정보가 포함되어 있지 않", "정보를 찾을 수 없",
+            ]):
+                # ledger v0.11: Brain says "no info" — show General only (no 📄 prefix)
+                final_text = gen_ans or doc_ans
+            else:
+                final_text = "**📄 본 문서 기반:**\n\n" + doc_ans
+                if gen_ans:
+                    final_text += "\n\n---\n\n**🌐 일반 지식 답변:**\n\n" + gen_ans
+
+            print(f"[stream {chat_id}] kind_counts={_kind_counts} final_text_len={len(final_text)}", flush=True)
+            assistant_msg = create_message(chat_id=chat_id, role="assistant", content=final_text)
+            yield _event("done", {
+                "assistant_msg_id": assistant_msg["id"],
+                "user_msg_id": user_msg["id"],
+                "stop_reason": stop_reason,
+                "model_used": model_used,
+                "timings": meta_final.get("timings", {}),
+                "usage": meta_final.get("usage", {}),
+            })
+        except Exception as e:
+            import traceback
+            tb = traceback.format_exc()
+            print("[stream] ERROR:", tb)
+            yield _event("error", {"message": str(e), "type": type(e).__name__})
+
+    return _SSEResponse(
+        _generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "X-Accel-Buffering": "no",  # disable nginx/cloudflared buffering
+            "Connection": "keep-alive",
+        },
+    )
 

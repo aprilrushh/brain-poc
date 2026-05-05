@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brain</title>
+<title>Big Brain</title>
 <style>
 :root {
   --bg: #faf9f6; --bg-sidebar: #f4f3ed; --bg-elevated: #ffffff;
   --border: #e8e5dc; --border-strong: #d4d0c4;
   --text: #1f1c18; --text-muted: #76705f; --text-subtle: #a8a293;
-  --accent: #c96342; --accent-hover: #b45638; --accent-bg: rgba(201,99,66,0.08);
+  --accent: #0ea5e9; --accent-hover: #0284c7; --accent-bg: rgba(14,165,233,0.10);
   --shadow: 0 1px 2px rgba(31,28,24,0.04), 0 4px 12px rgba(31,28,24,0.04);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -162,7 +162,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .brain-loader .n4 { animation-delay: 0.45s; }
 @keyframes nodeFlash {
   0%, 70%, 100% { fill: var(--bg); filter: none; }
-  15%, 35% { fill: var(--accent); filter: drop-shadow(0 0 3px rgba(201,99,66,0.85)) drop-shadow(0 0 6px rgba(201,99,66,0.5)); }
+  15%, 35% { fill: var(--accent); filter: drop-shadow(0 0 3px rgba(14,165,233,0.85)) drop-shadow(0 0 6px rgba(14,165,233,0.5)); }
 }
 .thinking-text { color: var(--text-muted); font-size: 14px; font-style: italic; }
 .thinking-text .dots::after { content: ''; animation: dotsAnim 1.4s steps(4) infinite; }
@@ -182,7 +182,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .brain-event {
   display: flex; align-items: flex-start; gap: 12px;
   padding: 10px 12px; margin-bottom: 8px;
-  background: var(--accent-bg, #fff5f0); border-radius: 8px;
+  background: var(--accent-bg, #eff6ff); border-radius: 8px;
   border-left: 3px solid var(--accent); font-size: 14px; line-height: 1.5;
 }
 .brain-event-icon { font-size: 16px; flex-shrink: 0; }
@@ -206,7 +206,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .brain-detail-list li { font-size: 13px; line-height: 1.5; padding: 4px 0; color: var(--text); }
 .brain-detail-list li::before { content: "•"; color: var(--accent); margin-right: 8px; }
 .brain-vocab-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.brain-vocab-tag { font-size: 11px; padding: 2px 8px; background: var(--accent-bg, #fff5f0); color: var(--accent); border-radius: 4px; border: 1px solid var(--accent); }
+.brain-vocab-tag { font-size: 11px; padding: 2px 8px; background: var(--accent-bg, #eff6ff); color: var(--accent); border-radius: 4px; border: 1px solid var(--accent); }
 .brain-confidence { color: var(--text-subtle); font-size: 11px; margin-left: 6px; }
 /* Sidebar Second Brain section */
 .sidebar-section.brain-summary { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -221,7 +221,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="sidebar-brand"><span class="dot"></span>Brain</div>
+    <div class="sidebar-brand"><span class="dot"></span>Big Brain</div>
     <button class="new-chat-btn" id="new-chat-btn"><span>＋</span><span>New chat</span></button>
     <div class="sidebar-section brain-summary">
       <div class="sidebar-label"><span>Second Brain</span></div>
@@ -264,16 +264,14 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <div class="chat-stream"><div class="chat-stream-inner" id="message-stream"></div>
 <div id="brain-events" class="brain-events-timeline" style="display:none;">
   <div class="brain-events-header">
-    <span>🌳 Brain</span>
-    <button class="brain-trigger-btn" onclick="triggerG1Now()">Trigger now</button>
-    <span id="brain-trigger-status" class="brain-trigger-status"></span>
+    <span>🌳 Big Brain</span>
   </div>
   <div id="brain-events-list"></div>
 </div></div>
       <div class="input-area">
         <div class="input-shell">
           <div class="input-attached" id="chat-attached"></div>
-          <textarea class="input" id="chat-input" rows="1" placeholder="Reply to Brain..."></textarea>
+          <textarea class="input" id="chat-input" rows="1" placeholder="Reply to Big Brain..."></textarea>
           <div class="input-row">
             <div class="input-actions"><button class="icon-btn" id="chat-attach-btn" title="Attach file">📎</button></div>
             <button class="send-btn" id="send-btn">→</button>
@@ -484,18 +482,123 @@ async function sendMessage() {
           `<circle class="node n3" cx="192" cy="102" r="9"/>` +
           `<circle class="node n4" cx="186" cy="142" r="9"/>` +
         `</svg>` +
-        `<div class="thinking-text">Brain이 답변 검색 중<span class="dots"></span></div>` +
+        `<div class="thinking-text">Big Brain이 답변 검색 중<span class="dots"></span></div>` +
       `</div>`);
     const sc = stream.parentElement;
     if (sc) setTimeout(() => { sc.scrollTop = sc.scrollHeight; }, 30);
   }
   try {
-    await api('POST', `/chats/${state.currentChatId}/messages`, { content: text + note });
-    await fetchProjects();
-    await renderChat(); renderSidebar();
+    // ledger v0.11: streaming branch — fetch SSE, append chunks live, reload on done.
+    const resp = await fetch(`/api/chats/${state.currentChatId}/messages?stream=1`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ content: text + note }),
+    });
+    if (!resp.ok || !resp.body) throw new Error('HTTP ' + resp.status);
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    let streamingMsg = null;   // <pre> for Brain chunks
+    let generalMsg = null;     // <pre> for General full text
+    let currentEvent = null;
+    const sc = stream ? stream.parentElement : null;
+    const autoScroll = () => { if (sc) sc.scrollTop = sc.scrollHeight; };
+
+    let noBrainMode = false;  // ledger v0.11: hide Brain section + sources when no docs uploaded
+    let brainBuffer = '';     // accumulate first chunks to detect "no info" markers before showing
+    const handleEvent = (eventName, dataStr) => {
+      let data;
+      try { data = JSON.parse(dataStr); } catch { return; }
+      if (eventName === 'start') {
+        const hasSources = Array.isArray(data && data.retrieved) && data.retrieved.length > 0;
+        noBrainMode = !hasSources;
+        // thinking-indicator stays visible until first user-facing token
+      } else if (eventName === 'brain_chunk') {
+        if (noBrainMode) return;  // suppress Brain output when no docs
+        if (!streamingMsg) {
+          // ledger v0.11: hold brain section creation until we know the answer is meaningful.
+          // If first chunks start with "I don't have information" or "해당 내용 없음" or 
+          // "제공된 소스에는", switch to noBrainMode silently (Brain says "no info" → hide section,
+          // let General mode answer instead). Indicator stays visible until General first token.
+          brainBuffer = (brainBuffer || '') + (data.text || '');
+          if (brainBuffer.length < 60) return;  // wait until we have enough to judge
+          const sniff = brainBuffer.trim();
+          const noInfoMarkers = ["I don't have information", "I do not have information",
+                                  "해당 내용 없음", "제공된 소스에는", "관련 정보가 없",
+                                  "정보가 포함되어 있지 않", "정보를 찾을 수 없"];
+          if (noInfoMarkers.some(m => sniff.startsWith(m) || sniff.includes(m))) {
+            noBrainMode = true;
+            return;
+          }
+          // OK, real answer — create Brain section and flush buffer
+          document.getElementById('brain-thinking')?.remove();
+          if (stream) {
+            stream.insertAdjacentHTML('beforeend',
+              '<div class="msg assistant" id="streaming-msg"><div class="msg-role">Big Brain</div><div class="msg-content"><div style="font-size:12px;color:var(--text-subtle);margin-bottom:8px;">📄 본 문서 기반 (생성 중…)</div><pre id="streaming-pre" style="white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:16px;line-height:1.7;background:transparent;border:none;padding:0;margin:0;"></pre></div></div>');
+            streamingMsg = document.getElementById('streaming-pre');
+            streamingMsg.appendChild(document.createTextNode(brainBuffer));
+            autoScroll();
+          }
+        } else if (data.text) {
+          streamingMsg.appendChild(document.createTextNode(data.text));
+          autoScroll();
+        }
+      } else if (eventName === 'general') {
+        // General arrived — remove indicator if still showing (covers no-Brain mode)
+        document.getElementById('brain-thinking')?.remove();
+        if (data.text && stream) {
+          const headerLabel = noBrainMode ? 'Big Brain 답변' : '🌐 일반 지식 답변';
+          stream.insertAdjacentHTML('beforeend',
+            '<div class="msg assistant" id="general-msg"><div class="msg-role">Big Brain</div><div class="msg-content"><div style="font-size:12px;color:var(--text-subtle);margin:0 0 8px;">' + headerLabel + '</div><pre id="general-pre" style="white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:16px;line-height:1.7;background:transparent;border:none;padding:0;margin:0;"></pre></div></div>');
+          document.getElementById('general-pre').textContent = data.text;
+          autoScroll();
+        }
+      } else if (eventName === 'done') {
+        document.getElementById('brain-thinking')?.remove();
+        document.getElementById('streaming-msg')?.remove();
+        document.getElementById('general-msg')?.remove();
+        fetchProjects().then(() => renderChat()).then(() => renderSidebar()).catch(()=>{});
+      } else if (eventName === 'error') {
+        document.getElementById('brain-thinking')?.remove();
+        document.getElementById('streaming-msg')?.remove();
+        document.getElementById('general-msg')?.remove();
+        alert('Stream error: ' + (data.message || 'unknown'));
+      }
+    };
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      // SSE frame separator = blank line
+      let idx;
+      while ((idx = buf.indexOf('\n\n')) !== -1) {
+        const frame = buf.slice(0, idx);
+        buf = buf.slice(idx + 2);
+        let eventName = 'message';
+        const dataLines = [];
+        for (const line of frame.split('\n')) {
+          if (line.startsWith('event: ')) eventName = line.slice(7).trim();
+          else if (line.startsWith('data: ')) dataLines.push(line.slice(6));
+        }
+        if (dataLines.length) handleEvent(eventName, dataLines.join('\n'));
+      }
+    }
   } catch (e) {
     document.getElementById('brain-thinking')?.remove();
-    alert('Send failed: ' + e.message);
+    // ledger v0.11: 답변이 이미 표시된 후 stream tail/reload 단계 error 는 silent
+    // (학자 화면에는 답변 정상 visible — alert 짜증 줄임). 진짜 error 는 console 에서 진단.
+    console.warn('[stream tail] ', e && e.message ? e.message : e);
+    const hasAnswer = document.getElementById('streaming-msg') || document.getElementById('general-msg');
+    if (!hasAnswer) {
+      alert('Send failed: ' + (e && e.message ? e.message : 'unknown'));
+    }
+    document.getElementById('streaming-msg')?.remove();
+    document.getElementById('general-msg')?.remove();
+    // best-effort reload (silent)
+    fetchProjects().then(() => renderChat()).then(() => renderSidebar()).catch(()=>{});
   }
   finally { sendBtn.disabled = false; input.focus(); }
 }
@@ -585,7 +688,7 @@ async function renderBrainEvents() {
     const events = data.events || [];
     const detail = data.extraction_detail;
     if (events.length === 0 && !detail) {
-      list.innerHTML = '<div class="brain-events-empty">아직 추출된 내용이 없습니다. 30분 idle 후 자동 또는 Trigger now 클릭.</div>';
+      list.innerHTML = '<div class="brain-events-empty">사용자님이 쉬거나 주무실때 Second Brain이 위의 내용을 더 조사하고, 발전시켜서 여기에 작성해 두겠습니다. 주무시고 나서 확인해 보세요.</div>';
       renderBrainSidebarSummary(null);
       return;
     }

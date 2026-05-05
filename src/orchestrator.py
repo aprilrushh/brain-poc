@@ -249,3 +249,156 @@ class RAGOrchestrator:
             "stop_reason": result["stop_reason"],
             "model_used": result["model"],
         }
+
+    def query_stream(
+        self,
+        question: str,
+        user_thinking_override: Optional[str] = None,
+        max_tokens: int = 4096,
+        extra_context: Optional[str] = None,
+        general_extra_context: Optional[str] = None,
+    ):
+        """Streaming version of query(). Generator.
+
+        Yields tuples (kind, payload):
+            ('start',       {retrieved, thinking_enabled/reason, retrieval_pattern})
+            ('brain_chunk', str)                                  # Brain LLM tokens
+            ('brain_done',  {input_tokens, output_tokens, stop_reason, model})
+            ('general',     {text, input_tokens, output_tokens, stop_reason, model})
+            ('meta',        {answer, answer_general, timings, usage, stop_reason, model_used})
+        """
+        timings = {}
+
+        t0 = time.perf_counter()
+        q_emb = self.encode_query(question)
+        timings["embed_ms"] = (time.perf_counter() - t0) * 1000
+
+        t0 = time.perf_counter()
+        retrieved = self.brain.recall(q_emb, top_k=self.top_k)
+        retrieval_pattern = self.brain.retrieval_pattern(q_emb, top_k=self.top_k)
+        timings["retrieve_ms"] = (time.perf_counter() - t0) * 1000
+
+        thinking_enabled, thinking_reason = decide_thinking(
+            question, retrieval_pattern, user_thinking_override
+        )
+
+        context = self.build_context(retrieved)
+        attached_section = ""
+        if extra_context:
+            attached_section = f"\n\n=== Attached files (chat-scoped) ===\n{extra_context}\n=== End attached ===\n"
+        user_msg = f"Sources:\n\n{context}{attached_section}\n\nQuestion: {question}"
+        if not thinking_enabled:
+            user_msg = "/no_think " + user_msg
+
+        yield ("start", {
+            "thinking_enabled": thinking_enabled,
+            "thinking_reason": thinking_reason,
+            "retrieval_pattern": retrieval_pattern,
+            "retrieved": [
+                {"rank": r["rank"], "score": r["score"],
+                 "title": r["doc"].get("title"), "page": r["doc"].get("page"),
+                 "url": r["doc"].get("url", ""),
+                 "text": (r["doc"].get("text", "") or "")[:300]}
+                for r in retrieved
+            ],
+        })
+
+        base_kwargs = {"max_tokens": max_tokens, "temperature": 0.7}
+        if is_openrouter():
+            base_kwargs["extra_body"] = {"reasoning": {"enabled": thinking_enabled}}
+
+        def _call_general():
+            nonlocal general_extra_context
+            if not general_extra_context:
+                try:
+                    if retrieved:
+                        general_extra_context = "\n\n".join(
+                            f"[Source {r['rank']}: {r['doc'].get('title','?')}, p{r['doc'].get('page','?')}]\n"
+                            f"{(r['doc'].get('text') or '')[:self.max_chunk_chars]}"
+                            for r in retrieved[:10]
+                        )
+                except (AttributeError, TypeError, KeyError):
+                    pass
+            if general_extra_context:
+                gen_user_msg = (
+                    "Reference documents (the user has provided these files):\n\n"
+                    + general_extra_context
+                    + "\n\nQuestion: " + question
+                )
+            else:
+                gen_user_msg = question
+            return self.adapter.chat_complete(
+                messages=[
+                    {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                    {"role": "user", "content": gen_user_msg},
+                ],
+                **base_kwargs,
+            )
+
+        t_gen = time.perf_counter()
+        brain_chunks = []
+        brain_done = None
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+            fut_general = ex.submit(_call_general)
+            try:
+                for kind, val in self.adapter.chat_complete_stream(
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_msg},
+                    ],
+                    **base_kwargs,
+                ):
+                    if kind == "chunk":
+                        brain_chunks.append(val)
+                        yield ("brain_chunk", val)
+                    elif kind == "done":
+                        brain_done = val
+            except Exception as e:
+                brain_done = {"text": "[Document answer error: " + str(e) + "]",
+                              "input_tokens": 0, "output_tokens": 0,
+                              "stop_reason": "error", "model": self.model}
+
+            yield ("brain_done", {
+                "input_tokens": (brain_done or {}).get("input_tokens"),
+                "output_tokens": (brain_done or {}).get("output_tokens"),
+                "stop_reason": (brain_done or {}).get("stop_reason"),
+                "model": (brain_done or {}).get("model", self.model),
+            })
+
+            try:
+                result_general = fut_general.result(timeout=60)
+            except Exception as e:
+                result_general = {"text": "[General answer error: " + str(e) + "]",
+                                  "input_tokens": 0, "output_tokens": 0,
+                                  "stop_reason": "error", "model": self.model}
+
+        timings["generate_ms"] = (time.perf_counter() - t_gen) * 1000
+        timings["total_ms"] = timings["embed_ms"] + timings["retrieve_ms"] + timings["generate_ms"]
+
+        brain_full = "".join(brain_chunks).strip()
+        general_text = (result_general.get("text") or "").strip()
+
+        yield ("general", {
+            "text": general_text,
+            "input_tokens": result_general.get("input_tokens", 0),
+            "output_tokens": result_general.get("output_tokens", 0),
+            "stop_reason": result_general.get("stop_reason"),
+            "model": result_general.get("model", self.model),
+        })
+
+        yield ("meta", {
+            "answer": brain_full,
+            "answer_general": general_text,
+            "timings": timings,
+            "usage": {
+                "prompt_tokens": ((brain_done or {}).get("input_tokens") or 0) + (result_general.get("input_tokens") or 0),
+                "completion_tokens": ((brain_done or {}).get("output_tokens") or 0) + (result_general.get("output_tokens") or 0),
+                "doc_prompt_tokens": (brain_done or {}).get("input_tokens") or 0,
+                "doc_completion_tokens": (brain_done or {}).get("output_tokens") or 0,
+                "general_prompt_tokens": result_general.get("input_tokens") or 0,
+                "general_completion_tokens": result_general.get("output_tokens") or 0,
+            },
+            "stop_reason": (brain_done or {}).get("stop_reason"),
+            "model_used": (brain_done or {}).get("model", self.model),
+        })

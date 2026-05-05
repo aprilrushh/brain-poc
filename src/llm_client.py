@@ -72,6 +72,61 @@ class OpenAIAdapter(LLMAdapter):
             "model": resp.model,
         }
 
+    def chat_complete_stream(self, messages: list[dict], **kwargs):
+        """Streaming version — yields text chunks as they arrive, then a final
+        dict with usage/stop_reason. Matches OpenAI streaming protocol.
+
+        Yields:
+            ('chunk', str)   — delta text as it arrives
+            ('done',  dict)  — final {text, input_tokens, output_tokens,
+                               stop_reason, model} (text = full concatenated)
+
+        Usage tokens may be None for some providers when stream=True; caller
+        handles None gracefully (cost log records what's available).
+        """
+        max_tokens = kwargs.pop("max_tokens", 2048)
+        temperature = kwargs.pop("temperature", 0.3)
+
+        stream = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stream=True,
+            stream_options={"include_usage": True},
+            **kwargs,
+        )
+
+        full_text = []
+        usage = None
+        stop_reason = None
+        model_used = self.model
+
+        for ev in stream:
+            # usage event (final, after [DONE])
+            if getattr(ev, "usage", None) is not None:
+                usage = ev.usage
+            if not ev.choices:
+                continue
+            choice = ev.choices[0]
+            delta = getattr(choice, "delta", None)
+            content = getattr(delta, "content", None) if delta else None
+            if content:
+                full_text.append(content)
+                yield ("chunk", content)
+            if getattr(choice, "finish_reason", None):
+                stop_reason = choice.finish_reason
+            if getattr(ev, "model", None):
+                model_used = ev.model
+
+        yield ("done", {
+            "text": "".join(full_text),
+            "input_tokens": getattr(usage, "prompt_tokens", None) if usage else None,
+            "output_tokens": getattr(usage, "completion_tokens", None) if usage else None,
+            "stop_reason": stop_reason,
+            "model": model_used,
+        })
+
 
 class AnthropicAdapter(LLMAdapter):
     """For Anthropic Claude (Opus, Sonnet, Haiku)."""
