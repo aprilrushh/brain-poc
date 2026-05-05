@@ -214,6 +214,42 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .brain-summary-stats { font-size: 12px; color: var(--text-muted); padding: 8px 12px; line-height: 1.7; }
 .brain-summary-stat { display: flex; justify-content: space-between; }
 .brain-summary-stat strong { color: var(--text); font-weight: 600; }
+
+/* === Stage 3 v0.15 — Brain Timeline (paradigm visible signature first UI delivery) === */
+.brain-timeline { margin: 48px 0 24px; padding: 24px 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+.brain-timeline-header { font-size: 13px; color: var(--text-subtle); display: flex; align-items: center; gap: 8px; margin-bottom: 4px; letter-spacing: 0.02em; }
+.brain-timeline-header .icon { font-size: 16px; }
+.brain-event { padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-soft, #f5f9ff); display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s ease; }
+.brain-event:hover { border-color: #7cb8e8; }
+.brain-event-summary { font-size: 14px; line-height: 1.55; color: var(--text); }
+.brain-event-meta { font-size: 11px; color: var(--text-subtle); display: flex; gap: 12px; align-items: center; }
+.brain-event-meta .type-badge { padding: 2px 8px; border-radius: 4px; background: rgba(124, 184, 232, 0.15); color: #2c6db3; font-weight: 500; letter-spacing: 0.02em; }
+.brain-event-meta .angle-badge { padding: 2px 8px; border-radius: 4px; background: rgba(124, 184, 232, 0.08); color: var(--text-subtle); }
+.brain-event.evt-extraction { background: #fafbfc; }
+.brain-event.evt-discovery { background: #f5f9ff; }
+.brain-timeline-empty { font-size: 13px; color: var(--text-subtle); font-style: italic; padding: 12px 0; }
+
+
+/* === Stage 3.1 v0.16 — Brain Event card expand === */
+.brain-event { cursor: pointer; }
+.brain-event-detail { display: none; padding-top: 12px; margin-top: 8px; border-top: 1px dashed var(--border); font-size: 13px; line-height: 1.65; color: var(--text); }
+.brain-event.expanded .brain-event-detail { display: block; }
+.brain-event-detail .label { font-size: 11px; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; margin-top: 12px; }
+.brain-event-detail .label:first-child { margin-top: 0; }
+.brain-event-detail .reasoning { background: rgba(124, 184, 232, 0.08); padding: 10px 12px; border-radius: 6px; border-left: 3px solid #7cb8e8; font-style: italic; }
+.brain-event-detail .abstract { color: var(--text); max-height: 200px; overflow-y: auto; padding-right: 8px; }
+.brain-event-detail .doi-link { display: inline-block; margin-top: 6px; font-size: 12px; color: #2c6db3; text-decoration: none; padding: 4px 10px; border: 1px solid #7cb8e8; border-radius: 4px; }
+.brain-event-detail .doi-link:hover { background: rgba(124, 184, 232, 0.1); }
+.brain-event-meta-detail { display: flex; gap: 16px; font-size: 11px; color: var(--text-subtle); margin-top: 6px; }
+.brain-event-toggle-hint { font-size: 11px; color: var(--text-subtle); margin-left: auto; }
+
+
+/* === Stage 3.2 v0.16 — sidebar footer always visible (overflow fix) === */
+.sidebar { overflow: hidden; }
+.sidebar-scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+/* 3 brain-summary sidebar-list 짧게 — sidebar 의 부담 줄이기 */
+.sidebar-section.brain-summary .sidebar-list { max-height: 160px; }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
@@ -223,6 +259,8 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
   <aside class="sidebar">
     <div class="sidebar-brand"><span class="dot"></span>Big Brain</div>
     <button class="new-chat-btn" id="new-chat-btn"><span>＋</span><span>New chat</span></button>
+    <div class="sidebar-scroll">
+
     <div class="sidebar-section brain-summary">
       <div class="sidebar-label"><span>Second Brain</span></div>
       <ul class="sidebar-list" id="brain-events-recent"></ul>
@@ -235,6 +273,8 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <div class="sidebar-label"><span>Recents</span></div>
       <ul class="sidebar-list" id="recent-chat-list"></ul>
     </div>
+    </div>
+
     <div class="sidebar-footer" id="sidebar-footer">
   <div class="avatar" id="user-avatar">A</div>
   <div style="flex:1;min-width:0;">
@@ -395,6 +435,7 @@ async function renderChat() {
   // chat-scoped attachments restore
   state.chatAttached = await fetchChatFiles(c.id);
   renderChatChips();
+  await renderBrainTimeline(state.currentChatId);
   renderBrainEvents();
   setTimeout(() => { const sc = stream.parentElement; sc.scrollTop = sc.scrollHeight; }, 50);
 }
@@ -450,6 +491,108 @@ async function deleteProjectFile(fid) {
 async function deleteChatFile(fid) {
   try { await api('DELETE', `/files/${fid}`); state.chatAttached = state.chatAttached.filter(f => f.id !== fid); renderChatChips(); }
   catch (e) { alert('Delete failed: ' + e.message); }
+}
+
+
+// === Stage 3 v0.15 — Brain Timeline (paradigm visible signature first UI delivery) ===
+async function renderBrainTimeline(chatId) {
+  if (!chatId) return;
+  const stream = document.getElementById('message-stream');
+  if (!stream) return;
+  const old = stream.querySelector('.brain-timeline');
+  if (old) old.remove();
+
+  let data;
+  try {
+    const resp = await fetch(`/api/chats/${chatId}/brain-events`, { credentials: 'include' });
+    if (!resp.ok) return;
+    data = await resp.json();
+  } catch (e) { console.warn('brain-events fetch fail', e); return; }
+
+  const events = (data && data.events) || [];
+  if (!events.length) return;
+
+  const container = document.createElement('div');
+  container.className = 'brain-timeline';
+  container.innerHTML = `<div class="brain-timeline-header"><span class="icon">🌊</span><span>Brain Timeline</span><span style="margin-left:auto;font-size:11px;">${events.length} event${events.length>1?'s':''}</span></div>`;
+
+  for (const ev of events) {
+    container.appendChild(renderBrainEventCard(ev));
+  }
+  stream.appendChild(container);
+}
+
+function renderBrainEventCard(ev) {
+  const card = document.createElement('div');
+  const isDisc = ev.event_type === 'discovery_generated';
+  const isExt = ev.event_type === 'extraction_completed';
+  card.className = 'brain-event ' + (isDisc ? 'evt-discovery' : (isExt ? 'evt-extraction' : ''));
+
+  let typeBadge = '';
+  let angleBadge = '';
+  let evMeta = {};
+  if (isDisc) {
+    try {
+      evMeta = typeof ev.evidence_chain_json === 'string' ? JSON.parse(ev.evidence_chain_json) : (ev.evidence_chain_json || {});
+      if (ev.type) typeBadge = `<span class="type-badge">${ev.type}</span>`;
+      if (evMeta && evMeta.angle_pattern) angleBadge = `<span class="angle-badge">${evMeta.angle_pattern}</span>`;
+    } catch (e) {}
+  }
+
+  const summary = ev.summary_text || ev.event_type;
+  const occurred = ev.occurred_at ? new Date(ev.occurred_at + (ev.occurred_at.includes('Z') ? '' : 'Z')).toLocaleString() : '';
+  const safeEsc = (typeof escapeHtml === 'function') ? escapeHtml : (s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])));
+
+  // Detail block (only for discovery events with paper data)
+  let detailHtml = '';
+  if (isDisc && ev.paper) {
+    const paper = ev.paper;
+    let absText = paper.abstract_text || '';
+    // Strip our own [venue: ... | citations: ... | is_oa: ... | abstract_source: ...] prefix (drift #4 unstash)
+    const prefixMatch = absText.match(/^\[venue:[^\]]*\]\s*\n\n/);
+    if (prefixMatch) absText = absText.substring(prefixMatch[0].length);
+    if (absText.length > 1500) absText = absText.substring(0, 1500) + '...';
+
+    const reasoning = (evMeta && evMeta.layer3_reasoning) || '';
+    const cit = (evMeta && evMeta.citations) || 0;
+    const venue = (evMeta && evMeta.venue) || '';
+    const ans_cos = (evMeta && evMeta.ans_cos);
+    const q_cos = (evMeta && evMeta.q_cos);
+    const doi = paper.doi || '';
+    const doiUrl = doi.startsWith('http') ? doi : (doi ? 'https://doi.org/' + doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, '') : '');
+
+    detailHtml = `
+      <div class="brain-event-detail">
+        ${reasoning ? `<div class="label">왜 이게 새 발견</div><div class="reasoning">${safeEsc(reasoning)}</div>` : ''}
+        ${absText ? `<div class="label">Abstract</div><div class="abstract">${safeEsc(absText)}</div>` : ''}
+        <div class="brain-event-meta-detail">
+          ${venue ? `<span>📰 ${safeEsc(venue)}</span>` : ''}
+          ${paper.year ? `<span>📅 ${safeEsc(String(paper.year))}</span>` : ''}
+          ${cit ? `<span>📊 ${safeEsc(String(cit))} citations</span>` : ''}
+          ${(typeof ans_cos === 'number') ? `<span>🎯 ans_cos=${ans_cos.toFixed(3)}</span>` : ''}
+          ${(typeof q_cos === 'number') ? `<span>q_cos=${q_cos.toFixed(3)}</span>` : ''}
+        </div>
+        ${doiUrl ? `<a href="${safeEsc(doiUrl)}" target="_blank" rel="noopener" class="doi-link" onclick="event.stopPropagation();">📄 Open paper →</a>` : ''}
+      </div>
+    `;
+  }
+
+  card.innerHTML = `
+    <div class="brain-event-summary">${safeEsc(summary)}</div>
+    <div class="brain-event-meta">
+      ${typeBadge}
+      ${angleBadge}
+      ${occurred ? `<span class="brain-event-toggle-hint">${safeEsc(occurred)} · 클릭하여 펼치기</span>` : ''}
+    </div>
+    ${detailHtml}
+  `;
+
+  if (isDisc) {
+    card.addEventListener('click', () => {
+      card.classList.toggle('expanded');
+    });
+  }
+  return card;
 }
 
 async function sendMessage() {

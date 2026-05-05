@@ -434,8 +434,36 @@ from src.g1_extractor import run_g1_extraction as _sb_run_g1
 
 @router.get("/chats/{chat_id}/brain-events")
 def api_list_brain_events(chat_id: int, current_user: dict = Depends(require_login)):
-    """Brain timeline events + latest extraction detail for chat tail render."""
-    events = _sb_list_events(chat_id, only_visible=True, only_unread=False)
+    """Brain timeline events + latest extraction detail for chat tail render.
+    v0.16: enrich discovery_generated events with paper + discovery JOIN
+           so frontend can render abstract / reasoning / DOI link on expand.
+    """
+    raw_events = _sb_list_events(chat_id, only_visible=True, only_unread=False)
+    # Enrich discovery_generated events with paper + discovery metadata
+    events = []
+    import sqlite3 as _sqlite3
+    from src.db import DB_PATH as _SB_DB_PATH
+    _conn = _sqlite3.connect(_SB_DB_PATH)
+    _conn.row_factory = _sqlite3.Row
+    _cur = _conn.cursor()
+    try:
+        for ev in raw_events:
+            ev_dict = dict(ev) if not isinstance(ev, dict) else ev
+            if ev_dict.get('event_type') == 'discovery_generated' and ev_dict.get('ref_table') == 'discoveries':
+                ref_id = ev_dict.get('ref_id')
+                if ref_id:
+                    drow = _cur.execute("SELECT type, evidence_chain_json, confidence_raw, paper_id FROM discoveries WHERE id = ?", (ref_id,)).fetchone()
+                    if drow:
+                        ev_dict['type'] = drow['type']
+                        ev_dict['evidence_chain_json'] = drow['evidence_chain_json']
+                        ev_dict['confidence_raw'] = drow['confidence_raw']
+                        if drow['paper_id']:
+                            prow = _cur.execute("SELECT id, doi, title, authors_json, year, abstract_text, url, source FROM papers WHERE id = ?", (drow['paper_id'],)).fetchone()
+                            if prow:
+                                ev_dict['paper'] = dict(prow)
+            events.append(ev_dict)
+    finally:
+        _conn.close()
     unread = _sb_count_unread(chat_id)
     extraction = _sb_get_extraction(chat_id)
     detail = None
