@@ -536,8 +536,17 @@ def _api_post_message_stream(chat_id: int, body, chat):
             yield _event("user_msg", {"id": user_msg["id"], "content": user_msg["content"]})
             print(f"[stream {chat_id}] user_msg yielded", flush=True)
 
-            orch = _get_orchestrator(project_id)
-            print(f"[stream {chat_id}] orchestrator ready", flush=True)
+            try:
+                orch = _get_orchestrator(project_id)
+                has_brain = True
+                print(f"[stream {chat_id}] orchestrator ready", flush=True)
+            except HTTPException as he:
+                if he.status_code == 400 and "no Brain index" in str(he.detail):
+                    has_brain = False
+                    orch = None
+                    print(f"[stream {chat_id}] no brain index -> general-only mode", flush=True)
+                else:
+                    raise
 
             # chat-attached 📎 files (same as non-streaming path)
             chat_attached_text = ""
@@ -595,33 +604,72 @@ def _api_post_message_stream(chat_id: int, body, chat):
             model_used = None
 
             retrieved_count_for_compose = 0
-            print(f"[stream {chat_id}] starting query_stream chat_attached={len(chat_attached_text)} general={len(general_attached_text)}", flush=True)
             _kind_counts = {"start":0, "brain_chunk":0, "brain_done":0, "general":0, "meta":0}
-            for kind, val in orch.query_stream(
-                body.content,
-                extra_context=chat_attached_text or None,
-                general_extra_context=general_attached_text or None,
-            ):
-                _kind_counts[kind] = _kind_counts.get(kind, 0) + 1
-                if kind == "start":
-                    retrieved_count_for_compose = len(val.get("retrieved", []) or [])
-                    print(f"[stream {chat_id}] start: retrieved={retrieved_count_for_compose}", flush=True)
-                    yield _event("start", val)
-                elif kind == "brain_chunk":
-                    brain_text_acc.append(val)
-                    yield _event("brain_chunk", {"text": val})
-                elif kind == "brain_done":
-                    yield _event("brain_done", val)
-                elif kind == "general":
-                    general_text_final = val.get("text", "")
-                    print(f"[stream {chat_id}] general: len={len(general_text_final)}", flush=True)
-                    yield _event("general", val)
-                elif kind == "meta":
-                    meta_final = val
-                    stop_reason = val.get("stop_reason")
-                    model_used = val.get("model_used")
-                    print(f"[stream {chat_id}] meta: timings={val.get('timings')}", flush=True)
-                    yield _event("meta", val)
+
+            if not has_brain:
+                # v0.17 Issue C: 0-file project -> general-only stream
+                # paradigm intent #2 (ledger v0.11): 문서 없으면 General mode = 일반 지식 답변
+                print(f"[stream {chat_id}] general-only: starting general LLM call", flush=True)
+                yield _event("start", {"retrieved": [], "thinking_enabled": False, "thinking_reason": "no_brain_index", "retrieval_pattern": None, "no_brain_mode": True})
+                _kind_counts["start"] = 1
+                from src.llm_client import get_llm_client
+                from src.orchestrator import GENERAL_KNOWLEDGE_PROMPT
+                _adapter = get_llm_client()
+                if general_attached_text:
+                    _gen_user_msg = "Reference documents (the user has provided these files):\n\n" + general_attached_text + "\n\nQuestion: " + body.content
+                else:
+                    _gen_user_msg = body.content
+                _gen_result = _adapter.chat_complete(
+                    messages=[
+                        {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                        {"role": "user", "content": _gen_user_msg},
+                    ],
+                    max_tokens=4096,
+                )
+                if isinstance(_gen_result, dict):
+                    general_text_final = _gen_result.get("text", "") or ""
+                    _gen_payload = {"text": general_text_final}
+                    for _k in ("input_tokens", "output_tokens", "stop_reason", "model"):
+                        if _k in _gen_result:
+                            _gen_payload[_k] = _gen_result[_k]
+                else:
+                    general_text_final = str(_gen_result)
+                    _gen_payload = {"text": general_text_final}
+                print(f"[stream {chat_id}] general-only: len={len(general_text_final)}", flush=True)
+                yield _event("general", _gen_payload)
+                _kind_counts["general"] = 1
+                stop_reason = _gen_payload.get("stop_reason")
+                model_used = _gen_payload.get("model")
+                meta_final = {"timings": {}, "model_used": model_used, "stop_reason": stop_reason}
+                yield _event("meta", meta_final)
+                _kind_counts["meta"] = 1
+            else:
+                print(f"[stream {chat_id}] starting query_stream chat_attached={len(chat_attached_text)} general={len(general_attached_text)}", flush=True)
+                for kind, val in orch.query_stream(
+                    body.content,
+                    extra_context=chat_attached_text or None,
+                    general_extra_context=general_attached_text or None,
+                ):
+                    _kind_counts[kind] = _kind_counts.get(kind, 0) + 1
+                    if kind == "start":
+                        retrieved_count_for_compose = len(val.get("retrieved", []) or [])
+                        print(f"[stream {chat_id}] start: retrieved={retrieved_count_for_compose}", flush=True)
+                        yield _event("start", val)
+                    elif kind == "brain_chunk":
+                        brain_text_acc.append(val)
+                        yield _event("brain_chunk", {"text": val})
+                    elif kind == "brain_done":
+                        yield _event("brain_done", val)
+                    elif kind == "general":
+                        general_text_final = val.get("text", "")
+                        print(f"[stream {chat_id}] general: len={len(general_text_final)}", flush=True)
+                        yield _event("general", val)
+                    elif kind == "meta":
+                        meta_final = val
+                        stop_reason = val.get("stop_reason")
+                        model_used = val.get("model_used")
+                        print(f"[stream {chat_id}] meta: timings={val.get('timings')}", flush=True)
+                        yield _event("meta", val)
 
             # Compose final visible answer (ledger v0.11: retrieved=0 → General only, no prefix)
             doc_ans = "".join(brain_text_acc).strip()

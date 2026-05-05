@@ -478,8 +478,15 @@ async function newChat(pid) {
 }
 
 async function newChatGlobal() {
-  if (!state.projects.length) { alert('먼저 프로젝트를 만드세요.'); await newProject(); return; }
-  await newChat(state.currentProjectId || state.projects[0].id);
+  // v0.17 A1: ChatGPT/Claude-style standalone = "Quick Chats" auto-project
+  let qp = state.projects.find(p => p.name === 'Quick Chats');
+  if (!qp) {
+    await api('POST', '/projects', { name: 'Quick Chats' });
+    await fetchProjects();
+    qp = state.projects.find(p => p.name === 'Quick Chats');
+  }
+  if (!qp) { console.error('Quick Chats project create failed'); return; }
+  await newChat(qp.id);
 }
 
 async function deleteProjectFile(fid) {
@@ -692,7 +699,7 @@ async function sendMessage() {
         // General arrived — remove indicator if still showing (covers no-Brain mode)
         document.getElementById('brain-thinking')?.remove();
         if (data.text && stream) {
-          const headerLabel = noBrainMode ? 'Big Brain 답변' : '🌐 일반 지식 답변';
+          const headerLabel = noBrainMode ? 'General Knowledge' : '🌐 일반 지식 답변';
           stream.insertAdjacentHTML('beforeend',
             '<div class="msg assistant" id="general-msg"><div class="msg-role">Big Brain</div><div class="msg-content"><div style="font-size:12px;color:var(--text-subtle);margin:0 0 8px;">' + headerLabel + '</div><pre id="general-pre" style="white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:16px;line-height:1.7;background:transparent;border:none;padding:0;margin:0;"></pre></div></div>');
           document.getElementById('general-pre').textContent = data.text;
