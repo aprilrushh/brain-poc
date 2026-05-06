@@ -308,6 +308,9 @@ class RAGOrchestrator:
             base_kwargs["extra_body"] = {"reasoning": {"enabled": thinking_enabled}}
 
         def _call_general():
+            """v0.18 F2: streaming generator. yields ('chunk', text) chunks then ('done', dict).
+            Cloudflare 5min timeout 회피 = first token < 1s 도착 → SSE connection alive.
+            ledger v0.17 section 12 fix path F2."""
             nonlocal general_extra_context
             if not general_extra_context:
                 try:
@@ -327,13 +330,14 @@ class RAGOrchestrator:
                 )
             else:
                 gen_user_msg = question
-            return self.adapter.chat_complete(
+            for kind, val in self.adapter.chat_complete_stream(
                 messages=[
                     {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
                     {"role": "user", "content": gen_user_msg},
                 ],
                 **base_kwargs,
-            )
+            ):
+                yield (kind, val)
 
         t_gen = time.perf_counter()
         brain_chunks = []
@@ -368,8 +372,23 @@ class RAGOrchestrator:
         })
 
         # Brain 끝난 후 General 시작 (sequential, 학자 명시)
+        # v0.18 F2: _call_general() 이 generator (chunk yield + done dict).
+        # general_chunks 모아 chunk 단위 SSE event yield → Cloudflare connection alive.
+        # 마지막 done dict = result_general (caller dict 기대 호환).
+        general_chunks = []
+        result_general = None
         try:
-            result_general = _call_general()
+            for kind, val in _call_general():
+                if kind == "chunk":
+                    general_chunks.append(val)
+                    yield ("general_chunk", val)
+                elif kind == "done":
+                    result_general = val
+            if result_general is None:
+                # done event 미도착 (드물게) → chunks 모음으로 fallback
+                result_general = {"text": "".join(general_chunks),
+                                  "input_tokens": 0, "output_tokens": 0,
+                                  "stop_reason": "stop", "model": self.model}
         except Exception as e:
             result_general = {"text": "[General answer error: " + str(e) + "]",
                               "input_tokens": 0, "output_tokens": 0,

@@ -620,25 +620,40 @@ def _api_post_message_stream(chat_id: int, body, chat):
                     _gen_user_msg = "Reference documents (the user has provided these files):\n\n" + general_attached_text + "\n\nQuestion: " + body.content
                 else:
                     _gen_user_msg = body.content
-                _gen_result = _adapter.chat_complete(
-                    messages=[
-                        {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
-                        {"role": "user", "content": _gen_user_msg},
-                    ],
-                    max_tokens=4096,
-                )
-                if isinstance(_gen_result, dict):
-                    general_text_final = _gen_result.get("text", "") or ""
-                    _gen_payload = {"text": general_text_final}
+                # v0.18 F2.1: general-only streaming (chat_complete -> chat_complete_stream).
+                # Cloudflare 5min timeout 회피 + 학자 화면 chunk-by-chunk visible.
+                # ledger v0.17 section 2 (Issue C path) 의 별도 mini stream 안 P1+P2+P3 효과 미적용 fix.
+                _gen_chunks = []
+                _gen_done = None
+                _gen_chunk_count = 0
+                try:
+                    for _kind, _val in _adapter.chat_complete_stream(
+                        messages=[
+                            {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                            {"role": "user", "content": _gen_user_msg},
+                        ],
+                        max_tokens=4096,
+                    ):
+                        if _kind == "chunk":
+                            _gen_chunks.append(_val)
+                            _gen_chunk_count += 1
+                            yield _event("general_chunk", {"text": _val})
+                        elif _kind == "done":
+                            _gen_done = _val
+                except Exception as _e:
+                    print(f"[stream {chat_id}] general-only stream error: {_e}", flush=True)
+                    _gen_done = None
+                general_text_final = (_gen_done or {}).get("text") or "".join(_gen_chunks)
+                _gen_payload = {"text": general_text_final}
+                if isinstance(_gen_done, dict):
                     for _k in ("input_tokens", "output_tokens", "stop_reason", "model"):
-                        if _k in _gen_result:
-                            _gen_payload[_k] = _gen_result[_k]
-                else:
-                    general_text_final = str(_gen_result)
-                    _gen_payload = {"text": general_text_final}
-                print(f"[stream {chat_id}] general-only: len={len(general_text_final)}", flush=True)
+                        if _k in _gen_done:
+                            _gen_payload[_k] = _gen_done[_k]
+                print(f"[stream {chat_id}] general-only: chunks={_gen_chunk_count} len={len(general_text_final)}", flush=True)
                 yield _event("general", _gen_payload)
                 _kind_counts["general"] = 1
+                _kind_counts.setdefault("general_chunk", 0)
+                _kind_counts["general_chunk"] = _gen_chunk_count
                 stop_reason = _gen_payload.get("stop_reason")
                 model_used = _gen_payload.get("model")
                 meta_final = {"timings": {}, "model_used": model_used, "stop_reason": stop_reason}
@@ -670,6 +685,11 @@ def _api_post_message_stream(chat_id: int, body, chat):
                                 print(f"[stream {chat_id}] L1 partial save msg_id={assistant_msg_id} len={len(_brain_partial)}", flush=True)
                             except Exception as _e:
                                 print(f"[stream {chat_id}] L1 partial save failed: {_e}", flush=True)
+                    elif kind == "general_chunk":
+                        # v0.18 F2: General LLM chunk-by-chunk SSE forward.
+                        # Cloudflare 5min timeout 회피 = first token < 1s 도착 → connection alive.
+                        # frontend 안 'general_chunk' listener (index.html) 가 incremental render.
+                        yield _event("general_chunk", {"text": val})
                     elif kind == "general":
                         general_text_final = val.get("text", "")
                         print(f"[stream {chat_id}] general: len={len(general_text_final)}", flush=True)
