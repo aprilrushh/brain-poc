@@ -602,6 +602,7 @@ def _api_post_message_stream(chat_id: int, body, chat):
             meta_final = {}
             stop_reason = None
             model_used = None
+            assistant_msg_id = None  # v0.17 L1: brain_done partial save -> done final update 분기 위해 init
 
             retrieved_count_for_compose = 0
             _kind_counts = {"start":0, "brain_chunk":0, "brain_done":0, "general":0, "meta":0}
@@ -660,6 +661,15 @@ def _api_post_message_stream(chat_id: int, body, chat):
                         yield _event("brain_chunk", {"text": val})
                     elif kind == "brain_done":
                         yield _event("brain_done", val)
+                        # v0.17 L1: Brain answer 끝나면 즉시 DB partial save (General hang/Cloudflare timeout 시 답변 손실 방지)
+                        if not assistant_msg_id:
+                            _brain_partial = "**ð 본 문서 기반:**\n\n" + "".join(brain_text_acc).strip()
+                            try:
+                                _msg = create_message(chat_id=chat_id, role="assistant", content=_brain_partial)
+                                assistant_msg_id = _msg["id"]
+                                print(f"[stream {chat_id}] L1 partial save msg_id={assistant_msg_id} len={len(_brain_partial)}", flush=True)
+                            except Exception as _e:
+                                print(f"[stream {chat_id}] L1 partial save failed: {_e}", flush=True)
                     elif kind == "general":
                         general_text_final = val.get("text", "")
                         print(f"[stream {chat_id}] general: len={len(general_text_final)}", flush=True)
@@ -691,7 +701,15 @@ def _api_post_message_stream(chat_id: int, body, chat):
                     final_text += "\n\n---\n\n**🌐 일반 지식 답변:**\n\n" + gen_ans
 
             print(f"[stream {chat_id}] kind_counts={_kind_counts} final_text_len={len(final_text)}", flush=True)
-            assistant_msg = create_message(chat_id=chat_id, role="assistant", content=final_text)
+            # v0.17 L1: assistant_msg_id 있으면 (brain_done partial save 후) UPDATE, 없으면 create (기존 path)
+            if assistant_msg_id:
+                from src.db import get_conn
+                with get_conn() as conn:
+                    conn.execute("UPDATE messages SET content = ? WHERE id = ?", (final_text, assistant_msg_id))
+                print(f"[stream {chat_id}] L1 final update msg_id={assistant_msg_id}", flush=True)
+                assistant_msg = {"id": assistant_msg_id}
+            else:
+                assistant_msg = create_message(chat_id=chat_id, role="assistant", content=final_text)
             yield _event("done", {
                 "assistant_msg_id": assistant_msg["id"],
                 "user_msg_id": user_msg["id"],

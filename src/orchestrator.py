@@ -339,39 +339,41 @@ class RAGOrchestrator:
         brain_chunks = []
         brain_done = None
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-            fut_general = ex.submit(_call_general)
-            try:
-                for kind, val in self.adapter.chat_complete_stream(
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_msg},
-                    ],
-                    **base_kwargs,
-                ):
-                    if kind == "chunk":
-                        brain_chunks.append(val)
-                        yield ("brain_chunk", val)
-                    elif kind == "done":
-                        brain_done = val
-            except Exception as e:
-                brain_done = {"text": "[Document answer error: " + str(e) + "]",
+        # v0.17 P5: sequential (학자 명시, ledger v0.17). 병렬 처리 제거 = Together endpoint 경합 zero,
+        # Brain streaming 속도 회복. trade-off: General 도착 시점 = Brain 끝난 후 (sequential).
+        # L1 partial save (api_d4.py) 가 Cloudflare timeout 시 Brain 답변 보존 = robust.
+        try:
+            for kind, val in self.adapter.chat_complete_stream(
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_msg},
+                ],
+                **base_kwargs,
+            ):
+                if kind == "chunk":
+                    brain_chunks.append(val)
+                    yield ("brain_chunk", val)
+                elif kind == "done":
+                    brain_done = val
+        except Exception as e:
+            brain_done = {"text": "[Document answer error: " + str(e) + "]",
+                          "input_tokens": 0, "output_tokens": 0,
+                          "stop_reason": "error", "model": self.model}
+
+        yield ("brain_done", {
+            "input_tokens": (brain_done or {}).get("input_tokens"),
+            "output_tokens": (brain_done or {}).get("output_tokens"),
+            "stop_reason": (brain_done or {}).get("stop_reason"),
+            "model": (brain_done or {}).get("model", self.model),
+        })
+
+        # Brain 끝난 후 General 시작 (sequential, 학자 명시)
+        try:
+            result_general = _call_general()
+        except Exception as e:
+            result_general = {"text": "[General answer error: " + str(e) + "]",
                               "input_tokens": 0, "output_tokens": 0,
                               "stop_reason": "error", "model": self.model}
-
-            yield ("brain_done", {
-                "input_tokens": (brain_done or {}).get("input_tokens"),
-                "output_tokens": (brain_done or {}).get("output_tokens"),
-                "stop_reason": (brain_done or {}).get("stop_reason"),
-                "model": (brain_done or {}).get("model", self.model),
-            })
-
-            try:
-                result_general = fut_general.result(timeout=60)
-            except Exception as e:
-                result_general = {"text": "[General answer error: " + str(e) + "]",
-                                  "input_tokens": 0, "output_tokens": 0,
-                                  "stop_reason": "error", "model": self.model}
 
         timings["generate_ms"] = (time.perf_counter() - t_gen) * 1000
         timings["total_ms"] = timings["embed_ms"] + timings["retrieve_ms"] + timings["generate_ms"]
