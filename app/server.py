@@ -54,15 +54,20 @@ async def _second_brain_startup():
     """Init DB schema (core + 13 SB tables, idempotent) + start G1 idle-poll (5min, UTC)."""
     _sb_init_db()
     print("[second_brain] DB schema initialized (core 6 + SB 13 tables)", flush=True)
-    _sb_start_pipeline()
-    print("[second_brain] G1 idle-poll pipeline started (5min interval, UTC)", flush=True)
+    # Second Brain FROZEN (2026-06-01): pipeline off by default. Re-enable: .env ENABLE_SECOND_BRAIN=1
+    if os.getenv("ENABLE_SECOND_BRAIN", "0") == "1":
+        _sb_start_pipeline()
+        print("[second_brain] G1 idle-poll pipeline started (5min interval, UTC)", flush=True)
+    else:
+        print("[second_brain] pipeline FROZEN (ENABLE_SECOND_BRAIN!=1) — skipped", flush=True)
 
 
 @app.on_event("shutdown")
 async def _second_brain_shutdown():
     """Gracefully stop the pipeline scheduler."""
-    _sb_stop_pipeline()
-    print("[second_brain] pipeline stopped", flush=True)
+    if os.getenv("ENABLE_SECOND_BRAIN", "0") == "1":
+        _sb_stop_pipeline()
+        print("[second_brain] pipeline stopped", flush=True)
 
 
 

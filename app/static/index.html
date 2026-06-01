@@ -262,7 +262,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
     <button class="new-chat-btn" id="new-chat-btn"><span>＋</span><span>New chat</span></button>
     <div class="sidebar-scroll">
 
-    <div class="sidebar-section brain-summary">
+    <div class="sidebar-section brain-summary" style="display:none;">
       <div class="sidebar-label"><span>Second Brain</span></div>
       <ul class="sidebar-list" id="brain-events-recent"></ul>
     </div>
@@ -824,6 +824,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // === Second Brain — sidebar recent events (ledger v0.9 paradigm visible signature) ===
 async function loadRecentBrainEvents() {
+  return;  // Second Brain FROZEN 2026-06-01 — re-enable: remove this line
   try {
     const res = await fetch('/api/brain-events/recent?limit=5', { credentials: 'include' });
     if (!res.ok) return;
@@ -859,6 +860,7 @@ if (document.readyState === 'loading') {
 async function renderBrainEvents() {
   const host = document.getElementById('brain-events');
   if (!host) return;
+  host.style.display = 'none'; return;  // Second Brain FROZEN 2026-06-01 — re-enable: remove this line
   if (!state.currentChatId) { host.style.display = 'none'; return; }
   host.style.display = 'block';
   const list = document.getElementById('brain-events-list');
