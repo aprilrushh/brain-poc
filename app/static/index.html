@@ -38,6 +38,27 @@ body {
   cursor: pointer; transition: all 0.15s ease; margin-bottom: 16px;
 }
 .new-chat-btn:hover { border-color: var(--border-strong); box-shadow: var(--shadow); }
+.sidebar-nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--text); transition: background 0.12s ease; }
+.sidebar-nav-item:hover { background: var(--bg-elevated); }
+.sidebar-nav-item.active { background: var(--accent-bg); color: var(--accent); }
+.sidebar-nav-item .nav-icon { font-size: 16px; }
+.upload-progress { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+.upload-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.upload-progress-name { font-size: 14px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.upload-progress-pct { margin-left: auto; font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+.upload-progress-track { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.upload-progress-fill { height: 100%; background: var(--accent); width: 0%; border-radius: 999px; transition: width 0.2s ease; }
+.upload-progress.indexing .upload-progress-fill { width: 100% !important; animation: pulse-bar 1.2s ease-in-out infinite; }
+@keyframes pulse-bar { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
+.upload-progress-stage { font-size: 12px; color: var(--text-subtle); margin-top: 8px; }
+.oversize-notice { position: relative; background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+.oversize-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.oversize-size { font-weight: 400; color: var(--text-muted); font-size: 13px; }
+.oversize-msg { font-size: 13px; color: var(--text-muted); margin: 6px 0 12px; line-height: 1.5; }
+.oversize-msg b { color: var(--text); }
+.oversize-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s ease; }
+.oversize-btn:hover { background: var(--accent-hover); }
+.oversize-dismiss { position: absolute; top: 10px; right: 12px; background: none; border: none; color: var(--text-subtle); font-size: 18px; cursor: pointer; line-height: 1; }
 .sidebar-section { margin-top: 16px; }
 .sidebar-label {
   padding: 6px 8px; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 600;
@@ -280,8 +301,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <ul class="sidebar-list" id="brain-events-recent"></ul>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-label"><span style="cursor:pointer;" onclick="openProjectsGrid()">Projects</span><button id="new-project-btn" title="New project">＋</button></div>
-      <ul class="sidebar-list" id="project-list"></ul>
+      <div class="sidebar-nav-item" id="projects-nav" onclick="openProjectsGrid()"><span class="nav-icon">📁</span><span>Projects</span></div>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label"><span>Recents</span></div>
@@ -308,6 +328,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <p class="project-desc" id="project-desc"></p>
       <div class="section-title"><span>Project knowledge</span></div>
       <div class="knowledge-zone">
+        <div id="upload-progress-host"></div>
         <ul class="file-list" id="file-list"></ul>
         <button class="upload-cta" id="project-upload-btn"><span>📎</span><span>Add files</span></button>
         <input type="file" id="project-file-input" class="hidden" multiple>
@@ -328,6 +349,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 </div></div>
       <div class="input-area">
         <div class="input-shell">
+          <div id="oversize-host"></div>
           <div class="input-attached" id="chat-attached"></div>
           <textarea class="input" id="chat-input" rows="1" placeholder="Reply to Big Brain..."></textarea>
           <div class="input-row">
@@ -395,11 +417,87 @@ async function api(method, path, body) {
   return r.json();
 }
 
-async function uploadFile(path, file) {
-  const fd = new FormData(); fd.append('file', file);
-  const r = await fetch('/api' + path, { method:'POST', body: fd });
-  if (!r.ok) { const t = await r.text(); throw new Error(`upload ${path} → ${r.status} ${t}`); }
-  return r.json();
+function _renderUploadProgress(file) {
+  const host = document.getElementById('upload-progress-host');
+  if (!host) return function(){};
+  const card = document.createElement('div');
+  card.className = 'upload-progress';
+  card.innerHTML = '<div class="upload-progress-row"><span class="upload-progress-name">\uD83D\uDCC4 ' + escapeHtml(file.name) + '</span><span class="upload-progress-pct">0%</span></div><div class="upload-progress-track"><div class="upload-progress-fill"></div></div><div class="upload-progress-stage">\uC5c5\ub85c\ub4dc \uc911...</div>';
+  host.appendChild(card);
+  const fill = card.querySelector('.upload-progress-fill');
+  const pct = card.querySelector('.upload-progress-pct');
+  const stage = card.querySelector('.upload-progress-stage');
+  return function(loaded, total, phase) {
+    if (phase === 'indexing') {
+      card.classList.add('indexing');
+      pct.textContent = '';
+      stage.textContent = '\uBD84\uC11d \uc911... (BGE-M3 \uc778\ucf54\ub529 + Brain \uc801\uc7ac)';
+    } else {
+      const p = total ? Math.round(loaded / total * 100) : 0;
+      fill.style.width = p + '%';
+      pct.textContent = p + '%';
+      stage.textContent = '\uc5c5\ub85c\ub4dc \uc911... ' + fmtBytes(loaded) + ' / ' + fmtBytes(total);
+    }
+  };
+}
+function _clearUploadProgress() {
+  const host = document.getElementById('upload-progress-host');
+  if (host) host.innerHTML = '';
+}
+// 큰 파일을 chat 에 붙이려 할 때: 막다른 alert 대신 "프로젝트로 올리기" 친절 안내
+window._pendingOversizeFile = null;
+function _renderOversizeNotice(file) {
+  window._pendingOversizeFile = file;  // 버튼이 쓸 수 있게 보관
+  const host = document.getElementById('oversize-host');
+  if (!host) return;
+  host.innerHTML = '';  // 이전 안내 카드 제거 (중복 방지)
+  const card = document.createElement('div');
+  card.className = 'oversize-notice';
+  card.innerHTML = '<div class="oversize-title">\uD83D\uDCC4 ' + escapeHtml(file.name) + ' <span class="oversize-size">' + fmtBytes(file.size) + '</span></div>'
+    + '<div class="oversize-msg">\ucc44\ud305 \ucca8\ubd80\ub294 \ud30c\uc77c\uc744 \ud1b5\uc9f8\ub85c \uc77d\uc5b4 \ud55c\ub3c4\uac00 5MB\uc785\ub2c8\ub2e4. <b>Add files</b>\ub85c \ud504\ub85c\uc81d\ud2b8\uc5d0 \uc62c\ub9ac\uba74 100MB\uae4c\uc9c0, \ub354 \uc815\ud655\ud558\uac8c \ucc98\ub9ac\ub429\ub2c8\ub2e4.</div>'
+    + '<button class="oversize-btn" onclick="_moveOversizeToProject()"><span>\uD83D\uDCC1</span> \ud504\ub85c\uc81d\ud2b8 \uc9c0\uc2dd\uc73c\ub85c \uc62c\ub9ac\uae30</button>'
+    + '<button class="oversize-dismiss" onclick="_dismissOversize(this)">\u00d7</button>';
+  host.appendChild(card);
+}
+function _dismissOversize(btn) {
+  var c = btn.closest('.oversize-notice'); if (c) c.remove();
+  window._pendingOversizeFile = null;
+}
+async function _moveOversizeToProject() {
+  const f = window._pendingOversizeFile;
+  const pid = state.currentProjectId;
+  if (!f || !pid) { alert('\ud504\ub85c\uc81d\ud2b8\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.'); return; }
+  // 안내 카드 제거 + 프로젝트 상세로 이동 (거기서 진행 bar 가 보임)
+  document.querySelectorAll('.oversize-notice').forEach(function(c){ c.remove(); });
+  await openProject(pid);
+  try {
+    await uploadFile(`/projects/${pid}/files`, f, _renderUploadProgress(f));
+    _clearUploadProgress();
+    window._pendingOversizeFile = null;
+    await openProject(pid);
+  } catch (err) { _clearUploadProgress(); alert('Upload failed (' + f.name + '): ' + err.message); }
+}
+function uploadFile(path, file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData(); fd.append('file', file);
+    xhr.open('POST', '/api' + path);
+    if (xhr.upload && onProgress) {
+      xhr.upload.addEventListener('progress', (ev) => {
+        if (ev.lengthComputable) onProgress(ev.loaded, ev.total, 'uploading');
+      });
+      // 전송 완료 → 서버 인덱싱(BGE-M3) 구간: % 모름 → indexing 단계 알림
+      xhr.upload.addEventListener('load', () => { onProgress(file.size, file.size, 'indexing'); });
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch { resolve({}); }
+      } else { reject(new Error('upload ' + path + ' -> ' + xhr.status + ' ' + xhr.responseText)); }
+    };
+    xhr.onerror = () => reject(new Error('upload network error'));
+    xhr.send(fd);
+  });
 }
 
 async function fetchProjects() {
@@ -455,7 +553,9 @@ function openProjectsGrid() {
   renderSidebar(); renderProjectsGrid();
 }
 function renderSidebar() {
-  document.getElementById('project-list').innerHTML = state.projects.map(p => `<li class="sidebar-item ${state.currentProjectId===p.id&&state.view==='project'?'active':''}" onclick="openProject(${p.id})">${escapeHtml(p.name)}<span class="meta">${(p.chats||[]).length} chats · ${(p.files||[]).length} files</span></li>`).join('') || '<li style="color:var(--text-subtle);font-size:12px;padding:8px;">No projects yet</li>';
+  // project-list removed — projects now shown as card grid via 📁 Projects nav
+  var _pnav = document.getElementById('projects-nav');
+  if (_pnav) _pnav.classList.toggle('active', state.view === 'projects');
   const all = [];
   state.projects.forEach(p => (p.chats||[]).forEach(c => all.push({...c, projectId: p.id, projectName: p.name})));
   all.sort((a,b) => (b.updated_at||'').localeCompare(a.updated_at||''));
@@ -830,15 +930,17 @@ async function sendMessage() {
 document.addEventListener('DOMContentLoaded', async () => {
   if (!await checkAuth()) return;
   document.getElementById('new-chat-btn').addEventListener('click', newChatGlobal);
-  document.getElementById('new-project-btn').addEventListener('click', newProject);
+  var _npb = document.getElementById('new-project-btn'); if (_npb) _npb.addEventListener('click', newProject);
   document.getElementById('new-chat-in-project-btn').addEventListener('click', () => newChat(state.currentProjectId));
   // Project knowledge upload
   document.getElementById('project-upload-btn').addEventListener('click', () => document.getElementById('project-file-input').click());
   document.getElementById('project-file-input').addEventListener('change', async (e) => {
     const pid = state.currentProjectId; if (!pid) return;
     for (const f of Array.from(e.target.files)) {
-      try { await uploadFile(`/projects/${pid}/files`, f); } catch (err) { alert(`Upload failed (${f.name}): ` + err.message); }
+      try { await uploadFile(`/projects/${pid}/files`, f, _renderUploadProgress(f)); }
+      catch (err) { alert(`Upload failed (${f.name}): ` + err.message); }
     }
+    _clearUploadProgress();
     e.target.value = '';
     await openProject(pid);
   });
@@ -846,7 +948,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('chat-attach-btn').addEventListener('click', () => document.getElementById('chat-file-input').click());
   document.getElementById('chat-file-input').addEventListener('change', async (e) => {
     const cid = state.currentChatId; if (!cid) return;
+    const CHAT_LIMIT = 5 * 1024 * 1024;  // 5MB — server-enforced too (api_d4 CHAT_FILE_LIMIT)
     for (const f of Array.from(e.target.files)) {
+      if (f.size > CHAT_LIMIT) { _renderOversizeNotice(f); continue; }  // 큰 파일 → 친절 안내, 전송 안 함
       try { const row = await uploadFile(`/chats/${cid}/files`, f); state.chatAttached.push(row); }
       catch (err) { alert(`Attach failed (${f.name}): ` + err.message); }
     }
@@ -873,7 +977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   })();
   var pgNew = document.getElementById('pg-new-project-btn');
-  if (pgNew) pgNew.addEventListener('click', function(){ document.getElementById('new-project-btn').click(); });
+  if (pgNew) pgNew.addEventListener('click', newProject);
   try { await fetchProjects(); renderSidebar(); openProjectsGrid(); } catch (e) { console.error('Init load failed:', e); }
 });
 
