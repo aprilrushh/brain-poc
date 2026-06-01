@@ -141,6 +141,15 @@ body {
 .msg { display: flex; flex-direction: column; gap: 8px; }
 .msg-role { font-family: system-ui; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-subtle); font-weight: 600; }
 .msg-content { font-size: 16px; line-height: 1.7; color: var(--text); }
+.deep-reasoning { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; color: var(--text-muted); padding: 4px 0; }
+.deep-reasoning .dr-icon { font-size: 18px; display: inline-block; animation: drPulse 1.4s ease-in-out infinite; }
+.deep-reasoning .dr-text { font-weight: 600; color: var(--text); }
+.deep-reasoning .dr-timer { font-size: 12px; color: var(--text-subtle); }
+.deep-reasoning .dr-dots span { animation: drBlink 1.4s infinite both; }
+.deep-reasoning .dr-dots span:nth-child(2) { animation-delay: 0.2s; }
+.deep-reasoning .dr-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes drPulse { 0%,100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.25); opacity: 1; } }
+@keyframes drBlink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
 .explore-btn { margin-top: 12px; padding: 9px 16px; font-size: 14px; font-weight: 600; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 10px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
 .explore-btn:hover { background: var(--accent); color: #fff; }
 .explore-btn:disabled { opacity: 0.6; cursor: default; background: var(--accent-bg); color: var(--accent); }
@@ -585,6 +594,16 @@ async function askExplore(btn) {
   btn.parentElement.insertAdjacentElement('afterend', box);
   const pre = box.querySelector('.explore-md');
   let _exploreRaw = '';
+  // Deep Reasoning 로딩 인디케이터 (GPT-5.5 xhigh thinking 동안 = 멈춤 인상 방지)
+  const _DR_ICONS = ['\u{1F9E0}','\u{1F4AD}','\u{1F50D}','\u26A1','\u{1F310}','\u{1F52C}','\u{1F4DA}','\u{1F9E9}','\u{1F4A1}','\u{1F3AF}','\u{1F52D}','\u2699\uFE0F','\u2728','\u{1F6F0}\uFE0F'];
+  const _drT0 = Date.now();
+  pre.innerHTML = '<div class="deep-reasoning"><span class="dr-icon">\u{1F9E0}</span><span class="dr-text">Deep Reasoning 중</span><span class="dr-dots"><span>.</span><span>.</span><span>.</span></span><span class="dr-timer"></span></div>';
+  let _drSpin = setInterval(() => {
+    const ic = pre.querySelector('.dr-icon'); const tm = pre.querySelector('.dr-timer');
+    if (ic) ic.textContent = _DR_ICONS[Math.floor(Math.random() * _DR_ICONS.length)];
+    if (tm) tm.textContent = ' (' + Math.floor((Date.now() - _drT0) / 1000) + 's)';
+  }, 1400);
+  const _drStop = () => { if (_drSpin) { clearInterval(_drSpin); _drSpin = null; } };
   const sc = document.getElementById('message-stream')?.parentElement;
   const scroll = () => { if (sc) sc.scrollTop = sc.scrollHeight; };
   try {
@@ -608,13 +627,13 @@ async function askExplore(btn) {
         if (!dl.length) continue;
         let data; try { data = JSON.parse(dl.join('\n')); } catch { continue; }
         // explore 는 general 답만 취함 (brain_chunk 무시 = Strict 박스 중복 방지)
-        if (ev === 'general_chunk' && data.text) { _exploreRaw += data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
-        else if (ev === 'general' && data.text && !_exploreRaw) { _exploreRaw = data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
+        if (ev === 'general_chunk' && data.text) { if (!_exploreRaw) _drStop(); _exploreRaw += data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
+        else if (ev === 'general' && data.text && !_exploreRaw) { _drStop(); _exploreRaw = data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
       }
     }
     btn.textContent = '✓ 외부 정보 조회됨';
   } catch (e) {
-    pre.textContent = '외부 정보 조회 실패: ' + (e && e.message ? e.message : 'unknown');
+    _drStop(); pre.textContent = '외부 정보 조회 실패: ' + (e && e.message ? e.message : 'unknown');
     btn.textContent = '🔍 외부 정보로 알아보기'; btn.disabled = false;
   }
 }
