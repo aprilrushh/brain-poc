@@ -613,9 +613,15 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                 print(f"[stream {chat_id}] general-only: starting general LLM call", flush=True)
                 yield _event("start", {"retrieved": [], "thinking_enabled": False, "thinking_reason": "no_brain_index", "retrieval_pattern": None, "no_brain_mode": True})
                 _kind_counts["start"] = 1
-                from src.llm_client import get_llm_client
+                from src.llm_client import get_llm_client, get_general_llm_client
                 from src.orchestrator import GENERAL_KNOWLEDGE_PROMPT, SYSTEM_PROMPT
-                _adapter = get_llm_client()
+                # Strict=Brain adapter(235B, 거부 검증됨). Explore=General adapter(GPT-5.5 등) fallback.
+                if mode == "strict":
+                    _adapter = get_llm_client()
+                    _gen_max_tokens = 4096
+                else:
+                    _adapter = get_general_llm_client() or get_llm_client()
+                    _gen_max_tokens = 16000 if get_general_llm_client() is not None else 4096
                 # v0.19: Strict/Explore branch on chat-attach (no_brain) path
                 _strict_refusal_msg = (
                     "업로드된 문서가 없습니다. 🛡 Strict 모드는 첨부 문서 안에서만 답합니다. "
@@ -650,7 +656,7 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                             {"role": "system", "content": _gen_system_prompt},
                             {"role": "user", "content": _gen_user_msg},
                         ],
-                        max_tokens=4096,
+                        max_tokens=_gen_max_tokens,
                     )
                     for _kind, _val in _gen_stream:
                         if _kind == "chunk":

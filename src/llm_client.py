@@ -43,7 +43,9 @@ class LLMAdapter:
 
 
 class OpenAIAdapter(LLMAdapter):
-    """For Together AI, OpenRouter, vLLM local — anything OpenAI-compatible."""
+    """For Together AI, OpenRouter, vLLM local, OpenAI — anything OpenAI-compatible."""
+    def _is_gpt(self):
+        return "gpt" in (self.model or "").lower()
     def __init__(self, client, model: str):
         self.client = client
         self.model = model
@@ -97,15 +99,28 @@ class OpenAIAdapter(LLMAdapter):
         if self._extra_body and "extra_body" not in kwargs:
             kwargs["extra_body"] = self._extra_body
 
-        stream = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            stream=True,
-            stream_options={"include_usage": True},
-            **kwargs,
-        )
+        if self._is_gpt():
+            # GPT-5.x reasoning model: max_completion_tokens (not max_tokens),
+            # no custom temperature, reasoning_effort (quality-first default xhigh).
+            stream = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_completion_tokens=max_tokens,
+                reasoning_effort=os.environ.get("GENERAL_REASONING_EFFORT", "xhigh"),
+                stream=True,
+                stream_options={"include_usage": True},
+                **kwargs,
+            )
+        else:
+            stream = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=True,
+                stream_options={"include_usage": True},
+                **kwargs,
+            )
 
         full_text = []
         usage = None
@@ -196,6 +211,21 @@ class AnthropicAdapter(LLMAdapter):
 def get_llm_provider() -> str:
     """Returns 'together' (default) or 'anthropic'."""
     return os.environ.get("LLM_PROVIDER", "together").lower()
+
+
+def get_general_llm_client():
+    """General(Explore) 경로 전용 LLM client. GENERAL_LLM_PROVIDER 설정 시에만.
+    미설정이면 None -> 호출부가 기존 adapter 로 fallback (하위호환)."""
+    prov = _clean(os.environ.get("GENERAL_LLM_PROVIDER", "")).lower()
+    if prov != "openai":
+        return None
+    from openai import OpenAI
+    api_key = _clean(os.environ.get("OPENAI_API_KEY"))
+    if not api_key:
+        return None
+    model = _clean(os.environ.get("GENERAL_LLM_MODEL")) or "gpt-5.5"
+    client = OpenAI(api_key=api_key)  # base_url 기본 = OpenAI
+    return OpenAIAdapter(client, model)
 
 
 def get_llm_client() -> LLMAdapter:

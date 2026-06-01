@@ -11,7 +11,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 
 from .brain import BrainMemory
-from .llm_client import get_llm_client, get_llm_model, is_openrouter
+from .llm_client import get_llm_client, get_general_llm_client, get_llm_model, is_openrouter
 from .thinking_router import decide_thinking
 
 
@@ -81,6 +81,8 @@ class RAGOrchestrator:
         # adapter is LLMAdapter (OpenAIAdapter or AnthropicAdapter)
         self.adapter = get_llm_client()
         self.model = self.adapter.model
+        # General(Explore) 전용 adapter (GPT-5.5 등). 미설정이면 기존 adapter fallback.
+        self.general_adapter = get_general_llm_client() or self.adapter
 
     def encode_query(self, query: str) -> torch.Tensor:
         emb = self.encoder.encode(
@@ -331,12 +333,13 @@ class RAGOrchestrator:
                 )
             else:
                 gen_user_msg = question
-            for kind, val in self.adapter.chat_complete_stream(
+            general_kwargs = {"max_tokens": 16000} if self.general_adapter is not self.adapter else base_kwargs
+            for kind, val in self.general_adapter.chat_complete_stream(
                 messages=[
                     {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
                     {"role": "user", "content": gen_user_msg},
                 ],
-                **base_kwargs,
+                **general_kwargs,
             ):
                 yield (kind, val)
 
