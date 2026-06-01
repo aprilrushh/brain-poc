@@ -47,6 +47,12 @@ class OpenAIAdapter(LLMAdapter):
     def __init__(self, client, model: str):
         self.client = client
         self.model = model
+        # Qwen3.5/3.6/3.7 are reasoning models; disable thinking for grounded
+        # 0%-hallucination task. Qwen3-235B does not match -> unchanged.
+        if any(t in self.model for t in ("Qwen3.5", "Qwen3.6", "Qwen3.7")):
+            self._extra_body = {"chat_template_kwargs": {"enable_thinking": False}}
+        else:
+            self._extra_body = {}
 
     def chat_complete(self, messages: list[dict], **kwargs) -> dict:
         """
@@ -56,6 +62,8 @@ class OpenAIAdapter(LLMAdapter):
         """
         max_tokens = kwargs.pop("max_tokens", 2048)
         temperature = kwargs.pop("temperature", 0.3)
+        if self._extra_body and "extra_body" not in kwargs:
+            kwargs["extra_body"] = self._extra_body
 
         resp = self.client.chat.completions.create(
             model=self.model,
@@ -86,6 +94,8 @@ class OpenAIAdapter(LLMAdapter):
         """
         max_tokens = kwargs.pop("max_tokens", 2048)
         temperature = kwargs.pop("temperature", 0.3)
+        if self._extra_body and "extra_body" not in kwargs:
+            kwargs["extra_body"] = self._extra_body
 
         stream = self.client.chat.completions.create(
             model=self.model,
