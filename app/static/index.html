@@ -76,6 +76,19 @@ body {
 .breadcrumb-link:hover { color: var(--text); }
 .breadcrumb-sep { color: var(--text-subtle); }
 .breadcrumb-current { color: var(--text); font-weight: 500; }
+.view-projects { display: none; }
+.view-projects.visible { display: block; flex: 1; overflow-y: auto; padding: 48px 64px; max-width: 1040px; margin: 0 auto; width: 100%; }
+.pg-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.pg-header h1 { font-size: 28px; color: var(--text); margin: 0; }
+.pg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.pg-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 14px; padding: 18px; cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.pg-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow); }
+.pg-card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.pg-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 600; }
+.pg-card-name { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.pg-card-desc { font-size: 13px; color: var(--text-muted); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-card-meta { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-subtle); }
+.pg-card-meta .spacer { margin-left: auto; }
 .view-project, .view-chat, .empty-state { display: none; }
 .view-project.visible { display: block; flex: 1; overflow-y: auto; padding: 48px 64px; max-width: 920px; margin: 0 auto; width: 100%; }
 .view-chat.visible { display: flex; flex: 1; flex-direction: column; overflow: hidden; }
@@ -267,7 +280,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
       <ul class="sidebar-list" id="brain-events-recent"></ul>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-label"><span>Projects</span><button id="new-project-btn" title="New project">＋</button></div>
+      <div class="sidebar-label"><span style="cursor:pointer;" onclick="openProjectsGrid()">Projects</span><button id="new-project-btn" title="New project">＋</button></div>
       <ul class="sidebar-list" id="project-list"></ul>
     </div>
     <div class="sidebar-section">
@@ -286,6 +299,10 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
   </aside>
   <main class="main">
     <header class="main-header" id="breadcrumb"></header>
+    <section class="view-projects" id="view-projects">
+      <div class="pg-header"><h1>Projects</h1><button class="upload-cta" id="pg-new-project-btn">＋ New project</button></div>
+      <div class="pg-grid" id="pg-grid"></div>
+    </section>
     <section class="view-project" id="view-project">
       <h1 class="project-title" id="project-title"></h1>
       <p class="project-desc" id="project-desc"></p>
@@ -401,6 +418,42 @@ async function fetchChatFiles(chatId) {
   return files;
 }
 
+const PG_COLORS = [
+  ['#E1F5EE','#0F6E56'], ['#E6F1FB','#185FA5'], ['#FAECE7','#993C1D'],
+  ['#FBEAF0','#993556'], ['#EEEDFE','#534AB7'], ['#FAEEDA','#854F0B'],
+];
+function renderProjectsGrid() {
+  const grid = document.getElementById('pg-grid');
+  if (!grid) return;
+  const ps = state.projects || [];
+  if (!ps.length) { grid.innerHTML = '<div style="color:var(--text-subtle);font-size:14px;padding:32px;">No projects yet. Create one to get started.</div>'; return; }
+  grid.innerHTML = ps.map(p => {
+    const c = PG_COLORS[p.id % PG_COLORS.length];
+    const initial = (p.name || '?').trim().charAt(0).toUpperCase();
+    const nFiles = (p.files || []).length;
+    const nChats = (p.chats || []).length;
+    const desc = p.description ? escapeHtml(p.description) : '';
+    return `<div class="pg-card" onclick="openProject(${p.id})">
+      <div class="pg-card-top">
+        <div class="pg-icon" style="background:${c[0]};color:${c[1]};">${escapeHtml(initial)}</div>
+        <div style="min-width:0;">
+          <div class="pg-card-name">${escapeHtml(p.name)}</div>
+          ${desc ? `<div class="pg-card-desc">${desc}</div>` : ''}
+        </div>
+      </div>
+      <div class="pg-card-meta">
+        <span>\uD83D\uDCC4 ${nFiles} ${nFiles===1?'file':'files'}</span>
+        <span>\uD83D\uDCAC ${nChats} ${nChats===1?'chat':'chats'}</span>
+        <span class="spacer">${p.updated_at ? fmtTime(p.updated_at) : ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openProjectsGrid() {
+  setView('projects');
+  state.currentProjectId = null; state.currentChatId = null; state.view = 'projects';
+  renderSidebar(); renderProjectsGrid();
+}
 function renderSidebar() {
   document.getElementById('project-list').innerHTML = state.projects.map(p => `<li class="sidebar-item ${state.currentProjectId===p.id&&state.view==='project'?'active':''}" onclick="openProject(${p.id})">${escapeHtml(p.name)}<span class="meta">${(p.chats||[]).length} chats · ${(p.files||[]).length} files</span></li>`).join('') || '<li style="color:var(--text-subtle);font-size:12px;padding:8px;">No projects yet</li>';
   const all = [];
@@ -447,6 +500,7 @@ function renderChatChips() {
 
 function setView(v) {
   state.view = v;
+  document.getElementById('view-projects').classList.toggle('visible', v === 'projects');
   document.getElementById('view-project').classList.toggle('visible', v === 'project');
   document.getElementById('view-chat').classList.toggle('visible', v === 'chat');
   document.getElementById('empty-state').classList.toggle('visible', v === 'empty');
@@ -818,7 +872,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       else { mt.firstChild.nodeValue = '\uD83E\uDDED '; if(lbl) lbl.textContent = 'Explore'; mt.title = 'Explore: 문서 밖 일반 지식 추론을 포함합니다. 누르면 Strict로 전환.'; }
     });
   })();
-  try { await fetchProjects(); renderSidebar(); } catch (e) { console.error('Init load failed:', e); }
+  var pgNew = document.getElementById('pg-new-project-btn');
+  if (pgNew) pgNew.addEventListener('click', function(){ document.getElementById('new-project-btn').click(); });
+  try { await fetchProjects(); renderSidebar(); openProjectsGrid(); } catch (e) { console.error('Init load failed:', e); }
 });
 
 
