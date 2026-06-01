@@ -314,7 +314,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
           <div class="input-attached" id="chat-attached"></div>
           <textarea class="input" id="chat-input" rows="1" placeholder="Reply to Big Brain..."></textarea>
           <div class="input-row">
-            <div class="input-actions"><button class="icon-btn" id="chat-attach-btn" title="Attach file">📎</button></div>
+            <div class="input-actions"><button class="icon-btn" id="chat-attach-btn" title="Attach file">📎</button><button class="icon-btn" id="mode-toggle-btn" title="Strict: 올린 문서 안에서만 답합니다. 누르면 Explore(자유 추론)로 전환." style="width:auto;padding:0 10px;gap:5px;display:inline-flex;align-items:center;font-size:13px;">🛡 <span id="mode-toggle-label">Strict</span></button></div>
             <button class="send-btn" id="send-btn">→</button>
           </div>
           <input type="file" id="chat-file-input" class="hidden" multiple>
@@ -364,7 +364,7 @@ async function checkAuth() {
   }
 }
 // === end D4.5e-6 ===
-const state = { view: 'empty', projects: [], currentProjectId: null, currentChatId: null, chatAttached: [] };
+const state = { view: 'empty', projects: [], currentProjectId: null, currentChatId: null, chatAttached: [], mode: 'strict' };
 
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function fmtBytes(n) { if (!n) return ''; if (n < 1024) return n+' B'; if (n < 1048576) return Math.round(n/1024)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
@@ -640,7 +640,7 @@ async function sendMessage() {
   }
   try {
     // ledger v0.11: streaming branch — fetch SSE, append chunks live, reload on done.
-    const resp = await fetch(`/api/chats/${state.currentChatId}/messages?stream=1`, {
+    const resp = await fetch(`/api/chats/${state.currentChatId}/messages?stream=1&mode=${state.mode}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -809,6 +809,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
   document.getElementById('send-btn').addEventListener('click', sendMessage);
+  (function(){
+    var mt = document.getElementById('mode-toggle-btn');
+    if (mt) mt.addEventListener('click', function(){
+      state.mode = (state.mode === 'strict') ? 'explore' : 'strict';
+      var lbl = document.getElementById('mode-toggle-label');
+      if (state.mode === 'strict') { mt.firstChild.nodeValue = '\uD83D\uDEE1 '; if(lbl) lbl.textContent = 'Strict'; mt.title = 'Strict: 올린 문서 안에서만 답합니다. 누르면 Explore(자유 추론)로 전환.'; }
+      else { mt.firstChild.nodeValue = '\uD83E\uDDED '; if(lbl) lbl.textContent = 'Explore'; mt.title = 'Explore: 문서 밖 일반 지식 추론을 포함합니다. 누르면 Strict로 전환.'; }
+    });
+  })();
   try { await fetchProjects(); renderSidebar(); } catch (e) { console.error('Init load failed:', e); }
 });
 
