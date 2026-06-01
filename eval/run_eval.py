@@ -43,6 +43,21 @@ REFUSAL_PATTERNS = [
 ]
 
 
+def _pctl(sorted_list, p):
+    if not sorted_list:
+        return 0
+    k = int(round(p * (len(sorted_list) - 1)))
+    return sorted_list[min(k, len(sorted_list) - 1)]
+
+
+def _median(vals):
+    if not vals:
+        return 0
+    s = sorted(vals)
+    n = len(s)
+    return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
+
+
 def matches_keywords(text: str, keywords: list) -> tuple[bool, list]:
     """Case-insensitive substring match. Returns (any_match, matched_list)."""
     if not text or not keywords:
@@ -149,12 +164,28 @@ def main():
         if orchestrator is not None:
             try:
                 t0 = time.perf_counter()
-                resp = orchestrator.query(q["query"], max_tokens=512)
-                gen_ms = (time.perf_counter() - t0) * 1000
-                answer = resp.get("answer", "")
+                ttft_ms = None
+                brain_done_ms = None
+                brain_chunks = []
+                answer = ""
+                completion_tokens = 0
+                for kind, val in orchestrator.query_stream(q["query"], max_tokens=512):
+                    if kind == "brain_chunk":
+                        if ttft_ms is None:
+                            ttft_ms = (time.perf_counter() - t0) * 1000
+                        brain_chunks.append(val)
+                    elif kind == "brain_done":
+                        brain_done_ms = (time.perf_counter() - t0) * 1000
+                        completion_tokens = (val or {}).get("output_tokens") or 0
+                    elif kind == "meta":
+                        answer = (val or {}).get("answer", "") or "".join(brain_chunks).strip()
+                total_ms = (time.perf_counter() - t0) * 1000
                 result["answer"] = answer
-                result["gen_ms"] = round(gen_ms, 1)
-                result["completion_tokens"] = resp.get("completion_tokens", 0)
+                result["ttft_ms"] = round(ttft_ms, 1) if ttft_ms is not None else None
+                result["brain_done_ms"] = round(brain_done_ms, 1) if brain_done_ms is not None else None
+                result["total_ms"] = round(total_ms, 1)
+                result["gen_ms"] = round(total_ms, 1)
+                result["completion_tokens"] = completion_tokens
 
                 # Keyword match
                 keyword_match, matched = matches_keywords(answer, q.get("expected_answer_keywords", []))
@@ -239,6 +270,11 @@ def compute_aggregates(results: list) -> dict:
         n_hallucination = sum(1 for r in rs if r.get("hallucination"))
         n_false_refusal = sum(1 for r in rs if r.get("false_refusal"))
         gen_list = [r.get("gen_ms", 0) for r in rs if r.get("gen_ms")]
+        ttft_list = [r["ttft_ms"] for r in rs if r.get("ttft_ms") is not None]
+        bdone_list = [r["brain_done_ms"] for r in rs if r.get("brain_done_ms") is not None]
+        SPIKE_MS = 3000.0
+        ttft_sorted = sorted(ttft_list)
+        n_spike = sum(1 for v in ttft_list if v > SPIKE_MS)
         comp_tokens = [r.get("completion_tokens", 0) for r in rs if r.get("completion_tokens")]
         return {
             "n": n,
@@ -250,6 +286,14 @@ def compute_aggregates(results: list) -> dict:
             "hallucination_pct": round(n_hallucination / n * 100, 1),
             "false_refusal_pct": round(n_false_refusal / n * 100, 1),
             "avg_gen_ms": round(sum(gen_list) / max(len(gen_list), 1), 1) if gen_list else 0,
+            "avg_ttft_ms": round(sum(ttft_list) / max(len(ttft_list), 1), 1) if ttft_list else 0,
+            "avg_brain_done_ms": round(sum(bdone_list) / max(len(bdone_list), 1), 1) if bdone_list else 0,
+            "med_ttft_ms": round(_median(ttft_list), 1) if ttft_list else 0,
+            "p95_ttft_ms": round(_pctl(ttft_sorted, 0.95), 1) if ttft_list else 0,
+            "max_ttft_ms": round(ttft_sorted[-1], 1) if ttft_list else 0,
+            "med_brain_done_ms": round(_median(bdone_list), 1) if bdone_list else 0,
+            "spike_count": n_spike,
+            "spike_rate": round(100.0 * n_spike / max(len(ttft_list), 1), 1) if ttft_list else 0,
             "avg_completion_tokens": round(sum(comp_tokens) / max(len(comp_tokens), 1), 0) if comp_tokens else 0,
         }
 
@@ -269,7 +313,12 @@ def print_summary(agg: dict, n_docs: int):
     print(f"  answer_accuracy:      {o['answer_accuracy_pct']}%")
     print(f"  hallucination_rate:   {o['hallucination_pct']}%")
     print(f"  false_refusal_rate:   {o['false_refusal_pct']}%")
-    print(f"  avg_gen_ms:           {o['avg_gen_ms']} ms")
+    print(f"  avg_ttft_ms:          {o.get('avg_ttft_ms', 0)} ms  (첫 토큰, Zero)")
+    print(f"  med_ttft_ms:          {o.get('med_ttft_ms', 0)} ms  (중앙값=진짜 대표값)")
+    print(f"  p95/max_ttft_ms:      {o.get('p95_ttft_ms', 0)} / {o.get('max_ttft_ms', 0)} ms  (꼬리=spike)")
+    print(f"  spike(>3s):           {o.get('spike_count', 0)} ({o.get('spike_rate', 0)}%)  ← Together serverless")
+    print(f"  avg_brain_done_ms:    {o.get('avg_brain_done_ms', 0)} ms  (Zero 완성)")
+    print(f"  avg_gen_ms (total):   {o['avg_gen_ms']} ms  (Zero+General 완성)")
     print(f"  avg_completion_tokens: {o['avg_completion_tokens']}")
     print()
     print(f"--- By Category ---")
@@ -298,7 +347,12 @@ def format_markdown_report(agg: dict, n_docs: int, results: list, elapsed: float
     md.append(f"| Answer accuracy | **{o['answer_accuracy_pct']}%** | — |")
     md.append(f"| Hallucination rate | **{o['hallucination_pct']}%** | < 10% target |")
     md.append(f"| False-refusal rate | **{o['false_refusal_pct']}%** | < 10% target |")
-    md.append(f"| Avg LLM gen time | {o['avg_gen_ms']} ms | — |")
+    md.append(f"| Avg TTFT (Zero 첫 토큰) | {o.get('avg_ttft_ms', 0)} ms | < 1000 |")
+    md.append(f"| Median TTFT | {o.get('med_ttft_ms', 0)} ms | < 500 |")
+    md.append(f"| p95 / max TTFT | {o.get('p95_ttft_ms', 0)} / {o.get('max_ttft_ms', 0)} ms | — |")
+    md.append(f"| Spike rate (>3s) | {o.get('spike_count', 0)} ({o.get('spike_rate', 0)}%) | < 5% |")
+    md.append(f"| Avg Zero 완성 (brain_done) | {o.get('avg_brain_done_ms', 0)} ms | — |")
+    md.append(f"| Avg total (Zero+General) | {o['avg_gen_ms']} ms | — |")
     md.append(f"\n## By Category\n")
     md.append(f"| Category | n | Accuracy | Recall@5 | Top1 | Hallucination | False-Refusal |")
     md.append(f"|---|---|---|---|---|---|---|")
