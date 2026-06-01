@@ -257,6 +257,7 @@ class RAGOrchestrator:
         max_tokens: int = 4096,
         extra_context: Optional[str] = None,
         general_extra_context: Optional[str] = None,
+        mode: str = "explore",
     ):
         """Streaming version of query(). Generator.
 
@@ -377,22 +378,27 @@ class RAGOrchestrator:
         # 마지막 done dict = result_general (caller dict 기대 호환).
         general_chunks = []
         result_general = None
-        try:
-            for kind, val in _call_general():
-                if kind == "chunk":
-                    general_chunks.append(val)
-                    yield ("general_chunk", val)
-                elif kind == "done":
-                    result_general = val
-            if result_general is None:
-                # done event 미도착 (드물게) → chunks 모음으로 fallback
-                result_general = {"text": "".join(general_chunks),
+        if mode == "strict":
+            # Strict: General LLM 호출 자체 skip (비용 절감 + "문서 안에서만" 정체성)
+            result_general = {"text": "", "input_tokens": 0, "output_tokens": 0,
+                              "stop_reason": "skipped", "model": self.model}
+        else:
+            try:
+                for kind, val in _call_general():
+                    if kind == "chunk":
+                        general_chunks.append(val)
+                        yield ("general_chunk", val)
+                    elif kind == "done":
+                        result_general = val
+                if result_general is None:
+                    # done event 미도착 (드물게) → chunks 모음으로 fallback
+                    result_general = {"text": "".join(general_chunks),
+                                      "input_tokens": 0, "output_tokens": 0,
+                                      "stop_reason": "stop", "model": self.model}
+            except Exception as e:
+                result_general = {"text": "[General answer error: " + str(e) + "]",
                                   "input_tokens": 0, "output_tokens": 0,
-                                  "stop_reason": "stop", "model": self.model}
-        except Exception as e:
-            result_general = {"text": "[General answer error: " + str(e) + "]",
-                              "input_tokens": 0, "output_tokens": 0,
-                              "stop_reason": "error", "model": self.model}
+                                  "stop_reason": "error", "model": self.model}
 
         timings["generate_ms"] = (time.perf_counter() - t_gen) * 1000
         timings["total_ms"] = timings["embed_ms"] + timings["retrieve_ms"] + timings["generate_ms"]

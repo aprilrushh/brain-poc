@@ -104,12 +104,12 @@ def api_list_messages(chat_id: int, current_user: dict = Depends(require_login))
 
 
 @router.post("/chats/{chat_id}/messages")
-def api_post_message(chat_id: int, body: MessageCreate, stream: int = 0, current_user: dict = Depends(require_login)):
+def api_post_message(chat_id: int, body: MessageCreate, stream: int = 0, mode: str = "explore", current_user: dict = Depends(require_login)):
     chat = get_chat(chat_id)
     if not chat:
         raise HTTPException(404, "Chat not found")
     if stream == 1:
-        return _api_post_message_stream(chat_id, body, chat)
+        return _api_post_message_stream(chat_id, body, chat, mode)
     user_msg = create_message(chat_id=chat_id, role="user", content=body.content)
     # Auto-title from first user message
     msgs = list_messages(chat_id)
@@ -519,7 +519,7 @@ def api_recent_brain_events(limit: int = 5, current_user: dict = Depends(require
 # DB save happens once at end (full assistant message, no partial).
 # ============================================================
 
-def _api_post_message_stream(chat_id: int, body, chat):
+def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
     user_msg = create_message(chat_id=chat_id, role="user", content=body.content)
     msgs = list_messages(chat_id)
     if chat["title"] == "New chat" and len([m for m in msgs if m["role"] == "user"]) == 1:
@@ -665,6 +665,7 @@ def _api_post_message_stream(chat_id: int, body, chat):
                     body.content,
                     extra_context=chat_attached_text or None,
                     general_extra_context=general_attached_text or None,
+                    mode=mode,
                 ):
                     _kind_counts[kind] = _kind_counts.get(kind, 0) + 1
                     if kind == "start":
