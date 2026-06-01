@@ -614,26 +614,45 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                 yield _event("start", {"retrieved": [], "thinking_enabled": False, "thinking_reason": "no_brain_index", "retrieval_pattern": None, "no_brain_mode": True})
                 _kind_counts["start"] = 1
                 from src.llm_client import get_llm_client
-                from src.orchestrator import GENERAL_KNOWLEDGE_PROMPT
+                from src.orchestrator import GENERAL_KNOWLEDGE_PROMPT, SYSTEM_PROMPT
                 _adapter = get_llm_client()
-                if general_attached_text:
-                    _gen_user_msg = "Reference documents (the user has provided these files):\n\n" + general_attached_text + "\n\nQuestion: " + body.content
+                # v0.19: Strict/Explore branch on chat-attach (no_brain) path
+                _strict_refusal_msg = (
+                    "업로드된 문서가 없습니다. 🛡 Strict 모드는 첨부 문서 안에서만 답합니다. "
+                    "파일을 첨부하거나 🧭 Explore 모드로 전환해 주세요.\n\n"
+                    "(No documents attached. Strict mode answers only from attached sources — "
+                    "attach a file or switch to Explore mode.)"
+                )
+                _strict_no_doc = (mode == "strict" and not general_attached_text)
+                if mode == "strict":
+                    _gen_system_prompt = SYSTEM_PROMPT
+                    _gen_user_msg = "/no_think Sources:\n\n" + (general_attached_text or "") + "\n\nQuestion: " + body.content
                 else:
-                    _gen_user_msg = body.content
+                    _gen_system_prompt = GENERAL_KNOWLEDGE_PROMPT
+                    if general_attached_text:
+                        _gen_user_msg = "Reference documents (the user has provided these files):\n\n" + general_attached_text + "\n\nQuestion: " + body.content
+                    else:
+                        _gen_user_msg = body.content
                 # v0.18 F2.1: general-only streaming (chat_complete -> chat_complete_stream).
                 # Cloudflare 5min timeout 회피 + 학자 화면 chunk-by-chunk visible.
                 # ledger v0.17 section 2 (Issue C path) 의 별도 mini stream 안 P1+P2+P3 효과 미적용 fix.
                 _gen_chunks = []
                 _gen_done = None
                 _gen_chunk_count = 0
+                if _strict_no_doc:
+                    yield _event("general_chunk", {"text": _strict_refusal_msg})
+                    _gen_chunks.append(_strict_refusal_msg)
+                    _gen_chunk_count = 1
+                    _gen_done = {"text": _strict_refusal_msg, "stop_reason": "strict_no_doc", "model": None}
                 try:
-                    for _kind, _val in _adapter.chat_complete_stream(
+                    _gen_stream = [] if _strict_no_doc else _adapter.chat_complete_stream(
                         messages=[
-                            {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                            {"role": "system", "content": _gen_system_prompt},
                             {"role": "user", "content": _gen_user_msg},
                         ],
                         max_tokens=4096,
-                    ):
+                    )
+                    for _kind, _val in _gen_stream:
                         if _kind == "chunk":
                             _gen_chunks.append(_val)
                             _gen_chunk_count += 1
