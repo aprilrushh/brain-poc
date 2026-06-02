@@ -260,6 +260,7 @@ class RAGOrchestrator:
         extra_context: Optional[str] = None,
         general_extra_context: Optional[str] = None,
         mode: str = "explore",
+        history: Optional[list] = None,
     ):
         """Streaming version of query(). Generator.
 
@@ -337,6 +338,7 @@ class RAGOrchestrator:
             for kind, val in self.general_adapter.chat_complete_stream(
                 messages=[
                     {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                    *(history or []),
                     {"role": "user", "content": gen_user_msg},
                 ],
                 **general_kwargs,
@@ -351,9 +353,15 @@ class RAGOrchestrator:
         # Brain streaming 속도 회복. trade-off: General 도착 시점 = Brain 끝난 후 (sequential).
         # L1 partial save (api_d4.py) 가 Cloudflare timeout 시 Brain 답변 보존 = robust.
         try:
+            _hist = history or []
+            _strict_sys = SYSTEM_PROMPT + (
+                "\n\n== Conversation history ==\n\uc774\uc804 \ub300\ud654\ub294 \ub9e5\ub77d \ud30c\uc545(\uc9c0\uc2dc\uc5b4 \ud574\uc18c)\uc6a9\uc77c \ubfd0\uc774\ub2e4. \ub2f5\ubcc0\uc758 \uadfc\uac70\ub294 \uc624\uc9c1 \uc704 Sources \ub2e4. \uc774\uc804 \ub300\ud654\uc5d0\uc11c \uc5b8\uae09\ub41c \ub0b4\uc6a9\uc774\ub77c\ub3c4 \ud604\uc7ac Sources \uc5d0 \uc5c6\uc73c\uba74 \uc0ac\uc2e4\ub85c \ub2e8\uc5b8\ud558\uc9c0 \ub9d0\uace0 'sources \uc5d0 \uc5c6\uc74c'\uc744 \uc720\uc9c0\ud558\ub77c."
+                if _hist else ""
+            )
             for kind, val in self.adapter.chat_complete_stream(
                 messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": _strict_sys},
+                    *_hist,
                     {"role": "user", "content": user_msg},
                 ],
                 **base_kwargs,

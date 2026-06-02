@@ -705,11 +705,27 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                 _kind_counts["meta"] = 1
             else:
                 print(f"[stream {chat_id}] starting query_stream chat_attached={len(chat_attached_text)} general={len(general_attached_text)}", flush=True)
+                # v0.22: 대화 히스토리 주입 (has_brain 경로, Strict/General 둘 다 — 재현실험서 Strict도 날조 안전 확인)
+                _bh_hist = []
+                try:
+                    _bh_all = list_messages(chat_id)
+                    _bh_prev = _bh_all[:-1] if _bh_all else []  # 마지막 = 방금 현재질문 제외
+                    for _bm in _bh_prev[-6:]:
+                        _bc = re.sub(r"\s*\[\+\d+ files? attached\]\s*$", "", (_bm.get("content") or "")).strip()
+                        if not _bc:
+                            continue
+                        if _bm.get("role") == "assistant" and len(_bc) > 2000:
+                            _bc = _bc[:2000] + " \u2026(\uc0dd\ub7b5)"
+                        _bh_hist.append({"role": _bm.get("role"), "content": _bc})
+                except Exception as _bhe:
+                    print(f"[stream {chat_id}] has_brain history build failed: {_bhe}", flush=True)
+                    _bh_hist = []
                 for kind, val in orch.query_stream(
                     body.content,
                     extra_context=chat_attached_text or None,
                     general_extra_context=general_attached_text or None,
                     mode=mode,
+                    history=_bh_hist,
                 ):
                     _kind_counts[kind] = _kind_counts.get(kind, 0) + 1
                     if kind == "start":
