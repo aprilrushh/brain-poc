@@ -650,10 +650,29 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                     _gen_chunks.append(_strict_refusal_msg)
                     _gen_chunk_count = 1
                     _gen_done = {"text": _strict_refusal_msg, "stop_reason": "strict_no_doc", "model": None}
+                # v0.21: 대화 히스토리 주입 (Explore 만, Strict 는 단발 유지 = 근거 오염 방지)
+                _hist_msgs = []
+                if mode != "strict":
+                    try:
+                        _all = list_messages(chat_id)
+                        # 마지막 항목 = 방금 저장된 현재 질문 → 제외. 직전 6턴(=메시지 6개)만.
+                        _prev = _all[:-1] if _all else []
+                        for _m in _prev[-6:]:
+                            _c = (_m.get("content") or "")
+                            _c = re.sub(r"\s*\[\+\d+ files? attached\]\s*$", "", _c).strip()
+                            if not _c:
+                                continue
+                            if _m.get("role") == "assistant" and len(_c) > 2000:
+                                _c = _c[:2000] + " …(생략)"
+                            _hist_msgs.append({"role": _m.get("role"), "content": _c})
+                    except Exception as _he:
+                        print(f"[stream {chat_id}] history build failed: {_he}", flush=True)
+                        _hist_msgs = []
                 try:
                     _gen_stream = [] if _strict_no_doc else _adapter.chat_complete_stream(
                         messages=[
                             {"role": "system", "content": _gen_system_prompt},
+                            *_hist_msgs,
                             {"role": "user", "content": _gen_user_msg},
                         ],
                         max_tokens=_gen_max_tokens,
