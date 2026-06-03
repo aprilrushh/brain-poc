@@ -153,6 +153,56 @@ class OpenAIAdapter(LLMAdapter):
         })
 
 
+    def responses_stream(self, messages: list[dict], max_tokens: int = 16000,
+                         reasoning_effort: str = "high", reasoning_summary: str = "detailed"):
+        """GPT reasoning 모델 전용 (Responses API). reasoning summary + 본문을 한 stream 에서 받음.
+        yields: ("reasoning", text) | ("chunk", text) | ("done", {text, model, ...})
+        messages([{system},{user/assistant}...]) -> Responses API instructions + input 변환."""
+        # system -> instructions, 나머지 -> input 메시지 리스트
+        instructions = ""
+        input_items = []
+        for m in messages:
+            role = m.get("role")
+            content = m.get("content", "")
+            if role == "system":
+                instructions = (instructions + "\n\n" + content) if instructions else content
+            else:
+                input_items.append({"role": role, "content": content})
+        full_text = []
+        reasoning_text = []
+        stream = self.client.responses.create(
+            model=self.model,
+            instructions=instructions or None,
+            input=input_items,
+            max_output_tokens=max_tokens,
+            reasoning={"effort": reasoning_effort, "summary": reasoning_summary},
+            stream=True,
+        )
+        for ev in stream:
+            t = getattr(ev, "type", "")
+            if t == "response.reasoning_summary_text.delta":
+                d = getattr(ev, "delta", None)
+                if d:
+                    reasoning_text.append(d)
+                    yield ("reasoning", d)
+            elif t == "response.output_text.delta":
+                d = getattr(ev, "delta", None)
+                if d:
+                    full_text.append(d)
+                    yield ("chunk", d)
+            elif t == "response.completed":
+                resp = getattr(ev, "response", None)
+                usage = getattr(resp, "usage", None) if resp else None
+                yield ("done", {
+                    "text": "".join(full_text),
+                    "reasoning": "".join(reasoning_text),
+                    "model": self.model,
+                    "input_tokens": getattr(usage, "input_tokens", None) if usage else None,
+                    "output_tokens": getattr(usage, "output_tokens", None) if usage else None,
+                    "stop_reason": "stop",
+                })
+
+
 class AnthropicAdapter(LLMAdapter):
     """For Anthropic Claude (Opus, Sonnet, Haiku)."""
     def __init__(self, client, model: str):

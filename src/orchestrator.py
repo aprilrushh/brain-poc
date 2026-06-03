@@ -334,16 +334,31 @@ class RAGOrchestrator:
                 )
             else:
                 gen_user_msg = question
-            general_kwargs = {"max_tokens": 16000} if self.general_adapter is not self.adapter else base_kwargs
-            for kind, val in self.general_adapter.chat_complete_stream(
-                messages=[
-                    {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
-                    *(history or []),
-                    {"role": "user", "content": gen_user_msg},
-                ],
-                **general_kwargs,
-            ):
-                yield (kind, val)
+            _gen_messages = [
+                {"role": "system", "content": GENERAL_KNOWLEDGE_PROMPT},
+                *(history or []),
+                {"role": "user", "content": gen_user_msg},
+            ]
+            _use_responses = (
+                self.general_adapter is not self.adapter
+                and hasattr(self.general_adapter, "responses_stream")
+                and getattr(self.general_adapter, "_is_gpt", lambda: False)()
+            )
+            if _use_responses:
+                # GPT reasoning 모델: Responses API → reasoning summary + 본문 스트리밍
+                import os as _os
+                _eff = _os.environ.get("GENERAL_REASONING_EFFORT", "high")
+                for kind, val in self.general_adapter.responses_stream(
+                    _gen_messages, max_tokens=16000, reasoning_effort=_eff,
+                ):
+                    yield (kind, val)  # kind: "reasoning" | "chunk" | "done"
+            else:
+                general_kwargs = {"max_tokens": 16000} if self.general_adapter is not self.adapter else base_kwargs
+                for kind, val in self.general_adapter.chat_complete_stream(
+                    messages=_gen_messages,
+                    **general_kwargs,
+                ):
+                    yield (kind, val)
 
         t_gen = time.perf_counter()
         brain_chunks = []
@@ -399,6 +414,8 @@ class RAGOrchestrator:
                     if kind == "chunk":
                         general_chunks.append(val)
                         yield ("general_chunk", val)
+                    elif kind == "reasoning":
+                        yield ("reasoning", val)  # GPT reasoning summary → SSE
                     elif kind == "done":
                         result_general = val
                 if result_general is None:

@@ -626,8 +626,23 @@ async function askExplore(btn) {
         }
         if (!dl.length) continue;
         let data; try { data = JSON.parse(dl.join('\n')); } catch { continue; }
+        // reasoning summary 실시간 표시 (Deep Reasoning 박스 대체)
+        if (ev === 'reasoning_chunk' && data.text) {
+          _drStop();
+          let rb = box.querySelector('.explore-reasoning');
+          if (!rb) {
+            const wrap = document.createElement('div');
+            wrap.className = 'explore-reasoning';
+            wrap.style.cssText = 'font-size:13px;line-height:1.55;color:var(--text-muted);background:var(--bg-sidebar);border-radius:8px;padding:10px 12px;margin:0 0 10px;white-space:pre-wrap;';
+            wrap.innerHTML = '<div style="font-size:11px;color:var(--text-subtle);margin-bottom:6px;">🧠 Reasoning</div><span class="er-body"></span>';
+            pre.parentElement.insertBefore(wrap, pre);
+            rb = wrap;
+          }
+          rb.querySelector('.er-body').appendChild(document.createTextNode(data.text));
+          scroll();
+        }
         // explore 는 general 답만 취함 (brain_chunk 무시 = Strict 박스 중복 방지)
-        if (ev === 'general_chunk' && data.text) { if (!_exploreRaw) _drStop(); _exploreRaw += data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
+        else if (ev === 'general_chunk' && data.text) { if (!_exploreRaw) _drStop(); _exploreRaw += data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
         else if (ev === 'general' && data.text && !_exploreRaw) { _drStop(); _exploreRaw = data.text; pre.innerHTML = DOMPurify.sanitize(marked.parse(_exploreRaw)); scroll(); }
       }
     }
@@ -927,6 +942,18 @@ async function sendMessage() {
           streamingMsg.appendChild(document.createTextNode(data.text));
           autoScroll();
         }
+      } else if (eventName === 'reasoning_chunk') {
+        document.getElementById('brain-thinking')?.remove();
+        let rPre = document.getElementById('reasoning-pre');
+        if (!rPre && stream) {
+          stream.insertAdjacentHTML('beforeend',
+            '<div class="msg assistant" id="reasoning-msg"><div class="msg-role">Big Brain</div><div class="msg-content"><div style="font-size:12px;color:var(--text-subtle);margin:0 0 8px;">\uD83E\uDDE0 Reasoning (\uc0ac\uace0 \uacfc\uc815)</div><pre id="reasoning-pre" style="white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:14px;line-height:1.6;color:var(--text-muted);background:var(--bg-sidebar);border-radius:8px;padding:12px 14px;margin:0;"></pre></div></div>');
+          rPre = document.getElementById('reasoning-pre');
+        }
+        if (rPre && data.text) {
+          rPre.appendChild(document.createTextNode(data.text));
+          autoScroll();
+        }
       } else if (eventName === 'general_chunk') {
         // v0.18 F2: General LLM chunk-by-chunk render.
         // 첫 chunk 도착 시 #general-msg + #general-pre 생성, 이후 chunk = appendChild incremental.
@@ -960,6 +987,7 @@ async function sendMessage() {
         document.getElementById('brain-thinking')?.remove();
         document.getElementById('streaming-msg')?.remove();
         document.getElementById('general-msg')?.remove();
+        document.getElementById('reasoning-msg')?.remove();
         fetchProjects().then(() => renderChat()).then(() => renderSidebar()).catch(()=>{});
       } else if (eventName === 'error') {
         document.getElementById('brain-thinking')?.remove();

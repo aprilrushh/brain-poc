@@ -598,6 +598,7 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                 print("[stream OptionB] build failed:", _e)
 
             brain_text_acc = []
+            _reasoning_acc = []
             general_text_final = ""
             meta_final = {}
             stop_reason = None
@@ -668,17 +669,32 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                     except Exception as _he:
                         print(f"[stream {chat_id}] history build failed: {_he}", flush=True)
                         _hist_msgs = []
+                _gen_messages = [
+                    {"role": "system", "content": _gen_system_prompt},
+                    *_hist_msgs,
+                    {"role": "user", "content": _gen_user_msg},
+                ]
+                _use_resp = (
+                    not _strict_no_doc
+                    and mode != "strict"
+                    and hasattr(_adapter, "responses_stream")
+                    and getattr(_adapter, "_is_gpt", lambda: False)()
+                )
+                _reasoning_acc = []
                 try:
-                    _gen_stream = [] if _strict_no_doc else _adapter.chat_complete_stream(
-                        messages=[
-                            {"role": "system", "content": _gen_system_prompt},
-                            *_hist_msgs,
-                            {"role": "user", "content": _gen_user_msg},
-                        ],
-                        max_tokens=_gen_max_tokens,
-                    )
+                    if _strict_no_doc:
+                        _gen_stream = []
+                    elif _use_resp:
+                        import os as _os
+                        _eff = _os.environ.get("GENERAL_REASONING_EFFORT", "high")
+                        _gen_stream = _adapter.responses_stream(_gen_messages, max_tokens=_gen_max_tokens, reasoning_effort=_eff)
+                    else:
+                        _gen_stream = _adapter.chat_complete_stream(messages=_gen_messages, max_tokens=_gen_max_tokens)
                     for _kind, _val in _gen_stream:
-                        if _kind == "chunk":
+                        if _kind == "reasoning":
+                            _reasoning_acc.append(_val)
+                            yield _event("reasoning_chunk", {"text": _val})
+                        elif _kind == "chunk":
                             _gen_chunks.append(_val)
                             _gen_chunk_count += 1
                             yield _event("general_chunk", {"text": _val})
@@ -746,6 +762,10 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                                 print(f"[stream {chat_id}] L1 partial save msg_id={assistant_msg_id} len={len(_brain_partial)}", flush=True)
                             except Exception as _e:
                                 print(f"[stream {chat_id}] L1 partial save failed: {_e}", flush=True)
+                    elif kind == "reasoning":
+                        # GPT reasoning summary (Responses API) → 실시간 thinking 표시 + 누적(영구 저장용)
+                        _reasoning_acc.append(val)
+                        yield _event("reasoning_chunk", {"text": val})
                     elif kind == "general_chunk":
                         # v0.18 F2: General LLM chunk-by-chunk SSE forward.
                         # Cloudflare 5min timeout 회피 = first token < 1s 도착 → connection alive.
@@ -765,6 +785,7 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
             # Compose final visible answer (ledger v0.11: retrieved=0 → General only, no prefix)
             doc_ans = "".join(brain_text_acc).strip()
             gen_ans = (general_text_final or "").strip()
+            _reasoning_full = "".join(_reasoning_acc).strip()
             _has_sources = bool(retrieved_count_for_compose)
             if not _has_sources:
                 # No documents uploaded — Big Brain answers with general knowledge only
@@ -781,7 +802,9 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
                 if gen_ans:
                     final_text += "\n\n---\n\n**🌐 일반 지식 답변:**\n\n" + gen_ans
 
-            print(f"[stream {chat_id}] kind_counts={_kind_counts} final_text_len={len(final_text)}", flush=True)
+            if _reasoning_full:
+                final_text = "\U0001F9E0 **Reasoning (\uc0ac\uace0 \uacfc\uc815)**\n\n" + _reasoning_full + "\n\n---\n\n" + final_text
+            print(f"[stream {chat_id}] kind_counts={_kind_counts} final_text_len={len(final_text)} reasoning_len={len(_reasoning_full)}", flush=True)
             # v0.17 L1: assistant_msg_id 있으면 (brain_done partial save 후) UPDATE, 없으면 create (기존 path)
             if assistant_msg_id:
                 from src.db import get_conn
