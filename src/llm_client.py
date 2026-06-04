@@ -101,12 +101,12 @@ class OpenAIAdapter(LLMAdapter):
 
         if self._is_gpt():
             # GPT-5.x reasoning model: max_completion_tokens (not max_tokens),
-            # no custom temperature, reasoning_effort (quality-first default xhigh).
+            # no custom temperature, reasoning_effort (default medium, env overrides).
             stream = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 max_completion_tokens=max_tokens,
-                reasoning_effort=os.environ.get("GENERAL_REASONING_EFFORT", "xhigh"),
+                reasoning_effort=os.environ.get("GENERAL_REASONING_EFFORT", "medium"),
                 stream=True,
                 stream_options={"include_usage": True},
                 **kwargs,
