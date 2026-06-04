@@ -154,7 +154,8 @@ class OpenAIAdapter(LLMAdapter):
 
 
     def responses_stream(self, messages: list[dict], max_tokens: int = 16000,
-                         reasoning_effort: str = "high", reasoning_summary: str = "detailed"):
+                         reasoning_effort: str = "high", reasoning_summary: str = "detailed",
+                         verbosity: str = None):
         """GPT reasoning 모델 전용 (Responses API). reasoning summary + 본문을 한 stream 에서 받음.
         yields: ("reasoning", text) | ("chunk", text) | ("done", {text, model, ...})
         messages([{system},{user/assistant}...]) -> Responses API instructions + input 변환."""
@@ -170,14 +171,22 @@ class OpenAIAdapter(LLMAdapter):
                 input_items.append({"role": role, "content": content})
         full_text = []
         reasoning_text = []
-        stream = self.client.responses.create(
+        # effort=none 은 reasoning 출력이 없으므로 summary 필드 제거 (API 400 회피)
+        if reasoning_effort == "none":
+            _reasoning = {"effort": "none"}
+        else:
+            _reasoning = {"effort": reasoning_effort, "summary": reasoning_summary}
+        _create_kw = dict(
             model=self.model,
             instructions=instructions or None,
             input=input_items,
             max_output_tokens=max_tokens,
-            reasoning={"effort": reasoning_effort, "summary": reasoning_summary},
+            reasoning=_reasoning,
             stream=True,
         )
+        if verbosity:
+            _create_kw["text"] = {"verbosity": verbosity}
+        stream = self.client.responses.create(**_create_kw)
         for ev in stream:
             t = getattr(ev, "type", "")
             if t == "response.reasoning_summary_text.delta":

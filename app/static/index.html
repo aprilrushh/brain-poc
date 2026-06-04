@@ -191,6 +191,11 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
 .input-actions { display: flex; gap: 6px; }
 .icon-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .icon-btn:hover { background: rgba(31,28,24,0.05); color: var(--text); }
+.mode-seg { display: inline-flex; gap: 2px; background: rgba(31,28,24,0.05); border-radius: 9px; padding: 2px; }
+.mode-seg button { border: none; background: transparent; cursor: pointer; color: var(--text-muted); filter: grayscale(1) opacity(0.55); display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 7px; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+.mode-seg button:hover { color: var(--text); filter: grayscale(0.3) opacity(0.85); }
+.mode-seg button.active { background: var(--accent); color: #fff; filter: none; }
+
 .send-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--accent); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.15s ease; }
 .send-btn:hover { background: var(--accent-hover); }
 .send-btn:disabled { background: var(--border-strong); cursor: not-allowed; }
@@ -365,7 +370,7 @@ textarea.input { width: 100%; border: none; outline: none; resize: none; font-fa
           <div class="input-attached" id="chat-attached"></div>
           <textarea class="input" id="chat-input" rows="1" placeholder="Reply to Big Brain..."></textarea>
           <div class="input-row">
-            <div class="input-actions"><button class="icon-btn" id="chat-attach-btn" title="Attach file">📎</button><button class="icon-btn" id="mode-toggle-btn" title="Strict: 올린 문서 안에서만 답합니다. 누르면 Explore(자유 추론)로 전환." style="width:auto;padding:0 10px;gap:5px;display:inline-flex;align-items:center;font-size:13px;">🛡 <span id="mode-toggle-label">Strict</span></button></div>
+            <div class="input-actions"><button class="icon-btn" id="chat-attach-btn" title="Attach file">📎</button><div class="mode-seg" id="mode-seg"><button data-mode="strict" class="active" title="Strict: 올린 문서 안에서만 답합니다.">🛡 Strict</button><button data-mode="explore" title="Explore: 문서 밖 일반 지식 추론을 포함합니다.">🧭 Explore</button><button data-mode="fast" title="Fast: 상식 질문에 짧고 빠르게 답합니다 (음성 대화용).">⚡ Fast</button></div></div>
             <button class="send-btn" id="send-btn">→</button>
           </div>
           <input type="file" id="chat-file-input" class="hidden" multiple>
@@ -1073,12 +1078,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('send-btn').addEventListener('click', sendMessage);
   (function(){
-    var mt = document.getElementById('mode-toggle-btn');
-    if (mt) mt.addEventListener('click', function(){
-      state.mode = (state.mode === 'strict') ? 'explore' : 'strict';
-      var lbl = document.getElementById('mode-toggle-label');
-      if (state.mode === 'strict') { mt.firstChild.nodeValue = '\uD83D\uDEE1 '; if(lbl) lbl.textContent = 'Strict'; mt.title = 'Strict: 올린 문서 안에서만 답합니다. 누르면 Explore(자유 추론)로 전환.'; }
-      else { mt.firstChild.nodeValue = '\uD83E\uDDED '; if(lbl) lbl.textContent = 'Explore'; mt.title = 'Explore: 문서 밖 일반 지식 추론을 포함합니다. 누르면 Strict로 전환.'; }
+    var seg = document.getElementById('mode-seg');
+    if (seg) seg.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        state.mode = b.getAttribute('data-mode');
+        seg.querySelectorAll('button').forEach(function(x){ x.classList.toggle('active', x === b); });
+      });
     });
   })();
   var pgNew = document.getElementById('pg-new-project-btn');

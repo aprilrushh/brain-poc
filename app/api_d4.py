@@ -536,6 +536,44 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
             yield _event("user_msg", {"id": user_msg["id"], "content": user_msg["content"]})
             print(f"[stream {chat_id}] user_msg yielded", flush=True)
 
+            # ===== FAST mode (v0.23): 상식 즉답, Brain/chat파일/히스토리 전부 skip =====
+            # gpt-5.5 effort=none + verbosity=low + 짧은 대화체. 음성 대화용 데모.
+            if mode == "fast":
+                print(f"[stream {chat_id}] FAST mode: short common-knowledge answer", flush=True)
+                from src.llm_client import get_general_llm_client, get_llm_client
+                from src.orchestrator import FAST_PROMPT
+                _fadapter = get_general_llm_client() or get_llm_client()
+                yield _event("start", {"retrieved": [], "thinking_enabled": False, "thinking_reason": "fast_mode", "retrieval_pattern": None, "no_brain_mode": True, "fast_mode": True})
+                _fmsgs = [
+                    {"role": "system", "content": FAST_PROMPT},
+                    {"role": "user", "content": body.content},
+                ]
+                _facc = []
+                _fdone = None
+                try:
+                    if hasattr(_fadapter, "responses_stream") and getattr(_fadapter, "_is_gpt", lambda: False)():
+                        _fstream = _fadapter.responses_stream(_fmsgs, max_tokens=512, reasoning_effort="none", verbosity="low")
+                    else:
+                        _fstream = _fadapter.chat_complete_stream(messages=_fmsgs, max_tokens=512)
+                    for _fk, _fv in _fstream:
+                        if _fk == "chunk":
+                            _facc.append(_fv)
+                            yield _event("general_chunk", {"text": _fv})
+                        elif _fk == "done":
+                            _fdone = _fv
+                except Exception as _fe:
+                    print(f"[stream {chat_id}] FAST error: {_fe}", flush=True)
+                    _ferr = f"[Fast 답변 오류: {_fe}]"
+                    _facc.append(_ferr)
+                    yield _event("general_chunk", {"text": _ferr})
+                _ftext = "".join(_facc).strip()
+                _fmodel = (_fdone or {}).get("model") if _fdone else None
+                _fasst = create_message(chat_id=chat_id, role="assistant", content=_ftext,
+                                        answer_general=_ftext)
+                yield _event("done", {"id": _fasst["id"], "content": _ftext, "sources": [], "model": _fmodel, "fast_mode": True})
+                print(f"[stream {chat_id}] FAST done ({len(_ftext)} chars)", flush=True)
+                return
+
             try:
                 orch = _get_orchestrator(project_id)
                 has_brain = True
