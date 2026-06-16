@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flikk voices (EN)</title>
+<style>
+ body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#faf8f5;color:#24211d;padding:24px}
+ h1{font-size:20px;font-weight:600}p{color:#8b857c;font-size:14px}
+ .v{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;margin:10px 0;
+  background:#fff;border:1px solid #eee;border-radius:14px;font-size:18px;font-weight:500}
+ .v button{font-size:15px;padding:10px 20px;border:none;border-radius:20px;color:#fff;
+  background:conic-gradient(from 130deg,#ff9f7e,#e596ff,#86b8ff,#7fe6c4,#ffaecb,#ff9f7e)}
+ .desc{font-size:12px;color:#aaa;font-weight:400;display:block;margin-top:3px}
+</style></head><body>
+<h1>Flikk — pick an English voice 🎧</h1>
+<p>Tap each to listen. Note which sounds most natural for male / female.</p>
+<div id="list"></div><audio id="a"></audio>
+<script>
+const voices=[["marin","OpenAI recommended (best quality)"],["cedar","OpenAI recommended (best quality)"],
+ ["nova","bright, friendly"],["onyx","deep, grounded"],["shimmer","soft, warm"],
+ ["sage","calm mid-tone"],["alloy","neutral, clean"],["fable","warm storyteller"]];
+const a=document.getElementById("a"),list=document.getElementById("list");
+voices.forEach(([v,d])=>{const r=document.createElement("div");r.className="v";
+ r.innerHTML='<span>'+v+'<span class="desc">'+d+'</span></span><button>▶ Play</button>';
+ r.querySelector("button").onclick=()=>{a.src="/static/voices_en/"+v+".mp3?t="+Date.now();a.play();};
+ list.appendChild(r);});
+</script></body></html>

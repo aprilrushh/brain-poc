@@ -1,0 +1,26 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flikk 음성 고르기</title>
+<style>
+ body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#faf8f5;color:#24211d;padding:24px}
+ h1{font-size:20px;font-weight:600}
+ p{color:#8b857c;font-size:14px}
+ .v{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;margin:10px 0;
+  background:#fff;border:1px solid #eee;border-radius:14px;font-size:18px;font-weight:500}
+ .v button{font-size:15px;padding:10px 20px;border:none;border-radius:20px;color:#fff;
+  background:conic-gradient(from 130deg,#ff9f7e,#e596ff,#86b8ff,#7fe6c4,#ffaecb,#ff9f7e)}
+ .desc{font-size:12px;color:#aaa;font-weight:400;display:block;margin-top:3px}
+</style></head><body>
+<h1>Flikk 음성 고르기 🎧</h1>
+<p>각 버튼을 눌러 들어보고, 마음에 드는 voice 이름을 알려주세요.</p>
+<div id="list"></div>
+<audio id="a"></audio>
+<script>
+const voices=[["alloy","중립적이고 깔끔"],["nova","밝고 친근"],["shimmer","부드럽고 따뜻"],
+ ["echo","차분하고 안정"],["fable","따뜻한 이야기톤"],["onyx","낮고 묵직"],["sage","차분한 중저음"],["coral","생기있는"]];
+const a=document.getElementById("a"),list=document.getElementById("list");
+voices.forEach(([v,d])=>{const row=document.createElement("div");row.className="v";
+ row.innerHTML='<span>'+v+'<span class="desc">'+d+'</span></span><button>▶ 듣기</button>';
+ row.querySelector("button").onclick=()=>{a.src="/static/voices/"+v+".mp3?t="+Date.now();a.play();};
+ list.appendChild(row);});
+</script></body></html>

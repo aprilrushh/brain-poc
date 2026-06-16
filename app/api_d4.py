@@ -876,3 +876,164 @@ def _api_post_message_stream(chat_id: int, body, chat, mode: str = "explore"):
         },
     )
 
+
+
+# ===== PROJECT PHOENIX 1단계 음성앱: Fast 전용 무인증 라우트 (저장 0, 완전 휘발) =====
+from fastapi import Request as _VRequest
+from fastapi.responses import StreamingResponse as _VResp
+
+
+@router.post("/voice/fast")
+async def api_voice_fast(request: _VRequest):
+    """음성 미니앱 전용. require_login 없음(의도). chat_id/DB write 없음(완전 휘발).
+    FAST_PROMPT + responses_stream(effort=none, verbosity=low) 재사용.
+    SSE: event: start / general_chunk {"text": ...}(반복) / done."""
+    import os as _vos, json as _vjson
+    from src.llm_client import get_general_llm_client, get_llm_client
+    from src.orchestrator import FAST_PROMPT
+
+    _need = _vos.environ.get("VOICE_FAST_KEY")
+    if _need and request.headers.get("x-voice-key") != _need:
+        raise HTTPException(status_code=401, detail="bad voice key")
+
+    try:
+        _payload = await request.json()
+    except Exception:
+        _payload = {}
+    _q = (_payload.get("q") or _payload.get("content") or "").strip()
+    if not _q:
+        raise HTTPException(status_code=400, detail="empty question")
+    # history (선택): 클라가 보내는 최근 대화. 저장 안 함, 이 요청 처리 중에만 사용.
+    _hist = []
+    _raw_hist = _payload.get("history")
+    if isinstance(_raw_hist, list):
+        for _m in _raw_hist:
+            if not isinstance(_m, dict):
+                continue
+            _r = _m.get("role")
+            _c = (_m.get("content") or "").strip()
+            if _r in ("user", "assistant") and _c:
+                _hist.append({"role": _r, "content": _c})
+    # 서버측 2차 방어: 최근 6턴 + 합산 4000자 상한 (오래된 것부터 drop)
+    _hist = _hist[-6:]
+    _budget = 4000
+    _kept = []
+    for _m in reversed(_hist):
+        _budget -= len(_m["content"])
+        if _budget < 0:
+            break
+        _kept.append(_m)
+    _hist = list(reversed(_kept))
+
+    def _vevent(name, data):
+        return ("event: " + name + "\n" + "data: " + _vjson.dumps(data, ensure_ascii=False) + "\n\n").encode("utf-8")
+
+    def _gen():
+        adapter = get_general_llm_client() or get_llm_client()
+        msgs = [{"role": "system", "content": FAST_PROMPT}]
+        msgs.extend(_hist)
+        msgs.append({"role": "user", "content": _q})
+        yield _vevent("start", {"fast_mode": True})
+        acc = []
+        done = None
+        try:
+            if hasattr(adapter, "responses_stream") and getattr(adapter, "_is_gpt", lambda: False)():
+                stream = adapter.responses_stream(msgs, max_tokens=512, reasoning_effort="none", verbosity="low")
+            else:
+                stream = adapter.chat_complete_stream(messages=msgs, max_tokens=512)
+            for _k, _v in stream:
+                if _k == "chunk":
+                    acc.append(_v)
+                    yield _vevent("general_chunk", {"text": _v})
+                elif _k == "done":
+                    done = _v
+        except Exception as _e:
+            print("[voice/fast] error: " + str(_e), flush=True)
+            yield _vevent("general_chunk", {"text": "[Fast 답변 오류: " + str(_e) + "]"})
+        _text = "".join(acc).strip()
+        _model = (done or {}).get("model") if done else None
+        yield _vevent("done", {"content": _text, "model": _model, "fast_mode": True})
+
+    return _VResp(_gen(), media_type="text/event-stream")
+# ===== /음성앱 Fast 라우트 =====
+
+
+# ===== PROJECT PHOENIX 음성앱: STT 중계 (오디오 → 텍스트, 저장 0, 무인증) =====
+from fastapi import UploadFile as _VUploadFile, File as _VFile
+
+
+@router.post("/voice/stt")
+async def api_voice_stt(audio: _VUploadFile = _VFile(...)):
+    """녹음된 오디오 한 덩어리를 받아 OpenAI gpt-4o-transcribe로 텍스트화.
+    저장 0(메모리에서만 처리), 무인증. 반환 {"text": "..."}."""
+    import os as _sos, io as _sio
+    from openai import OpenAI as _SOpenAI
+
+    _key = (_sos.environ.get("OPENAI_API_KEY") or "").strip()
+    if not _key:
+        raise HTTPException(status_code=500, detail="no OPENAI_API_KEY")
+
+    _data = await audio.read()
+    if not _data:
+        raise HTTPException(status_code=400, detail="empty audio")
+
+    _fname = audio.filename or "speech.m4a"
+    # 확장자 없거나 신뢰 못 할 때 m4a로 보정 (안드로이드 expo-audio 기본)
+    if "." not in _fname:
+        _fname = _fname + ".m4a"
+    _buf = _sio.BytesIO(_data)
+    _buf.name = _fname  # SDK가 확장자로 포맷 판별
+
+    try:
+        _client = _SOpenAI(api_key=_key)
+        _tr = _client.audio.transcriptions.create(
+            model="gpt-4o-transcribe",
+            file=_buf,
+        )
+        _text = (getattr(_tr, "text", "") or "").strip()
+    except Exception as _se:
+        print("[voice/stt] error: " + str(_se), flush=True)
+        raise HTTPException(status_code=502, detail="stt failed: " + str(_se))
+
+    return {"text": _text}
+# ===== /STT 중계 =====
+
+
+# ===== PROJECT PHOENIX 음성앱: TTS (텍스트 → 음성 mp3, 저장 0, 무인증) =====
+from fastapi.responses import Response as _VTTSResponse
+
+
+@router.post("/voice/tts")
+async def api_voice_tts(request: _VRequest):
+    """텍스트를 OpenAI gpt-4o-mini-tts로 mp3 변환해 반환. 저장 0, 무인증."""
+    import os as _tos
+    from openai import OpenAI as _TOpenAI
+
+    _key = (_tos.environ.get("OPENAI_API_KEY") or "").strip()
+    if not _key:
+        raise HTTPException(status_code=500, detail="no OPENAI_API_KEY")
+    try:
+        _payload = await request.json()
+    except Exception:
+        _payload = {}
+    _text = (_payload.get("text") or "").strip()
+    if not _text:
+        raise HTTPException(status_code=400, detail="empty text")
+    _voice = (_payload.get("voice") or "alloy").strip()
+    _text = _text[:2000]
+
+    try:
+        _client = _TOpenAI(api_key=_key)
+        _resp = _client.audio.speech.create(
+            model="gpt-4o-mini-tts",
+            voice=_voice,
+            input=_text,
+            response_format="mp3",
+        )
+        _audio = _resp.read()
+    except Exception as _te:
+        print("[voice/tts] error: " + str(_te), flush=True)
+        raise HTTPException(status_code=502, detail="tts failed: " + str(_te))
+
+    return _VTTSResponse(content=_audio, media_type="audio/mpeg")
+# ===== /TTS =====

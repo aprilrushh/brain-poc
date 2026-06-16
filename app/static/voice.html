@@ -1,0 +1,188 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Flikk</title>
+<style>
+ *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+ html,body{margin:0;height:100%}
+ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;color:#1d1b19;
+  background:radial-gradient(120% 80% at 50% 18%,#ffffff 0%,#f9f7f4 58%,#eeebe5 100%);
+  display:flex;flex-direction:column;align-items:center;-webkit-user-select:none;user-select:none;overflow:hidden}
+ .topbar{width:100%;padding:18px 22px;display:flex;align-items:center;justify-content:center;position:relative}
+ .brand{display:inline-flex;align-items:flex-end;font-size:22px;font-weight:600;letter-spacing:.3px;color:#2a2724;line-height:1}
+ .brand .ii{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;margin:0 1px}
+ .brand .ii .dot{width:6px;height:6px;border-radius:50%;margin-bottom:2px;
+  background:conic-gradient(from 130deg,#ff9f7e,#e596ff,#86b8ff,#7fe6c4,#ffaecb,#ff9f7e)}
+ .brand .ii .stem{width:2.4px;height:12px;border-radius:1.2px;background:#2a2724}
+ .topbtn{position:absolute;top:17px;font-size:13px;background:none;border:none;transition:opacity .3s}
+ #vtoggle{right:74px;color:#a89fb0}
+ #clear{right:20px;color:#bdb6ac;opacity:0;pointer-events:none}
+ #clear.show{opacity:1;pointer-events:auto}
+ .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding-bottom:6vh}
+ .orb-wrap{position:relative;width:256px;height:256px;display:flex;align-items:center;justify-content:center}
+ .ring{position:absolute;width:208px;height:208px;border-radius:50%;border:1.5px solid rgba(214,140,170,.5);opacity:0}
+ .orb{position:relative;width:208px;height:208px;border-radius:50%;overflow:hidden;border:none;padding:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,.92);
+  box-shadow:0 24px 42px -10px rgba(120,90,115,.45),0 10px 18px -6px rgba(120,90,115,.32),
+   inset 0 3px 8px rgba(255,255,255,.6),inset 0 -14px 28px rgba(150,110,140,.22),0 0 0 1px rgba(130,110,130,.14);
+  transition:transform .26s cubic-bezier(.34,1.2,.5,1),box-shadow .26s,border-color .3s}
+ .orb-grad{position:absolute;inset:-42%;border-radius:50%;filter:blur(12px);
+  background:conic-gradient(from 130deg,#ffc4a8,#eeb6ff,#aecfff,#b6efdc,#ffc6dd,#ffc4a8);
+  animation:spin 16s linear infinite;transition:filter .5s,opacity .5s}
+ .orb-veil{position:absolute;inset:0;border-radius:50%;transition:opacity .55s ease;
+  background:radial-gradient(70% 60% at 38% 30%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.30) 55%,rgba(255,255,255,.05) 100%)}
+ .orb-glass{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(54% 40% at 34% 22%,rgba(255,255,255,.8),rgba(255,255,255,0) 56%)}
+ .mic{position:absolute;z-index:3;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.82);box-shadow:0 6px 14px -4px rgba(120,90,115,.4),inset 0 1px 2px rgba(255,255,255,.9);
+  transition:opacity .4s,transform .26s,background .4s}
+ .hint{margin-top:40px;font-size:17px;font-weight:400;color:#6f6a62;letter-spacing:.2px;text-align:center}
+ .sub{margin-top:9px;font-size:14px;color:#b3ada3;letter-spacing:.2px;transition:opacity .3s;text-align:center}
+ .answer{width:100%;max-width:600px;padding:0 32px;margin-top:30px;min-height:36px}
+ .answer p{font-size:18px;line-height:28px;color:#24211d;text-align:left;font-weight:400;margin:0;
+  opacity:0;transform:translateY(6px);transition:opacity .45s,transform .45s}
+ .answer p.show{opacity:1;transform:none}
+ .turns{position:fixed;bottom:18px;font-size:12px;color:#c6c0b6;letter-spacing:.3px}
+ @keyframes spin{to{transform:rotate(360deg)}}
+ @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.012)}}
+ @keyframes speak{0%,100%{transform:translateY(-2px) scale(1.012)}50%{transform:translateY(-7px) scale(1.05)}}
+ @keyframes ripple{0%{transform:scale(.86);opacity:.55}100%{transform:scale(1.6);opacity:0}}
+ body[data-state="idle"] .orb{animation:float 5.5s ease-in-out infinite}
+ body[data-state="idle"] .orb-grad{filter:blur(12px) saturate(.85)}
+ body[data-state="idle"] .orb-veil{opacity:.85}
+ body[data-state="listening"] .orb{transform:translateY(5px) scale(.95);border-color:rgba(236,150,182,.95);
+  box-shadow:0 9px 16px -8px rgba(120,90,115,.34),inset 0 8px 20px rgba(120,80,110,.36),
+   inset 0 -2px 6px rgba(255,255,255,.5),0 0 0 4px rgba(236,150,182,.28),0 0 30px rgba(236,150,182,.4);animation:none}
+ body[data-state="listening"] .orb-grad{filter:blur(12px) saturate(1.25);animation-duration:7s}
+ body[data-state="listening"] .orb-veil{opacity:.35}
+ body[data-state="listening"] .mic{transform:translate(-50%,-50%) scale(.92);background:rgba(255,255,255,.6)}
+ body[data-state="listening"] .ring{animation:ripple 2.2s ease-out infinite}
+ body[data-state="listening"] .ring.r2{animation-delay:1.1s}
+ body[data-state="thinking"] .orb{animation:float 2.6s ease-in-out infinite}
+ body[data-state="thinking"] .orb-veil{opacity:.15}
+ body[data-state="thinking"] .orb-grad{filter:blur(12px) saturate(1.2);animation-duration:3.2s}
+ body[data-state="thinking"] .mic{opacity:.25}
+ body[data-state="speaking"] .orb{animation:speak .8s ease-in-out infinite;
+  box-shadow:0 26px 46px -10px rgba(120,90,120,.48),inset 0 2px 8px rgba(255,255,255,.5),0 0 44px rgba(214,150,200,.45)}
+ body[data-state="speaking"] .orb-veil{opacity:0}
+ body[data-state="speaking"] .orb-grad{filter:blur(11px) saturate(1.3);animation-duration:4.5s}
+ body[data-state="speaking"] .mic{opacity:0}
+</style></head><body data-state="idle">
+<div class="topbar"><div class="brand">Fl<span class="ii"><span class="dot"></span><span class="stem"></span></span>kk</div>
+ <button id="vtoggle" class="topbtn"></button><button id="clear" class="topbtn"></button></div>
+<div class="stage">
+ <div class="orb-wrap">
+  <div class="ring r1"></div><div class="ring r2"></div>
+  <button id="orb" class="orb" aria-label="누른 채로 말하기">
+   <div class="orb-grad"></div><div class="orb-veil"></div><div class="orb-glass"></div>
+   <span class="mic"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4a4550" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="21.5"/></svg></span>
+  </button>
+ </div>
+ <div class="hint" id="hint">누른 채로 말하기</div>
+ <div class="sub" id="sub"></div>
+ <div class="answer"><p id="ans"></p></div>
+</div>
+<div class="turns" id="turns"></div>
+<script>
+const STT="/api/voice/stt", FAST="/api/voice/fast", TTS="/api/voice/tts";
+const VOICES={female:"marin",male:"cedar"};
+const I18N={
+ en:{hold:"Hold and speak",listen:"Speak, then release",think:"Thinking\u2026",speak:"Speaking\u2026",
+  sub:"Ask anything. Flikk answers, fast.",female:"Female",male:"Male",clear:"Clear",
+  voiceMsg:"Hi, this is my new voice.",
+  errStt:"Didn\u2019t catch that. Try again.",errConn:"Connection issue. Try again.",
+  errTimeout:"Taking too long. Try again.",errMic:"Please allow microphone access",
+  noHear:"Didn\u2019t hear you. Tap and speak again.",turns:function(n){return "Remembering "+n+(n>1?" turns":" turn");}},
+ ko:{hold:"\uB204\uB978 \uCC44\uB85C \uB9D0\uD558\uAE30",listen:"\uB9D0\uD558\uACE0 \uC190\uC744 \uB5BC\uC138\uC694",think:"\uC0DD\uAC01 \uC911\u2026",speak:"\uB2F5\uD558\uB294 \uC911\u2026",
+  sub:"\uC9C8\uBB38\uD558\uBA74, Flikk\uAC00 \uBE60\uB974\uAC8C \uB2F5\uD574\uB4DC\uB824\uC694.",female:"\uC5EC\uC131",male:"\uB0A8\uC131",clear:"\uC9C0\uC6B0\uAE30",
+  voiceMsg:"\uC548\uB155\uD558\uC138\uC694. \uC81C \uBAA9\uC18C\uB9AC\uB85C \uBCC0\uACBD\uD558\uC600\uC2B5\uB2C8\uB2E4.",
+  errStt:"\uC798 \uBABB \uB4E4\uC5C8\uC5B4\uC694. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.",errConn:"\uC5F0\uACB0\uC5D0 \uBB38\uC81C\uAC00 \uC788\uC5B4\uC694. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.",
+  errTimeout:"\uC751\uB2F5\uC774 \uB108\uBB34 \uC624\uB798 \uAC78\uB824\uC694. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.",errMic:"\uB9C8\uC774\uD06C \uAD8C\uD55C\uC744 \uD5C8\uC6A9\uD574 \uC8FC\uC138\uC694",
+  noHear:"\uBABB \uC54C\uC544\uB4E4\uC5C8\uC5B4\uC694. \uB2E4\uC2DC \uB20C\uB7EC \uB9D0\uD574 \uC8FC\uC138\uC694",turns:function(n){return "\uAE30\uC5B5 \uC911\uC778 \uB300\uD654 "+n;}}
+};
+const LANG=(function(){try{var l=(navigator.language||"en").toLowerCase();return l.indexOf("ko")===0?"ko":"en";}catch(e){return "en";}})();
+const L=I18N[LANG];
+document.documentElement.lang=LANG;
+const MAX_TURNS=6, MAX_CHARS=4000, FAST_TIMEOUT=45000;
+let voiceGender=(function(){try{return localStorage.getItem("flikk_voice")||"female";}catch(e){return "female";}})();
+const orb=document.getElementById("orb"),hintEl=document.getElementById("hint"),subEl=document.getElementById("sub"),
+ ansEl=document.getElementById("ans"),turnsEl=document.getElementById("turns"),clearBtn=document.getElementById("clear"),
+ vtoggleEl=document.getElementById("vtoggle");
+let mediaStream=null,recorder=null,chunks=[],holding=false,history=[],audioEl=null,previewAudio=null;
+const HINTS={idle:L.hold,listening:L.listen,thinking:L.think,speaking:L.speak};
+function dlog(m){try{console.log("[flikk] "+m);}catch(e){}}
+function setState(s){document.body.dataset.state=s;hintEl.textContent=HINTS[s];
+ subEl.textContent=L.sub;subEl.style.opacity=(s==="idle"&&!ansEl.textContent)?"1":"0";}
+function showAns(t){ansEl.textContent=t;ansEl.classList.add("show");subEl.style.opacity="0";}
+function showError(msg){ansEl.textContent=msg;ansEl.classList.add("show");setState("idle");}
+function renderTurns(){const n=(history.length/2)|0;turnsEl.textContent=n?L.turns(n):"";clearBtn.classList.toggle("show",n>0);}
+function trimHistory(){if(history.length>MAX_TURNS)history=history.slice(-MAX_TURNS);
+ let t=history.reduce((s,m)=>s+m.content.length,0);while(t>MAX_CHARS&&history.length){t-=history[0].content.length;history.shift();}}
+function ensureAudio(){if(!audioEl){audioEl=new Audio();audioEl.preload="auto";}return audioEl;}
+function warmAudio(){try{const a=ensureAudio();a.muted=true;a.play().then(()=>{a.pause();a.currentTime=0;a.muted=false;}).catch(()=>{a.muted=false;});}catch(e){}}
+async function ensureStream(){if(mediaStream)return mediaStream;
+ try{mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});return mediaStream;}
+ catch(e){hintEl.textContent=L.errMic;return null;}}
+function pickMime(){for(const m of["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"])
+ if(window.MediaRecorder&&MediaRecorder.isTypeSupported(m))return m;return"";}
+async function onPress(){if(holding)return;warmAudio();const s=await ensureStream();if(!s)return;
+ holding=true;ansEl.classList.remove("show");ansEl.textContent="";if(audioEl){try{audioEl.pause();}catch(e){}}
+ setState("listening");chunks=[];const mime=pickMime();
+ try{recorder=mime?new MediaRecorder(s,{mimeType:mime}):new MediaRecorder(s);}catch(e){recorder=new MediaRecorder(s);}
+ recorder.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data);};
+ recorder.onstop=onRecStop;recorder.start();}
+function onRelease(){if(!holding)return;holding=false;
+ try{if(recorder&&recorder.state!=="inactive")recorder.stop();}catch(e){setState("idle");}}
+async function onRecStop(){const type=(recorder&&recorder.mimeType)||"audio/webm";
+ const blob=new Blob(chunks,{type});if(!blob.size){setState("idle");return;}
+ setState("thinking");let q="";
+ try{const ext=type.includes("mp4")?"mp4":(type.includes("ogg")?"ogg":"webm");
+  const fd=new FormData();fd.append("audio",blob,"speech."+ext);
+  const r=await fetch(STT,{method:"POST",body:fd});if(!r.ok){showError(L.errStt);return;}
+  const j=await r.json();q=(j.text||"").trim();}
+ catch(e){dlog("stt err "+e);showError(L.errConn);return;}
+ if(!q){hintEl.textContent=L.noHear;setState("idle");return;}
+ await ask(q);}
+async function ask(q){setState("thinking");let acc="";const sent=history.slice();
+ const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),FAST_TIMEOUT);
+ try{const res=await fetch(FAST,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q,history:sent}),signal:ctrl.signal});
+  const reader=res.body.getReader(),dec=new TextDecoder();let buf="";
+  while(true){const{done,value}=await reader.read();if(done)break;
+   buf+=dec.decode(value,{stream:true});const parts=buf.split("\n\n");buf=parts.pop();
+   for(const b of parts){const ev=parse(b);
+    if(ev&&ev.event==="general_chunk"&&ev.data&&ev.data.text!=null){acc+=ev.data.text;showAns(acc);}
+    else if(ev&&ev.event==="done"&&ev.data&&ev.data.content){acc=ev.data.content;showAns(acc);}}}}
+ catch(e){clearTimeout(timer);dlog("fast err "+e);
+  if(!acc){showError(e.name==="AbortError"?L.errTimeout:L.errConn);return;}}
+ clearTimeout(timer);
+ const fin=acc.trim();
+ if(!fin){setState("idle");return;}
+ history.push({role:"user",content:q});history.push({role:"assistant",content:fin});trimHistory();renderTurns();
+ speak(fin);}
+async function speak(t){
+ if(!t){setState("idle");return;}
+ setState("speaking");
+ try{const res=await fetch(TTS,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t,voice:VOICES[voiceGender]})});
+  if(!res.ok){dlog("tts http "+res.status);setState("idle");return;}
+  const blob=await res.blob();const url=URL.createObjectURL(blob);const a=ensureAudio();
+  a.onerror=null;a.onended=()=>{setState("idle");URL.revokeObjectURL(url);};
+  a.src=url;a.play().then(()=>{a.onerror=()=>{dlog("audio err");setState("idle");};}).catch(e=>{dlog("play blocked "+e);setState("idle");});
+ }catch(e){dlog("tts fetch err "+e);setState("idle");}}
+function parse(block){let ev=null,d=null;for(const ln of block.split("\n")){
+ if(ln.startsWith("event:"))ev=ln.slice(6).trim();else if(ln.startsWith("data:")){try{d=JSON.parse(ln.slice(5).trim())}catch(e){d=null}}}
+ return ev?{event:ev,data:d}:null;}
+function renderVoice(){vtoggleEl.textContent=(voiceGender==="female")?L.female:L.male;}
+async function previewVoice(){
+ try{if(previewAudio)previewAudio.pause();}catch(e){}
+ try{const res=await fetch(TTS,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:L.voiceMsg,voice:VOICES[voiceGender]})});
+  if(!res.ok)return;const blob=await res.blob();previewAudio=new Audio(URL.createObjectURL(blob));previewAudio.play().catch(()=>{});}catch(e){}}
+vtoggleEl.addEventListener("click",()=>{voiceGender=(voiceGender==="female")?"male":"female";
+ try{localStorage.setItem("flikk_voice",voiceGender);}catch(e){}renderVoice();previewVoice();});
+clearBtn.addEventListener("click",()=>{history=[];renderTurns();ansEl.classList.remove("show");ansEl.textContent="";if(audioEl){try{audioEl.pause();}catch(e){}}setState("idle");});
+orb.addEventListener("touchstart",e=>{e.preventDefault();onPress()},{passive:false});
+orb.addEventListener("touchend",e=>{e.preventDefault();onRelease()},{passive:false});
+orb.addEventListener("touchcancel",e=>{e.preventDefault();onRelease()},{passive:false});
+orb.addEventListener("mousedown",onPress);window.addEventListener("mouseup",onRelease);
+renderVoice();setState("idle");
+</script></body></html>
